@@ -10,7 +10,7 @@
 add_action( 'admin_menu', 'vspostman_admin_menu' );
 
 function vspostman_admin_menu() {
-    add_menu_page('Почтовик', 'Почтовик', 'gogo', 'vspostman_admin', '', '', 7);
+    add_menu_page('Почтовик', 'Почтовик', '', 'vspostman_admin', '', '', 7);
     
     add_submenu_page('vspostman_admin', 'Письма', 'Письма', 'manage_options', 'vspostman-mails', 'vspostman_menu_mails');
     add_submenu_page('vspostman_admin', 'Клиенты', 'Клиенты', 'manage_options', 'vspostman-clients', 'vspostman_menu_clients');
@@ -19,7 +19,17 @@ function vspostman_admin_menu() {
 
 
 function vspostman_menu_mails() {
-    echo 'MAILS';
+    
+    $items = array(
+        array(
+            'id' => 1,
+            'title' => 'Первая воронка',
+            'date' => '12/12/1223',
+            'readers' => 12
+        )
+    );
+    
+    include  'templates/mails.php';
 }
 function vspostman_menu_clients() {
     echo 'CLIENTS';
