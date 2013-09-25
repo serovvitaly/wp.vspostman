@@ -1,5 +1,5 @@
 <div class="wrap">
-<div id="icon-edit-pages" class="icon32"><br></div><h2>Письма <a href="/wp-admin/plugin-install.php" class="add-new-h2">Добавить воронку</a>
+<div class="icon32"><img src="/wp-content/plugins/vspostman/img/blue-document-text-image.png" alt=""></div><h2>Письма <a href="/wp-admin/admin.php?page=vspostman-mails&act=add" class="add-new-h2">Добавить воронку</a>
 </h2>
 
 
