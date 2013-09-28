@@ -28,6 +28,7 @@ function vspostman_menu_mails() {
     $uid = isset($_REQUEST['uid']) ? $_REQUEST['uid'] : 0;
     
     $_table_funnels = $wpdb->prefix . 'vspostman_funnels';    
+    $_table_mails   = $wpdb->prefix . 'vspostman_mails';    
     
     switch ($act) {
         case 'add':
@@ -44,6 +45,17 @@ function vspostman_menu_mails() {
             $item = $wpdb->get_row("SELECT * FROM {$_table_funnels} WHERE id={$uid}");
             
             $item->title = $item->name;
+            
+            $mails = $wpdb->get_results("SELECT `id`,`level`,`title`,`left` FROM {$_table_mails} WHERE funnel_id={$uid}");
+            $ms = array();
+            if (count($mails) > 0) {
+                foreach ($mails AS $mail) {
+                    $ms[$mail->level][] = $mail;
+                }
+            }
+            $mails = $ms;
+            
+            $item->mails = json_encode($mails);
             
             include  'templates/mails/funnel-form.php';
             break;
