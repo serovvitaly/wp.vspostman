@@ -1,6 +1,4 @@
-<script type="text/javascript" src="/wp-content/plugins/vspostman/libs/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js"></script>
-<script type="text/javascript" src="/wp-content/plugins/vspostman/libs/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
-<link rel="stylesheet" type="text/css" href="/wp-content/plugins/vspostman/libs/jquery-ui-1.10.3.custom/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
+<script type="text/javascript" src="/wp-content/plugins/vspostman/libs/raphael-min.js"></script>
 
 <style>
 .draggable{
@@ -64,36 +62,88 @@
     
   </form>
   
+  <div style="margin: 10px 0 5px;">
+    <input type="submit" value="+" class="button" onclick="zoom('+')">
+    <input type="submit" value="-" class="button" onclick="zoom('-')">
+    <input type="submit" value="Сбросить" class="button" onclick="zoom()">
+  </div>
+  
   <div id="myholder" style="border: 1px solid #DFDFDF; height: 600px; overflow: scroll;">
   </div>
   
 </div>
 
 <script>
-$(function() {
-    
-    var levels_content = '';
-    for (var lev=0; lev<=100; lev++) {
-        levels_content += '<div id="slevel-'+lev+'" class="level-sending empty"><div class="meter">'+lev+'</div></div>';
+var $ = jQuery;
+
+var zoomIndex = 0;
+
+var mailsMix = $.parseJSON('<?= $item->mails ?>');
+
+function zoom(z){
+    switch (z) {
+        case '+':
+            zoomIndex--;
+            break;
+        case '-':
+            zoomIndex++;
+            break;
+        default:
+            zoomIndex = 0;
     }
-    $('#myholder').html(levels_content);
+    if (zoomIndex < 0) zoomIndex = 0;
+    if (zoomIndex > 5) zoomIndex = 5;
     
-    $('#slevel-0').removeClass('empty');
-    $('#slevel-0').append('<div class="draggable"><p>Первое письмо</p></div>');
+    var multiplier = 300 * zoomIndex;
+    var width  = paper.width  + multiplier;
+    var height = paper.height + multiplier;
     
-    $('#slevel-1').removeClass('empty');
-    $('#slevel-1').append('<div class="draggable"><p>Второе письмо</p></div>');
-    $('#slevel-1').append('<div class="draggable"><p>Третье письмо</p></div>');
+    paper.setViewBox(0, 0, width, height);
+}
+
+var paper = Raphael("myholder", $('myholder').width(), $('myholder').height());
+
+for (var ofs = 0; ofs < 10; ofs++) {
     
-    $('#slevel-4').removeClass('empty');
-    $('#slevel-4').append('<div class="draggable"><p>Второе письмо</p></div>');
-    $('#slevel-4').append('<div class="draggable"><p>Третье письмо</p></div>');
-    $('#slevel-4').append('<div class="draggable"><p>Третье письмо</p></div>');
-    
-    $( ".draggable" ).draggable({
-        axis: "x",
-        grid: [ 50, 50 ],
-        containment: 'myholder'
-    });
-});
+    if (mailsMix[ofs] && mailsMix[ofs].length > 0) {
+        var offset = 100 * ofs;
+        paper.text(30, offset + 15, ofs).attr({
+            'fill': '#C0C0C0',
+            'font-size': 30
+        });
+        
+        paper.path('M0 '+(offset+95)+'H'+paper.width).attr({
+            'fill': '#D0D0D0',
+            'stroke' : '#D0D0D0',
+            'stroke-width': 1
+        });
+        
+        for (var it = 0; it < mailsMix[ofs].length; it++) {
+            var item = mailsMix[ofs][it];
+            paper.rect(item.left*1, offset+20, 150, 50, 2).attr({
+                text: paper.text(item.left*1+75, offset+45, item.title).attr({'font-size': 14, 'width': 150}).dblclick(function(){
+                    console.log(this);
+                }),
+                title: item.title,
+                fill: '#fc0',
+                'font-size': 20
+            }).drag(
+                function (dx, dy) {
+                    this.attr({
+                        x: this.ox*1 + dx*1,
+                        y: this.oy
+                    });
+                    paper.safari();
+                },
+                function () {
+                    this.ox = this.attr("x");
+                    this.oy = this.attr("y");
+                }
+            ).dblclick(function(){
+                console.log(this);
+            });
+        }        
+    }
+}
+
 </script>
