@@ -6,8 +6,7 @@
 <ul class="subsubsub">
     <li class="all"><a href="plugins.php?plugin_status=all" class="current">Все <span class="count">(4)</span></a> |</li>
     <li class="active"><a href="plugins.php?plugin_status=active">Активный <span class="count">(1)</span></a> |</li>
-    <li class="inactive"><a href="plugins.php?plugin_status=inactive">Неактивные <span class="count">(3)</span></a> |</li>
-    <li class="recently_activated"><a href="plugins.php?plugin_status=recently_activated">Недавно активные <span class="count">(3)</span></a></li>
+    <li class="inactive"><a href="plugins.php?plugin_status=inactive">Неактивные <span class="count">(3)</span></a></li>
 </ul>
 
 
@@ -20,15 +19,13 @@
 
         <div class="alignleft actions">
             <select name="action">
-<option value="-1" selected="selected">Действия</option>
     <option value="activate-selected">Активировать</option>
     <option value="deactivate-selected">Деактивировать</option>
-    <option value="update-selected">Обновить</option>
     <option value="delete-selected">Удалить</option>
 </select>
 <input type="submit" name="" id="doaction" class="button action" value="Применить">
         </div>
-<div class="tablenav-pages one-page"><span class="displaying-num">4 элемента</span>
+<div class="tablenav-pages one-page">
 <span class="pagination-links"><a class="first-page disabled" title="Перейти на первую страницу" href="http://wordpress/wp-admin/plugins.php">«</a>
 <a class="prev-page disabled" title="Перейти на предыдущую страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">‹</a>
 <span class="paging-input"><input class="current-page" title="Текущая страница" type="text" name="paged" value="1" size="1"> из <span class="total-pages">1</span></span>
@@ -43,7 +40,6 @@
         <th scope="col" class="manage-column column-name" style="">Воронка</th>
         <th scope="col" class="manage-column column-name" style="">Дата</th>
         <th scope="col" class="manage-column column-name" style="">К-во подписчиков</th>
-        <th scope="col" class="manage-column column-description" style="">Описание</th>
       </tr>
     </thead>
 
@@ -53,7 +49,6 @@
         <th scope="col" class="manage-column column-name" style="">Воронка</th>
         <th scope="col" class="manage-column column-name" style="">Дата</th>
         <th scope="col" class="manage-column column-name" style="">К-во подписчиков</th>
-        <th scope="col" class="manage-column column-description" style="">Описание</th>
       </tr>
     </tfoot>
 
@@ -64,27 +59,24 @@
             foreach ($items AS $item) {
     ?>
         <tr class="inactive">
-          <th scope="row" class="check-column"><input type="checkbox" name="checked[]" value="<?= $item['id'] ?>"></th>
+          <th scope="row" class="check-column"><input type="checkbox" name="checked[]" value="<?= $item->id ?>"></th>
           <td class="title">
-            <strong><?= $item['title'] ?></strong>
+            <strong><?= $item->name ?></strong>
             <div class="row-actions-visible">
-              <span class="duplicate"><a href="#">Дублировать</a> | </span>
-              <span class="edit"><a href="#">Редактировать</a> | </span>
-              <span><a href="#">Статистика</a> | </span>
-              <span class="delete"><a href="#" class="delete" onclick="if (!confirm('Точно удалить?')) return false;">Удалить</a></span></div>
+              <span class="duplicate"><a href="/wp-admin/admin.php?page=vspostman-mails&act=duplicate&uid=<?= $item->id ?>">Дублировать</a> | </span>
+              <span class="edit"><a href="/wp-admin/admin.php?page=vspostman-mails&act=edit&uid=<?= $item->id ?>">Редактировать</a> | </span>
+              <span class="stat"><a href="/wp-admin/admin.php?page=vspostman-stats&act=stat&uid=<?= $item->id ?>">Статистика</a> | </span>
+              <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-mails&act=delete&uid=<?= $item->id ?>" class="delete" onclick="if (!confirm('Точно удалить?')) return false;">Удалить</a></span></div>
           </td>
           
           <td class="">
-            <?= $item['date'] ?>
+            <?= $item->created ?>
           </td>
           
           <td class="">
-            <a href="#" title="Показать список подписчиков"><?= $item['readers'] ?></a>
+            <a href="#" title="Показать список подписчиков"><?= $item->readers ?></a>
           </td>
-          
-          <td class="column-description desc">
-            <div class="plugin-description"><p>описание</p></div>
-          </td>
+
         </tr>
     <?
             }
@@ -96,15 +88,13 @@
 
         <div class="alignleft actions">
             <select name="action2">
-<option value="-1" selected="selected">Действия</option>
     <option value="activate-selected">Активировать</option>
     <option value="deactivate-selected">Деактивировать</option>
-    <option value="update-selected">Обновить</option>
     <option value="delete-selected">Удалить</option>
 </select>
 <input type="submit" name="" id="doaction2" class="button action" value="Применить">
         </div>
-<div class="tablenav-pages one-page"><span class="displaying-num">4 элемента</span>
+<div class="tablenav-pages one-page">
 <span class="pagination-links"><a class="first-page disabled" title="Перейти на первую страницу" href="http://wordpress/wp-admin/plugins.php">«</a>
 <a class="prev-page disabled" title="Перейти на предыдущую страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">‹</a>
 <span class="paging-input">1 из <span class="total-pages">1</span></span>
