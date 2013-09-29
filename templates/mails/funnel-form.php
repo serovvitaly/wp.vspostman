@@ -101,7 +101,88 @@ function zoom(z){
     paper.setViewBox(0, 0, width, height);
 }
 
+function rectangle(options){
+    this.rap = paper;
+    this.opt = jQuery.extend({
+        text: '',
+        X: 0,
+        Y: 0,
+        bg: '#fc0',
+        width: 150,
+        height: 50,
+        radius: 2,
+        textColor: 'blue',
+        fontSize: 12,
+    }, options);
+    
+    this.rect = this.rap.rect(opt.X*1, opt.Y*1, opt.width*1, opt.height*1, opt.radius*1);
+    this.rect.attr({
+        title: opt.text,
+        fill: opt.bg
+    });
+    
+    this.text = paper.text(opt.X*1, opt.Y*1+10, opt.text);
+    this.text.attr({
+        'fill': opt.textColor,
+        'font-size': opt.fontSize
+    });
+    
+    this.element = this.rap.set();
+    this.element.push(this.rect);
+    this.element.push(this.text);
+    
+    this.element.drag(
+        function (dx, dy) {
+            // Move main element
+            var att = this.type == "ellipse" ? {cx: this.ox + dx, cy: this.oy + dy} : {x: this.ox + dx, y: this.oy + dy};
+            this.attr(att);
+            // Move paired element
+            att = this.pair.type == "ellipse" ? {cx: this.pair.ox + dx, cy: this.pair.oy + dy} : {x: this.pair.ox + dx, y: this.pair.oy + dy};
+            this.pair.attr(att);
+            // Move connections
+            //for (i = connections.length; i--;) {
+            //    paper.connection(connections[i]);
+            //}
+            paper.safari();
+        },
+        function () {
+            console.log(this);
+            this.ox = this.attr("x");
+            this.oy = this.attr("y");
+        }
+    );
+    
+    return this.element; 
+}
+
+function dragger() {
+        // Original coords for main element
+    this.ox = this.type == "ellipse" ? this.attr("cx") : this.attr("x");
+    this.oy = this.type == "ellipse" ? this.attr("cy") : this.attr("y");
+        
+        // Original coords for pair element
+    this.pair.ox = this.pair.type == "ellipse" ? this.pair.attr("cx") : this.pair.attr("x");
+    this.pair.oy = this.pair.type == "ellipse" ? this.pair.attr("cy") : this.pair.attr("y");           
+}
+function move (dx, dy) {
+        // Move main element
+    var att = this.type == "ellipse" ? {cx: this.ox + dx, cy: this.oy + dy} : {x: this.ox + dx, y: this.oy + dy};
+    this.attr(att);
+    
+        // Move paired element
+    att = this.pair.type == "ellipse" ? {cx: this.pair.ox + dx, cy: this.pair.oy + dy} : {x: this.pair.ox + dx, y: this.pair.oy + dy};
+    this.pair.attr(att);            
+    
+        // Move connections
+    for (i = connections.length; i--;) {
+        paper.connection(connections[i]);
+    }
+    paper.safari();
+}
+
 var paper = Raphael("myholder", $('myholder').width(), $('myholder').height());
+
+var connections = [], shapes = [], texts = [], tempS, tempT;
 
 for (var ofs = 0; ofs < 10; ofs++) {
     
@@ -117,31 +198,28 @@ for (var ofs = 0; ofs < 10; ofs++) {
             'stroke' : '#D0D0D0',
             'stroke-width': 1
         });
-        
         for (var it = 0; it < mailsMix[ofs].length; it++) {
             var item = mailsMix[ofs][it];
-            paper.rect(item.left*1, offset+20, 150, 50, 2).attr({
-                text: paper.text(item.left*1+75, offset+45, item.title).attr({'font-size': 14, 'width': 150}).dblclick(function(){
-                    console.log(this);
-                }),
+            
+            tempS = paper.rect(item.left*1, offset+20, 150, 50, 2).attr({
                 title: item.title,
                 fill: '#fc0',
-                'font-size': 20
-            }).drag(
-                function (dx, dy) {
-                    this.attr({
-                        x: this.ox*1 + dx*1,
-                        y: this.oy
-                    });
-                    paper.safari();
-                },
-                function () {
-                    this.ox = this.attr("x");
-                    this.oy = this.attr("y");
-                }
-            ).dblclick(function(){
-                console.log(this);
+                cursor: "move"
+            }).drag(move, dragger).dblclick(function(){
+                //console.log(this);
             });
+            
+            tempT = paper.text(item.left*1, offset+40, item.title).attr({
+                fill: 'blue',
+                cursor: "move",
+                'font-size': 12
+            }).drag(move, dragger);
+            
+            tempS.pair = tempT;
+            tempT.pair = tempS;
+            
+            shapes.push(tempS);
+            texts.push(tempT);
         }        
     }
 }
