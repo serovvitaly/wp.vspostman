@@ -159,9 +159,12 @@
             <option value="3">Точно в</option>
           </select>
           
-          <label style="display: none" data-vsp-target="time_mailing_type" data-vsp-values="2"><input type="text" name="time_mailing_delay_days" style="width: 40px; text-align: center;"> дней</label> 
+          <label style="display: none" data-vsp-target="time_mailing_type" data-vsp-values="2">
+            <input type="text" name="time_mailing_delay_days" style="width: 40px; text-align: center;"> дней
+          </label> 
           
-          <label style="display: none" data-vsp-target="time_mailing_type" data-vsp-values="2"><select name="time_mailing_delay_hours">
+          <label style="display: none" data-vsp-target="time_mailing_type" data-vsp-values="2">
+            <select name="time_mailing_delay_hours">
           <?
               for ($hh = 0; $hh < 24; $hh++) {
                   $selected = '';
@@ -243,10 +246,10 @@ $('.vsp-target').on('change', function(){
 
 $('select[name="funnel_id"]').on('change', function(){
     var data = getData({
-        controller: 'mails_list',
+        act: 'mails-list',
         funnel_id: this.value
     }, function(data){
-        if(data.result && data.result.length > 0){
+        if(data.success === true && data.result && data.result.length > 0){
             $('select[name="bound_id"]').removeAttr("disabled");
             var options = '<option value="0" style="color:gray">--- выберите письмо ---</option>';
             $.each(data.result, function(index, item){
@@ -259,14 +262,14 @@ $('select[name="funnel_id"]').on('change', function(){
 
 $('select[name="bound_id"]').on('change', function(){
     var data = getData({
-        controller: 'mail_links_list',
+        act: 'mail-links-list',
         mail_id: this.value
     }, function(data){
         if(data.result && data.result.length > 0){
             $('select[name="mail_link_id"]').removeAttr("disabled");
             var options = '<option value="0" style="color:gray">--- выберите ссылку ---</option>';
             $.each(data.result, function(index, item){
-                options += '<option value="'+item.id+'">'+item.title+'</option>';
+                options += '<option value="'+item.id+'">'+item.link+'</option>';
             });
             $('select[name="mail_link_id"]').html(options);
         }

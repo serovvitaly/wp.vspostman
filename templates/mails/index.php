@@ -70,7 +70,7 @@
           <td class="title">
             <strong><?= $item->name ?></strong>
             <div class="row-actions-visible">
-              <span class="duplicate"><a href="/wp-admin/admin.php?page=vspostman-mails&act=duplicate&uid=<?= $item->id ?>">Дублировать</a> | </span>
+              <span class="duplicate"><a href="/wp-admin/admin.php?page=vspostman-mails&act=duplicate&uid=<?= $item->id ?>" onclick="if (!confirm('Точно дублировать?')) return false;">Дублировать</a> | </span>
               <span class="edit"><a href="/wp-admin/admin.php?page=vspostman-mails&act=edit&uid=<?= $item->id ?>">Редактировать</a> | </span>
               <span class="stat"><a href="/wp-admin/admin.php?page=vspostman-stats&act=stat&uid=<?= $item->id ?>">Статистика</a> | </span>
               <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-mails&act=delete&uid=<?= $item->id ?>" class="delete" onclick="if (!confirm('Точно удалить?')) return false;">Удалить</a></span></div>

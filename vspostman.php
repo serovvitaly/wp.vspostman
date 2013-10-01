@@ -28,8 +28,9 @@ function vspostman_menu_mails() {
     $uid = isset($_REQUEST['uid']) ? $_REQUEST['uid'] : 0;
     $mid = isset($_REQUEST['mid']) ? $_REQUEST['mid'] : 0;
     
-    $_table_funnels = $wpdb->prefix . 'vspostman_funnels';    
-    $_table_mails   = $wpdb->prefix . 'vspostman_mails';    
+    $_table_funnels    = $wpdb->prefix . 'vspostman_funnels';    
+    $_table_mails      = $wpdb->prefix . 'vspostman_mails';    
+    $_table_mail_links = $wpdb->prefix . 'vspostman_mail_links';    
     
     switch ($act) {
         case 'add':
@@ -78,10 +79,44 @@ function vspostman_menu_mails() {
             include  'templates/redirect.php';
             break;
         case 'duplicate':
-            if ($uid < 1) {
-                //
+            if ($uid > 0) {
+                $funnel = $wpdb->get_row("SELECT * FROM {$_table_funnels} WHERE `id`={$uid}");
+                unset($funnel->id);
+                $funnel->name = 'Копия: ' . $funnel->name;
+                $wpdb->insert($_table_funnels, (array) $funnel);
+                $funnel_id = $wpdb->insert_id;
+                
+                $mails  = $wpdb->get_results("SELECT * FROM {$_table_mails} WHERE `funnel_id`={$uid}");
+                if (count($mails) > 0) {
+                    $mids = array();
+                    $mmix = array();
+                    foreach ($mails AS $mail) {
+                        $_mid = $mail->id;
+                        unset($mail->id);
+                        $mids[] = $_mid;
+                        $mail->funnel_id = $funnel_id;
+                        $wpdb->insert($_table_mails, (array) $mail);
+                        $mmix[$_mid] = $wpdb->insert_id;
+                    }
+                    
+                    $mids = implode(',', $mids);
+                    $links  = $wpdb->get_results("SELECT * FROM {$_table_mail_links} WHERE `mail_id` IN ({$mids})");
+                    if (count($links) > 0) {
+                        foreach ($links AS $link) {
+                            unset($link->id);
+                            $link->mail_id = $mmix[$link->mail_id];
+                            $wpdb->insert($_table_mail_links, (array) $link);
+                        }
+                    }
+                }
+                
+                $redirect_to = '/wp-admin/admin.php?page=vspostman-mails&act=edit&uid=' . $funnel_id;
+                include  'templates/redirect.php';
+                
+            } else {
+                echo '<h4>Не удалось дублировать воронку.</h4>';
             }
-            //
+            
             break;
         case 'stat':
             if ($uid < 1) {
@@ -90,12 +125,25 @@ function vspostman_menu_mails() {
             //
             break;
         case 'delete':
-            if ($uid < 1) {
-                //
+            if ($uid > 0) {
+                $mails = $wpdb->get_results("SELECT `id` FROM {$_table_mails} WHERE `funnel_id`={$uid}");
+                if (count($mails) > 0) {
+                    $mids = array();
+                    foreach ($mails AS $mail) {
+                        $mids[] = $mail->id;
+                    }
+                    $mids = implode(',', $mids);
+                    $wpdb->query("DELETE FROM {$_table_mail_links} WHERE `mail_id` IN ({$mids})");
+                    $wpdb->delete($_table_mails, array('funnel_id' => $uid));
+                }
+                
+                $wpdb->delete($_table_funnels, array('id' => $uid));
+                $redirect_to = '/wp-admin/admin.php?page=vspostman-mails';
+                include  'templates/redirect.php';
+            } else {
+                echo '<h4>Не удалось удалить воронку.</h4>';
             }
-            $wpdb->delete($_table_funnels, array('id' => $uid));
-            $redirect_to = '/wp-admin/admin.php?page=vspostman-mails';
-            include  'templates/redirect.php';
+            
             break;
             
         case 'mail-add':

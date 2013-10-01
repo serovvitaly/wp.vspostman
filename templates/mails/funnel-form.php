@@ -54,12 +54,12 @@
   </div>
   
   <div style="margin: 10px 0 5px;">
-  
     <div style="float: right;">
       <a class="button button-large button-primary" href="/wp-admin/admin.php?page=vspostman-mails&act=mail-add&uid=<?= $item->id ?>">Добавить письмо</a>
     </div>
-  
   </div>
+  
+  <h3>Список отдельных писем</h3>
   
 </div>
 
