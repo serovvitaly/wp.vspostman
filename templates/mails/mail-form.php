@@ -39,6 +39,12 @@
 .mail-type-select label:hover{
     border-color: #BDBDBD;
 }
+.mail-type-select label.active, .mail-type-select label.active:hover{
+    border-color: #9C9C9C;
+    border-width: 2px;
+    height: 98px;
+    width: 98px;
+}
 .mail-type-select label:hover{
     border-color: #BDBDBD;
 }
@@ -268,6 +274,12 @@ $('select[name="bound_id"]').on('change', function(){
 });
 
 $(document).ready(function(){
+    
+    $('.mail-type-select label').on('click', function(){
+        $('.mail-type-select label').removeClass('active');
+        $(this).addClass('active');
+    });
+    
     $('#ajaxForm').ajaxForm({
         dataType: 'json',
         beforeSubmit: function(formData, jqForm, options){
@@ -290,7 +302,9 @@ $(document).ready(function(){
             
         },
         success: function(data, statusText, xhr, $form){
-            console.log(data);
+            if (data.success === true && data.result == 'mail-save-ok') {
+                window.location = data.redirect_to;
+            }
         }
     });
 });

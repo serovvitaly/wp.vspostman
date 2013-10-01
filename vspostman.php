@@ -46,7 +46,8 @@ function vspostman_menu_mails() {
             }
             $item = $wpdb->get_row("SELECT * FROM {$_table_funnels} WHERE id={$uid}");
             
-            $item->title = $item->name;
+            //$item->title = $item->name;
+            $item->title = 'Редактирование';
             
             $mails = $wpdb->get_results("SELECT `id`,`level`,`title`,`left`,`bound_id` FROM {$_table_mails} WHERE funnel_id={$uid}");
             $ms = array();
