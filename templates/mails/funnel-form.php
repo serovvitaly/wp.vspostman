@@ -1,29 +1,6 @@
 <script type="text/javascript" src="/wp-content/plugins/vspostman/libs/raphael-min.js"></script>
 
 <style>
-.draggable{
-    width: 150px;
-    height: 50px;
-    background: #808080;
-    text-align: center;
-    color: #FFF;
-    float: left;
-    cursor: initial;
-}
-.level-sending{
-    height: 50px;
-    padding: 10px;
-    border-bottom: 1px dotted #ACACAC;
-}
-.level-sending .meter{
-    font-size: 33px;
-    color: #E1E1E1;
-    position: relative;
-    float: left;
-}
-.level-sending.empty{
-    display: none;
-}
 .buttons-grp{
     float: right;
     margin-top: 10px;
@@ -46,8 +23,8 @@
     <input type="hidden" name="act" value="save">
   
     <div class="buttons-grp">
-      <input type="submit" value="Сохранить" class="button button-primary">
-      <a href="<?= $_SERVER['HTTP_REFERER'] ?>" class="button">Отмена</a>
+      <input type="submit" value="Сохранить" class="button button-primary button-large">
+      <a href="/wp-admin/admin.php?page=vspostman-mails" class="button button-large">Отмена</a>
       <? if ($item->id > 0) { ?><a href="/wp-admin/admin.php?page=vspostman-mails&act=delete&uid=<?= $item->id ?>" class="delete" onclick="if (!confirm('Точно удалить?')) return false;">Удалить</a><? } ?>
       
     </div>
@@ -63,12 +40,25 @@
   </form>
   
   <div style="margin: 10px 0 5px;">
-    <input type="submit" value="+" class="button" onclick="zoom('+')">
-    <input type="submit" value="-" class="button" onclick="zoom('-')">
-    <input type="submit" value="Сбросить" class="button" onclick="zoom()">
+  
+    <div style="float: right;">
+      <a class="button button-large button-primary" href="/wp-admin/admin.php?page=vspostman-mails&act=mail-add&uid=<?= $item->id ?>">Добавить письмо</a>
+    </div>
+  
+    <input type="submit" value="+" class="button button-large" onclick="zoom('+')">
+    <input type="submit" value="-" class="button button-large" onclick="zoom('-')">
+    <input type="submit" value="Сбросить" class="button button-large" onclick="zoom()">
   </div>
   
   <div id="myholder" style="border: 1px solid #DFDFDF; height: 600px; overflow: scroll;">
+  </div>
+  
+  <div style="margin: 10px 0 5px;">
+  
+    <div style="float: right;">
+      <a class="button button-large button-primary" href="/wp-admin/admin.php?page=vspostman-mails&act=mail-add&uid=<?= $item->id ?>">Добавить письмо</a>
+    </div>
+  
   </div>
   
 </div>
@@ -155,25 +145,88 @@ function rectangle(options){
     return this.element; 
 }
 
-function dragger() {
-        // Original coords for main element
-    this.ox = this.type == "ellipse" ? this.attr("cx") : this.attr("x");
-    this.oy = this.type == "ellipse" ? this.attr("cy") : this.attr("y");
+Raphael.fn.connection = function (obj1, obj2, line, bg) {
+    if (!obj1) return false;
+    if (obj1.line && obj1.from && obj1.to) {
+        line = obj1;
+        obj1 = line.from;
+        obj2 = line.to;
+    }
+    var bb1 = obj1.getBBox(),
+        bb2 = obj2.getBBox(),
+        p = [
+            {x: bb1.x + bb1.width / 2,   y: bb1.y - 1},
+            {x: bb1.x + bb1.width / 2,   y: bb1.y + bb1.height + 1},
+            {x: bb1.x - 1,               y: bb1.y + bb1.height / 2},
+            {x: bb1.x + bb1.width + 1,   y: bb1.y + bb1.height / 2},
+            {x: bb2.x + bb2.width / 2,   y: bb2.y - 1},
+            {x: bb2.x + bb2.width / 2,   y: bb2.y + bb2.height + 1},
+            {x: bb2.x - 1,               y: bb2.y + bb2.height / 2},
+            {x: bb2.x + bb2.width + 1,   y: bb2.y + bb2.height / 2}
+        ],
+        d = {}, dis = [];
         
-        // Original coords for pair element
-    this.pair.ox = this.pair.type == "ellipse" ? this.pair.attr("cx") : this.pair.attr("x");
-    this.pair.oy = this.pair.type == "ellipse" ? this.pair.attr("cy") : this.pair.attr("y");           
+    for (var i = 0; i < 4; i++) {
+        for (var j = 4; j < 8; j++) {
+            var dx = Math.abs(p[i].x - p[j].x),
+                dy = Math.abs(p[i].y - p[j].y);
+            if ((i == j - 4) || (((i != 3 && j != 6) || p[i].x < p[j].x) && ((i != 2 && j != 7) || p[i].x > p[j].x) && ((i != 0 && j != 5) || p[i].y > p[j].y) && ((i != 1 && j != 4) || p[i].y < p[j].y))) {
+                dis.push(dx + dy);
+                d[dis[dis.length - 1]] = [i, j];
+            }
+        }
+    }
+    
+    if (dis.length == 0) {
+        var res = [0, 4];
+    } else {
+        res = d[Math.min.apply(Math, dis)];
+    }
+    var x1 = p[res[0]].x,
+        y1 = p[res[0]].y,
+        x4 = p[res[1]].x,
+        y4 = p[res[1]].y;
+    dx = Math.max(Math.abs(x1 - x4) / 2, 10);
+    dy = Math.max(Math.abs(y1 - y4) / 2, 10);
+    var x2 = [x1, x1, x1 - dx, x1 + dx][res[0]].toFixed(3),
+        y2 = [y1 - dy, y1 + dy, y1, y1][res[0]].toFixed(3),
+        x3 = [0, 0, 0, 0, x4, x4, x4 - dx, x4 + dx][res[1]].toFixed(3),
+        y3 = [0, 0, 0, 0, y1 + dy, y1 - dy, y4, y4][res[1]].toFixed(3);
+    var path = ["M", x1.toFixed(3), y1.toFixed(3), "C", x2, y2, x3, y3, x4.toFixed(3), y4.toFixed(3)].join(",");
+    //var path = ["M", x1.toFixed(3), y1.toFixed(3), "Q", x2, y2, x4.toFixed(3), y4.toFixed(3)].join(",");
+    if (line && line.line) {
+        line.bg && line.bg.attr({path: path});
+        line.line.attr({path: path});
+    } else {
+        var color = typeof line == "string" ? line : "#000";
+        return {
+            bg: bg && bg.split && this.path(path).attr({stroke: bg.split("|")[0], fill: "none", "stroke-width": bg.split("|")[1] || 3}),
+            line: this.path(path).attr({stroke: color, fill: "none"}),
+            from: obj1,
+            to: obj2
+        };
+    }
+};
+
+function dragger() {
+    // Original coords for main element
+    this.ox = this.attr("x");
+    this.oy = this.attr("y");
+        
+    // Original coords for pair element
+    this.pair.ox = this.pair.attr("x");
+    this.pair.oy = this.pair.attr("y");           
 }
 function move (dx, dy) {
-        // Move main element
-    var att = this.type == "ellipse" ? {cx: this.ox + dx, cy: this.oy + dy} : {x: this.ox + dx, y: this.oy + dy};
+    // Move main element
+    var att = {x: this.ox + dx, y: this.oy};
     this.attr(att);
     
-        // Move paired element
-    att = this.pair.type == "ellipse" ? {cx: this.pair.ox + dx, cy: this.pair.oy + dy} : {x: this.pair.ox + dx, y: this.pair.oy + dy};
+    // Move paired element
+    att = {x: this.pair.ox + dx, y: this.pair.oy};
     this.pair.attr(att);            
     
-        // Move connections
+    // Move connections
     for (i = connections.length; i--;) {
         paper.connection(connections[i]);
     }
@@ -184,10 +237,12 @@ var paper = Raphael("myholder", $('myholder').width(), $('myholder').height());
 
 var connections = [], shapes = [], texts = [], tempS, tempT;
 
-for (var ofs = 0; ofs < 10; ofs++) {
+var iterate = 0;
+for (var ofs = 0; ofs < 100; ofs++) {
     
     if (mailsMix[ofs] && mailsMix[ofs].length > 0) {
-        var offset = 100 * ofs;
+        var offset = 100 * iterate;
+        iterate++;
         paper.text(30, offset + 15, ofs).attr({
             'fill': '#C0C0C0',
             'font-size': 30
@@ -203,14 +258,16 @@ for (var ofs = 0; ofs < 10; ofs++) {
             
             tempS = paper.rect(item.left*1, offset+20, 150, 50, 2).attr({
                 title: item.title,
-                fill: '#fc0',
+                fill: '#F0F0F0',
                 cursor: "move"
             }).drag(move, dragger).dblclick(function(){
                 //console.log(this);
             });
             
-            tempT = paper.text(item.left*1, offset+40, item.title).attr({
-                fill: 'blue',
+            tempS.bound_id = item.bound_id;
+            
+            tempT = paper.text(item.left*1+75, offset+40, item.title).attr({
+                fill: '#585858',
                 cursor: "move",
                 'font-size': 12
             }).drag(move, dragger);
@@ -218,10 +275,22 @@ for (var ofs = 0; ofs < 10; ofs++) {
             tempS.pair = tempT;
             tempT.pair = tempS;
             
-            shapes.push(tempS);
-            texts.push(tempT);
-        }        
+            shapes[item.id] = tempS;
+            texts[item.id] = tempT;
+            
+        }               
     }
 }
 
+$.each(shapes, function(index, item){
+    if (item && item.bound_id > 0) {
+        connections[item.id] = paper.connection(shapes[index], shapes[item.bound_id], "#000");
+    }
+});
+
 </script>
+
+
+<div>
+
+</div>

@@ -1,6 +1,8 @@
 <div class="wrap">
-<div class="icon32"><img src="/wp-content/plugins/vspostman/img/blue-document-text-image.png" alt=""></div><h2>Письма <a href="/wp-admin/admin.php?page=vspostman-mails&act=add" class="add-new-h2">Добавить воронку</a>
-</h2>
+  <div class="icon32"><img src="/wp-content/plugins/vspostman/img/blue-document-text-image.png" alt=""></div>
+  <h2>Письма 
+    <a href="/wp-admin/admin.php?page=vspostman-mails&act=add" class="add-new-h2">Добавить воронку</a>
+  </h2>
 
 
 <ul class="subsubsub">
@@ -17,20 +19,25 @@
 
 <input type="hidden" id="_wpnonce" name="_wpnonce" value="0879c54e6a"><input type="hidden" name="_wp_http_referer" value="/wp-admin/plugins.php">    <div class="tablenav top">
 
-        <div class="alignleft actions">
+        <div class="actions">
+            <div style="float: right;">
+              <a href="/wp-admin/admin.php?page=vspostman-mails&act=add" class="button button-primary">Добавить воронку</a>
+            </div>
+        
             <select name="action">
-    <option value="activate-selected">Активировать</option>
-    <option value="deactivate-selected">Деактивировать</option>
-    <option value="delete-selected">Удалить</option>
-</select>
-<input type="submit" name="" id="doaction" class="button action" value="Применить">
+                <option value="activate-selected">Активировать</option>
+                <option value="deactivate-selected">Деактивировать</option>
+                <option value="delete-selected">Удалить</option>
+            </select>
+            <input type="submit" name="" id="doaction" class="button action" value="Применить">
         </div>
-<div class="tablenav-pages one-page">
-<span class="pagination-links"><a class="first-page disabled" title="Перейти на первую страницу" href="http://wordpress/wp-admin/plugins.php">«</a>
-<a class="prev-page disabled" title="Перейти на предыдущую страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">‹</a>
-<span class="paging-input"><input class="current-page" title="Текущая страница" type="text" name="paged" value="1" size="1"> из <span class="total-pages">1</span></span>
-<a class="next-page disabled" title="Перейти на следующую страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">›</a>
-<a class="last-page disabled" title="Перейти на последнюю страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">»</a></span></div>
+    <div class="tablenav-pages one-page">
+        <span class="pagination-links"><a class="first-page disabled" title="Перейти на первую страницу" href="http://wordpress/wp-admin/plugins.php">«</a>
+        <a class="prev-page disabled" title="Перейти на предыдущую страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">‹</a>
+        <span class="paging-input"><input class="current-page" title="Текущая страница" type="text" name="paged" value="1" size="1"> из <span class="total-pages">1</span></span>
+        <a class="next-page disabled" title="Перейти на следующую страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">›</a>
+        <a class="last-page disabled" title="Перейти на последнюю страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">»</a></span>
+    </div>
         <br class="clear">
     </div>
 <table class="wp-list-table widefat" cellspacing="0">
@@ -86,13 +93,16 @@
 </table>
     <div class="tablenav bottom">
 
-        <div class="alignleft actions">
+        <div class="actions">
+            <div style="float: right;">
+              <a href="/wp-admin/admin.php?page=vspostman-mails&act=add" class="button button-primary">Добавить воронку</a>
+            </div> 
             <select name="action2">
-    <option value="activate-selected">Активировать</option>
-    <option value="deactivate-selected">Деактивировать</option>
-    <option value="delete-selected">Удалить</option>
-</select>
-<input type="submit" name="" id="doaction2" class="button action" value="Применить">
+                <option value="activate-selected">Активировать</option>
+                <option value="deactivate-selected">Деактивировать</option>
+                <option value="delete-selected">Удалить</option>
+            </select>
+            <input type="submit" name="" id="doaction2" class="button action" value="Применить">
         </div>
 <div class="tablenav-pages one-page">
 <span class="pagination-links"><a class="first-page disabled" title="Перейти на первую страницу" href="http://wordpress/wp-admin/plugins.php">«</a>
