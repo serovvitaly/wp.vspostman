@@ -104,6 +104,19 @@ switch ($action) {
             }
         }
         break;
+    case 'set-param':
+        $source = _post('source');
+        $param  = _post('param');
+        $value  = _post('value');
+        switch ($source) {
+            case 'maile':
+                $mid = _post('mid');
+                if ($mid > 0) {
+                    $wpdb->update($_table_mails, array($param => $value), array('id' => $mid));
+                }
+                break;
+        }
+        break;
     case '':
         //
         break;
