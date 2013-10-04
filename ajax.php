@@ -109,7 +109,7 @@ switch ($action) {
         $param  = _post('param');
         $value  = _post('value');
         switch ($source) {
-            case 'maile':
+            case 'mail':
                 $mid = _post('mid');
                 if ($mid > 0) {
                     $wpdb->update($_table_mails, array($param => $value), array('id' => $mid));

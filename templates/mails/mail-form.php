@@ -67,11 +67,11 @@
       
     </div>
     
-    <h2><?= $item->title ?></h2>
+    <h2><?= $item->page_title ?></h2>
     
     <div id="titlediv">
       <div id="titlewrap">
-        <input type="text" name="title" size="30" value="<?= $item->name ?>" id="title" autocomplete="off" placeholder="Введите заголовок письма">
+        <input type="text" name="title" size="30" value="<?= $item->title ?>" id="title" autocomplete="off" placeholder="Введите заголовок письма">
       </div>
     </div>
     
@@ -222,6 +222,10 @@
 <script>
 var $ = jQuery;
 
+function initMailType(tid){
+    $('.mail-type-select input[value="'+tid+'"]').click();
+}
+
 function getData(data, success){
     $.ajax({
         url: '/wp-content/plugins/vspostman/ajax.php',
@@ -277,6 +281,8 @@ $('select[name="bound_id"]').on('change', function(){
 });
 
 $(document).ready(function(){
+    
+    <?if ($item->mail_type > 0) {?>initMailType(<?= $item->mail_type ?>);<?}?>
     
     $('.mail-type-select label').on('click', function(){
         $('.mail-type-select label').removeClass('active');

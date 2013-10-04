@@ -61,6 +61,71 @@
   
   <h3>Список отдельных писем</h3>
   
+  
+<table class="wp-list-table widefat" cellspacing="0">
+    <thead>
+      <tr>
+        <th scope="col" class="manage-column column-cb check-column" style=""><input id="cb-select-all-1" type="checkbox"></th>
+        <th scope="col" class="manage-column column-name" style="">Наименование</th>
+        <th scope="col" class="manage-column column-name" style="">Дата</th>
+        <th scope="col" class="manage-column column-name" style="">Тип</th>
+      </tr>
+    </thead>
+
+    <tfoot>
+      <tr>
+        <th scope="col" class="manage-column column-cb check-column" style=""><input id="cb-select-all-1" type="checkbox"></th>
+        <th scope="col" class="manage-column column-name" style="">Наименование</th>
+        <th scope="col" class="manage-column column-name" style="">Дата</th>
+        <th scope="col" class="manage-column column-name" style="">Тип</th>
+      </tr>
+    </tfoot>
+
+    <tbody id="the-list">
+    
+    <?
+        if (count($item->mails) > 0) {
+            
+            $_mail_types = array(
+                1 => 'По подписке',
+                2 => 'По ручному добавлению',
+                3 => 'По клику',
+                4 => 'По открытию',
+                5 => 'По отправке',
+                6 => 'По заказу',
+                7 => 'По изменению данных',
+                8 => 'По специальной дате',
+            );
+            
+            foreach ($item->mails AS $mail) {
+    ?>
+        <tr class="inactive">
+          <th scope="row" class="check-column"><input type="checkbox" name="checked[]" value="<?= $mail->id ?>"></th>
+          <td class="title">
+            <strong><?= $mail->title ?></strong>
+            <div class="row-actions-visible">
+              <span class="duplicate"><a href="/wp-admin/admin.php?page=vspostman-mails&act=mail-duplicate&mid=<?= $mail->id ?>" onclick="if (!confirm('Точно дублировать?')) return false;">Дублировать</a> | </span>
+              <span class="edit"><a href="/wp-admin/admin.php?page=vspostman-mails&act=mail-edit&mid=<?= $mail->id ?>">Редактировать</a> | </span>
+              <span class="stat"><a href="/wp-admin/admin.php?page=vspostman-stats&act=mail-stat&mid=<?= $mail->id ?>">Статистика</a> | </span>
+              <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-mails&act=mail-delete&mid=<?= $mail->id ?>" class="delete" onclick="if (!confirm('Точно удалить?')) return false;">Удалить</a></span></div>
+          </td>
+          
+          <td class="">
+            <?= $mail->created ?>
+          </td>
+          
+          <td class="">
+            <?= $_mail_types[$mail->mail_type] ?>
+          </td>
+
+        </tr>
+    <?
+            }
+        }    
+    ?>    
+    </tbody>
+</table>
+  
 </div>
 
 <script>
@@ -68,7 +133,7 @@ var $ = jQuery;
 
 var zoomIndex = 0;
 
-var mailsMix = $.parseJSON('<?= $item->mails ?>');
+var mailsMix = $.parseJSON('<?= $item->mails_json ?>');
 
 function zoom(z){
     switch (z) {
@@ -91,59 +156,6 @@ function zoom(z){
     paper.setViewBox(0, 0, width, height);
 }
 
-function rectangle(options){
-    this.rap = paper;
-    this.opt = jQuery.extend({
-        text: '',
-        X: 0,
-        Y: 0,
-        bg: '#fc0',
-        width: 150,
-        height: 50,
-        radius: 2,
-        textColor: 'blue',
-        fontSize: 12,
-    }, options);
-    
-    this.rect = this.rap.rect(opt.X*1, opt.Y*1, opt.width*1, opt.height*1, opt.radius*1);
-    this.rect.attr({
-        title: opt.text,
-        fill: opt.bg
-    });
-    
-    this.text = paper.text(opt.X*1, opt.Y*1+10, opt.text);
-    this.text.attr({
-        'fill': opt.textColor,
-        'font-size': opt.fontSize
-    });
-    
-    this.element = this.rap.set();
-    this.element.push(this.rect);
-    this.element.push(this.text);
-    
-    this.element.drag(
-        function (dx, dy) {
-            // Move main element
-            var att = this.type == "ellipse" ? {cx: this.ox + dx, cy: this.oy + dy} : {x: this.ox + dx, y: this.oy + dy};
-            this.attr(att);
-            // Move paired element
-            att = this.pair.type == "ellipse" ? {cx: this.pair.ox + dx, cy: this.pair.oy + dy} : {x: this.pair.ox + dx, y: this.pair.oy + dy};
-            this.pair.attr(att);
-            // Move connections
-            //for (i = connections.length; i--;) {
-            //    paper.connection(connections[i]);
-            //}
-            paper.safari();
-        },
-        function () {
-            console.log(this);
-            this.ox = this.attr("x");
-            this.oy = this.attr("y");
-        }
-    );
-    
-    return this.element; 
-}
 
 Raphael.fn.connection = function (obj1, obj2, line, bg) {
     if (!obj1) return false;
@@ -196,7 +208,7 @@ function dragstop(){
         url: '/wp-content/plugins/vspostman/ajax.php',
         data: {
             act: 'set-param',
-            source: 'maile',
+            source: 'mail',
             param: 'left',
             mid: this.mid,
             value: this.getBBox().x
@@ -258,6 +270,26 @@ for (var ofs = 0; ofs < 100; ofs++) {
                 cursor: "move"
             }).drag(move, dragger, dragstop).dblclick(function(){
                 //console.log(this);
+            });
+            
+            tempS.mouseover(function(){ return;
+                if (!this.popover) {
+                    this.popover = paper.rect(this.getPointAtLength().x*1-5, this.getPointAtLength().y-5, 160, 60, 2).attr({
+                        fill: 'red',
+                        opacity: 0.6,
+                        cursor: "pointer",
+                        'stroke-width': 0
+                    });
+                    
+                } else this.popover.show();
+                
+            }).mouseout(function(e){ return;
+                var bb = this.popover.getBBox();
+                console.log(e.offsetX, '<', bb.x, 'OR', e.offsetX, '>', bb.x2, 'AND', e.offsetY, '<', bb.y, 'OR', e.offsetY, '>', bb.y2);
+                if (this.popover && (e.offsetX < bb.x || e.offsetX > bb.x2) && (e.offsetY < bb.y || e.offsetY > bb.y2)) {
+                    console.log('HIDE');
+                    this.popover.hide();
+                } else console.log('NoN');
             });
             
             tempS.mid = item.id;

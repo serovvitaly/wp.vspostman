@@ -10,6 +10,14 @@
 add_action('admin_menu', 'vspostman_admin_menu');
 
 
+function _get($field, $default = NULL){
+    return isset($_GET[$field]) ? $_GET[$field] : $default; 
+}
+
+function _post($field, $default = NULL){
+    return isset($_POST[$field]) ? $_POST[$field] : $default; 
+}
+
 
 function vspostman_admin_menu() {
     add_menu_page('Почтовик', 'Почтовик', '', 'vspostman_admin', '', '/wp-content/plugins/vspostman/img/mail-air.png');
@@ -50,7 +58,8 @@ function vspostman_menu_mails() {
             //$item->title = $item->name;
             $item->title = 'Редактирование';
             
-            $mails = $wpdb->get_results("SELECT `id`,`level`,`title`,`left`,`bound_id` FROM {$_table_mails} WHERE funnel_id={$uid}");
+            $mails = $wpdb->get_results("SELECT `id`,`level`,`title`,`left`,`bound_id`,`mail_type`,`created` FROM {$_table_mails} WHERE funnel_id={$uid} ORDER BY `created`");
+            $item->mails = $mails;
             $ms = array();
             if (count($mails) > 0) {
                 foreach ($mails AS $mail) {
@@ -58,8 +67,8 @@ function vspostman_menu_mails() {
                 }
             }
             $mails = $ms;
-            
-            $item->mails = json_encode($mails);
+             
+            $item->mails_json = json_encode($mails); 
             
             include  'templates/mails/funnel-form.php';
             break;
@@ -149,7 +158,7 @@ function vspostman_menu_mails() {
         case 'mail-add':
             $item = new stdClass();
             $item->id = 0;
-            $item->title = 'Новое письмо';
+            $item->page_title = 'Новое письмо';
             $item->funnel_id = $uid;
             $item->content = file_get_contents(dirname(__FILE__) . '/templates/mails/empty-mail.tpl');
             
@@ -158,48 +167,56 @@ function vspostman_menu_mails() {
             include  'templates/mails/mail-form.php';
             break;
             
-        case 'mail-save':
+        case 'mail-edit':
+            $mid = _get('mid');
+            $item = $wpdb->get_row("SELECT * FROM {$_table_mails} WHERE `id`={$mid}");
+            $item->page_title = 'Редактирование';
             
-            $map = array(
-                'funnel_id'                => array(1,3,4,5,6,7,8),
-                'bound_id'                 => array(3,4,5),
-                'mail_link_id'             => array(3),
-                'order_id'                 => array(6),
-                'data_modified_type'       => array(7),
-                'data_modified_field'      => array(7),
-                'date_field'               => array(8),
-                'time_mailing_type'        => array(1,3,4,5,6,7,8),
-                'time_mailing_delay_days'  => array(1,3,4,5,6,7,8),
-                'time_mailing_delay_hours' => array(1,3,4,5,6,7,8),
-                'time_mailing_hour'        => array(1,3,4,5,6,7,8),
-                'time_mailing_weekday'     => array(1,3,4,5,6,7,8),
-                'content'                  => array(1,2,3,4,5,6,7,8),
-            );
+            $funnels_list = $wpdb->get_results("SELECT `id`,`name` FROM {$_table_funnels}");
             
-            $mail_type = isset($_POST['mail_type']) ? $_POST['mail_type'] : 0;
+            include  'templates/mails/mail-form.php';
+            break;
             
-            $data = array(
-                'mail_type' => $mail_type,
-                'title'    => isset($_POST['title']) ? $_POST['title'] : NULL,
-                'time_mailing_type'    => isset($_POST['time_mailing_type']) ? $_POST['time_mailing_type'] : NULL,
-                'time_mailing_weekday' => isset($_POST['time_mailing_weekday']) ? implode(',', $_POST['time_mailing_weekday']) : NULL
-            );
-                       
-            if (count($_POST) > 0) {
-                foreach ($_POST AS $data_key => $data_value) {
-                    if (isset($map[$data_key]) AND in_array($mail_type, $map[$data_key])) {
-                        $data[$data_key] = is_array($data_value) ? implode(',', $data_value) : $data_value;
+        case 'mail-stat':
+            
+            break;
+            
+        case 'mail-duplicate':
+            $mid = _get('mid');
+            if ($mid > 0) {
+                $mail = $wpdb->get_row("SELECT * FROM {$_table_mails} WHERE `id`={$mid}");
+                unset($mail->id);
+                $mail->title = 'Копия: ' . $mail->title;
+                $wpdb->insert($_table_mails, (array) $mail);
+                $mail_id = $wpdb->insert_id;
+                
+                $links  = $wpdb->get_results("SELECT * FROM {$_table_mail_links} WHERE `mail_id`={$mail_id}");
+                if (count($links) > 0) {
+                    foreach ($links AS $link) {
+                        unset($link->id);
+                        $link->mail_id = $mail_id;
+                        $wpdb->insert($_table_mail_links, (array) $link);
                     }
                 }
-            }
-        
-            if ($mid > 0) {
-                $wpdb->update($_table_mails, $data, array('id' => $mid));
+                
+                $redirect_to = $_SERVER['HTTP_REFERER'];
+                include  'templates/redirect.php';
+                
             } else {
-                $wpdb->insert($_table_mails, $data);
+                echo '<h4>Не удалось дублировать письмо.</h4>';
             }
-            $redirect_to = $uid > 0 ? '/wp-admin/admin.php?page=vspostman-mails&act=edit&uid='.$uid : '/wp-admin/admin.php?page=vspostman-mails';
-            include  'templates/redirect.php';
+            break;
+            
+        case 'mail-delete':
+            $mid = _get('mid');
+            if ($mid > 0) {
+                $wpdb->delete($_table_mail_links, array('mail_id' => $mid));
+                $wpdb->delete($_table_mails, array('id' => $mid));
+                $redirect_to = $_SERVER['HTTP_REFERER'];
+                include  'templates/redirect.php';
+            } else {
+                echo '<h4>Не удалось удалить письмо.</h4>';
+            }
             break;
             
         default:            
