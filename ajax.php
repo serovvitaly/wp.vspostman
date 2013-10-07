@@ -7,7 +7,7 @@ if ( !isset($wp_did_header) ) {
 } else die('FALSE');
 
 
-function _post($field, $default = NULL){
+function _post2($field, $default = NULL){
     return isset($_POST[$field]) ? $_POST[$field] : $default; 
 }
 
@@ -17,6 +17,13 @@ $_table_mail_links = $wpdb->prefix . 'vspostman_mail_links';
 
 
 $action = isset($_REQUEST['act']) ? $_REQUEST['act'] : NULL;
+$controller = isset($_REQUEST['controller']) ? $_REQUEST['controller'] : NULL;
+
+switch ($controller) {
+    case 'clients':
+        _controller('Clients_Controller')->action($action);
+        break;
+}
 
 $out = array(
     'success' => false,
@@ -123,4 +130,4 @@ switch ($action) {
 }
 
 
-echo json_encode($out);
+//echo json_encode($out);

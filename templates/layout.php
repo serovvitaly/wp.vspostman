@@ -1,4 +1,5 @@
 <script src="/wp-content/plugins/vspostman/libs/jquery.tmpl.min.js"></script>
+<script src="/wp-content/plugins/vspostman/libs/jquery.form.min.js"></script>
 
 <script>
 $ = jQuery;
@@ -41,6 +42,15 @@ $ = jQuery;
     color: #F0F0F0;
     background: #585858;
     text-shadow: none;
+}
+.big-text{
+    padding: 3px 8px;
+    font-size: 1.7em;
+    line-height: 100%;
+    height: 1.7em;
+    width: 100%;
+    outline: 0;
+    margin: 1px 0;
 }
 </style>
 

@@ -4,20 +4,30 @@
 </h2>
 
 <div class="tab-container">
+  <form id="filter-form" action="/wp-content/plugins/vspostman/ajax.php" method="POST">
+  
   <label>Фильтры: 
     <select style="width: 200px;">
       <option value=""></option>
-      <option value="">Парвый</option>
-      <option value="">Второй</option>
+      <?
+        if (count($filters) > 0) {
+            foreach ($filters AS $filter) {
+        ?>
+        <option value="<?= $filter->id ?>"><?= $filter->name ?></option>
+        <?
+            }
+        }
+      ?>
     </select>
   </label>
-  <input type="submit" class="button" value="Загрузить фильтр">
+  <a href="#" class="button" onclick="return false;">Загрузить фильтр</a>
   
+
   <div style="float: right;">
       <input type="submit" class="button button-primary" value="Добавить новый фильтр">
   
       <label style="padding-left: 30px;">Сахранить фильтр как:
-        <input type="text" style="width: 200px;">
+        <input name="filter_name" type="text" style="width: 200px;">
         
       </label>
       <input type="submit" class="button" value="Сохранить">
@@ -25,23 +35,57 @@
   </div>
   
   <div style="padding: 0; border-top: 1px solid #C9C9C9; margin-top: 20px;">
-  <form action="/wp-admin/admin.php?page=vspostman-clients&act=filtersave" method="POST">
+  
     
-    <input type="hidden" name="id" value="">
+    <input type="hidden" name="controller" value="clients">
+    <input type="hidden" name="act" value="filtersave">
+    <input type="hidden" name="id" value="0">
     
     <div class="filter-items"></div>
   
-  </form>
+  
+  <div style="text-align: center; margin: 20px 0;">
+    <a style="padding: 0 20px" class="button button-primary button-large" href="#" onclick="goSearch(); return false;">ПОИСК</a>
   </div>
-
+  </div>
+  </form>
 </div>
 
 
 <script>
 
 $(document).ready(function(){
-    addConditionsGroup(); 
+    addConditionsGroup();
+    
+    $('#filter-form').ajaxForm({
+        dataType: 'json',
+        beforeSubmit: function(formData, jqForm, options){
+            for (var i = 0; i < formData.length; i++) {
+                var field = formData[i];
+                switch (field.name) {
+                    case 'filter_name':
+                        if (field.value.replace(' ','') == '') {
+                            jqForm.find('input[name="filter_name"]').css('border-color', 'red');
+                            return false;
+                        }
+                        break;
+                }
+            }
+        },
+        success: function(data){
+            console.log(data);
+            if (data.success === true) {
+                window.location = '/wp-admin/admin.php?page=vspostman-clients&act=filterlist';
+            }
+        }
+    });
+     
 });
+
+function getUniqueId(){
+    var d = new Date();
+    return d.valueOf() + '' + d.getUTCMilliseconds();
+}
 
 function checkConditionsGroupRemover(){
     var items = $('.filter-item');
@@ -55,7 +99,7 @@ function checkConditionsGroupRemover(){
 }
 
 function addConditionsGroup(){
-    var tpl = $.tmpl( $('#tpl-filter-item').html().trim(), {} );
+    var tpl = $.tmpl( $('#tpl-filter-item').html().trim(), {uid: getUniqueId()} );
     tpl.appendTo('.filter-items');
     tpl.slideDown(200);
     addConditionsGroupField(null, tpl);
@@ -95,20 +139,31 @@ function removeConditionsGroupField(el){
     });
 }
 
+function getFilterData(){
+    var data = $('#filter-form').serializeArray();
+    
+    return data;
+}
+
+
+function goSearch(){
+    getFilterData();
+}
+
 </script>
 
 
 <script id="tpl-filter-item" type="text/x-jquery-tmpl">
-    <div class="filter-item">
+    <div data-uid="${uid}" class="filter-item">
   
         <table class="filter-params">
           <tr>
             <td style="width: 80px;">Контакты:</td>
             <td>
-            <select style="width: 200px;">
-              <option value="">Все</option>
-              <option value="">Получающие рассылку</option>
-              <option value="">Не получающие рассылку</option>
+            <select name="contacts_type[${uid}]" style="width: 200px;">
+              <option value="all">Все</option>
+              <option value="rec">Получающие рассылку</option>
+              <option value="no_rec">Не получающие рассылку</option>
             </select>        
             </td>
           </tr>
@@ -120,7 +175,7 @@ function removeConditionsGroupField(el){
                   if (count($funnels_list) > 0) {
                       foreach ($funnels_list AS $funnel) {
                   ?>
-                <li><label><input type="checkbox" value="<?= $funnel->id ?>"> - <?= $funnel->name ?></label></li>  
+                <li><label><input type="checkbox" value="funnels[${uid}][<?= $funnel->id ?>]"> - <?= $funnel->name ?></label></li>  
                   <?
                       }
                   }
@@ -134,7 +189,7 @@ function removeConditionsGroupField(el){
           <tr>
             <td style="width: 130px;">Диапазон дат:</td>
             <td>
-            <select type="text" name="basicTermsRange_3_1" id="basicTermsRange_3_1" class="selWithOtherEl basicTermsRange" onfocus="javascript:$(this).parents('.fieldLine').find('input:radio').attr(&quot;checked&quot;,true);">
+            <select type="text" name="dates_range[${uid}]" id="basicTermsRange_3_1" class="selWithOtherEl basicTermsRange" onfocus="javascript:$(this).parents('.fieldLine').find('input:radio').attr(&quot;checked&quot;,true);">
               <option value="today">Сегодня</option>
               <option value="yesterday">Вчера</option>
               <option value="this_week">На этой неделе</option>
@@ -151,8 +206,8 @@ function removeConditionsGroupField(el){
           <tr>
             <td>Свой диапазон дат:</td>
             <td>
-              <input type="text" style="width: 68px;"> - 
-              <input type="text" style="width: 68px;">
+              <input name="date_start[${uid}]" type="text" style="width: 68px;"> - 
+              <input name="date_end[${uid}]" type="text" style="width: 68px;">
             </td>
           </tr>
         </table>
@@ -161,9 +216,9 @@ function removeConditionsGroupField(el){
           <tr>
             <td style="width: 130px;">Соответствует</td>
             <td>
-            <select>
-              <option value="all">Всем</option>
-              <option value="any">Одному из</option>
+            <select value="match[${uid}]">
+              <option value="and">Всем</option>
+              <option value="or">Одному из</option>
             </select>
             из следующих:       
             </td>

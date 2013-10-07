@@ -29,7 +29,11 @@ abstract class Base_Controller {
         
         $action = 'action_' . strtolower($action_name);
         
-        $result = call_user_method($action, $this);
+        if (method_exists($this, $action)) {
+            $result = call_user_method($action, $this);
+        } else {
+            $result = "<p>Метод {$action} не найден в контроллере ".get_class($this)."</p>";
+        }        
         
         if ($result !== false) {
             
@@ -37,15 +41,17 @@ abstract class Base_Controller {
             $controller = explode('_', $controller);
             $controller = $controller[0];
             
-            ob_start();
+            $include_tpl = VSP_DIR . "/templates/{$controller}/{$action_name}." . static::TPL_EXT;
             
-            extract( get_object_vars($this) );
-            
-            include VSP_DIR . "/templates/{$controller}/{$action_name}." . static::TPL_EXT;
-            
-            $content = ob_get_contents();
-            
-            ob_end_clean();
+            if (file_exists($include_tpl)) {
+                ob_start();
+                extract( get_object_vars($this) );
+                include $include_tpl;
+                $content = ob_get_contents();
+                ob_end_clean();
+            } else {
+                $content = "<p>Шаблон {$include_tpl} не найден</p>";
+            }            
             
             include VSP_DIR . "/templates/{$this->layout}." . static::TPL_EXT;
         }             
