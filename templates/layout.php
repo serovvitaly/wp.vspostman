@@ -15,16 +15,21 @@ $ = jQuery;
 }
 .wrap .filter-params{
     display: inline-block;
-    margin-right: 100px;
+    margin-right: 80px;
     vertical-align: top;
+}
+.wrap .filter-params input, .wrap .filter-params select{
+    margin-top: -1px;
 }
 .wrap .filter-item{
     margin: 30px 0 10px;
+    display: none;
 }
 .wrap .filter-item .remove-button{
     color: red;
     padding-left: 10px;
     text-decoration: none;
+    display: none;
 }
 .wrap .filter-item .remove-button:hover{
     text-decoration: underline;
