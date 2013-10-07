@@ -9,6 +9,12 @@
 
 define('VSP_DIR', dirname(__FILE__));
 
+
+define('TABLE_FUNNELS', $wpdb->prefix . 'vspostman_funnels');
+define('TABLE_MAILS', $wpdb->prefix . 'vspostman_mails');
+define('TABLE_MAIL_LINKS', $wpdb->prefix . 'vspostman_mail_links');
+
+
 add_action('admin_menu', 'vspostman_admin_menu');
 
 

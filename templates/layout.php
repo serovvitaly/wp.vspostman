@@ -1,4 +1,37 @@
+<script src="/wp-content/plugins/vspostman/libs/jquery.tmpl.min.js"></script>
+
+<script>
+$ = jQuery;
+</script>
+
 <style>
+.wrap table td{
+    vertical-align: top;
+}
+.wrap .tab-container{
+    padding: 20px;
+    border: 1px solid #C9C9C9;
+    border-top: 0;
+}
+.wrap .filter-params{
+    display: inline-block;
+    margin-right: 100px;
+    vertical-align: top;
+}
+.wrap .filter-item{
+    margin: 30px 0 10px;
+}
+.wrap .filter-item .remove-button{
+    color: red;
+    padding-left: 10px;
+    text-decoration: none;
+}
+.wrap .filter-item .remove-button:hover{
+    text-decoration: underline;
+}
+.wrap .filter-params td{
+    padding: 0 0 20px;
+}
 .wrap .add-new-h2.active{
     color: #F0F0F0;
     background: #585858;

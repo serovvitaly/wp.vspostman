@@ -6,7 +6,18 @@ abstract class Base_Controller {
     
     protected $layout = 'layout';
     
+    protected $db = NULL;
+    
     public $action = NULL;
+    
+    
+    public function __construct()
+    {
+        global $wpdb;
+        
+        $this->db = $wpdb;
+    }
+    
     
     public function action($action_name = NULL)
     {

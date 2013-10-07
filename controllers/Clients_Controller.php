@@ -8,7 +8,7 @@ class Clients_Controller extends Base_Controller{
         array(
             'text' => 'Поиск клиентов',
             'act'  => 'index',
-            'href' => '#'
+            'href' => '/wp-admin/admin.php?page=vspostman-clients'
         ),
         array(
             'text' => 'Добавить клиента',
@@ -44,8 +44,14 @@ class Clients_Controller extends Base_Controller{
     
     public function action_index()
     {
+        $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
         
-        $this->hello = 'WORLD';
+    }
+    
+    
+    public function action_filterlist()
+    {
+        //
     }
     
 }
