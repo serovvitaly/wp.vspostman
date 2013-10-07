@@ -7,6 +7,8 @@
 * Author URI: serovvitaly@gmail.com
 */
 
+define('VSP_DIR', dirname(__FILE__));
+
 add_action('admin_menu', 'vspostman_admin_menu');
 
 
@@ -16,6 +18,15 @@ function _get($field, $default = NULL){
 
 function _post($field, $default = NULL){
     return isset($_POST[$field]) ? $_POST[$field] : $default; 
+}
+
+function _controller($controller){
+    if (!class_exists($controller)) {
+        include_once "controllers/Base_Controller.php";
+        include_once "controllers/{$controller}.php";
+    }
+    
+    return new $controller;
 }
 
 
@@ -32,7 +43,7 @@ function vspostman_menu_mails() {
     
     global $wpdb;
     
-    $act = isset($_REQUEST['act']) ? $_REQUEST['act'] : NULL;
+    $act = isset($_REQUEST['act']) ? $_REQUEST['act'] : 'index';
     $uid = isset($_REQUEST['uid']) ? $_REQUEST['uid'] : 0;
     $mid = isset($_REQUEST['mid']) ? $_REQUEST['mid'] : 0;
     
@@ -227,8 +238,8 @@ function vspostman_menu_mails() {
     
 }
 function vspostman_menu_clients() {
-    echo 'CLIENTS';
+    echo _controller('Clients_Controller')->action($_REQUEST['act']);
 }
 function vspostman_menu_stats() {
-    echo 'STATS';
+    echo _controller('Stats_Controller')->action($_REQUEST['act']);
 }
