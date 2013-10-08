@@ -14,6 +14,7 @@ define('TABLE_FUNNELS', $wpdb->prefix . 'vspostman_funnels');
 define('TABLE_MAILS', $wpdb->prefix . 'vspostman_mails');
 define('TABLE_MAIL_LINKS', $wpdb->prefix . 'vspostman_mail_links');
 define('TABLE_CLIENTS_FILTERS', $wpdb->prefix . 'vspostman_clients_filters');
+define('TABLE_CLIENTS_CONTACTS', $wpdb->prefix . 'vspostman_clients_contacts');
 
 
 add_action('admin_menu', 'vspostman_admin_menu');

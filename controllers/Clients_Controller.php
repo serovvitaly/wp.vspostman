@@ -98,4 +98,50 @@ class Clients_Controller extends Base_Controller{
         return false;
     }
     
+    
+    public function action_contactadd()
+    {
+        $input = $_POST;
+        
+        $name  = isset($input['first_name'])  ? trim($input['first_name'])  : NULL;
+        $email = isset($input['email']) ? trim($input['email']) : NULL;
+        
+        $this->db->insert(TABLE_CLIENTS_CONTACTS, array(
+            'name'  => $name,
+            'email' => $email,
+        ));
+        
+        
+        echo json_encode(array(
+            'success' => true
+        ));
+        
+        return false;
+    }
+    
+    
+    public function action_validemail()
+    {
+        $input = $_POST;
+        
+        $result = NULL;
+        
+        $email = isset($_POST['email']) ? trim($_POST['email']) : NULL;
+        
+        if (!empty($email)) {
+            $row = $this->db->get_var("SELECT `id` FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `email` = '{$email}'");
+            
+            if ($row === NULL) {
+                $result = 'validemail-ok';
+            }
+        }        
+        
+        echo json_encode(array(
+            'success' => true,
+            'result'  => $result
+        ));
+        
+        return false;
+    }
+    
 }

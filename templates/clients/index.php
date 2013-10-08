@@ -6,6 +6,10 @@
 <div class="tab-container">
   <form id="filter-form" action="/wp-content/plugins/vspostman/ajax.php" method="POST">
   
+    <input type="hidden" name="controller" value="clients">
+    <input type="hidden" name="act" value="filtersave">
+    <input type="hidden" name="id" value="0">
+  
   <label>Фильтры: 
     <select style="width: 200px;">
       <option value=""></option>
@@ -35,11 +39,6 @@
   </div>
   
   <div style="padding: 0; border-top: 1px solid #C9C9C9; margin-top: 20px;">
-  
-    
-    <input type="hidden" name="controller" value="clients">
-    <input type="hidden" name="act" value="filtersave">
-    <input type="hidden" name="id" value="0">
     
     <div class="filter-items"></div>
   
