@@ -58,6 +58,8 @@ class Clients_Controller extends Base_Controller{
     
     public function action_filterlist()
     {
+        $this->action = 'index';
+        
         $this->filters = $this->db->get_results("SELECT `id`,`name`,`created` FROM " . TABLE_CLIENTS_FILTERS);
     }
     
@@ -142,6 +144,24 @@ class Clients_Controller extends Base_Controller{
         ));
         
         return false;
+    }
+    
+    
+    public function action_import()
+    {
+        //
+    }
+    
+    
+    public function action_importfile()
+    {
+        $this->action = 'import';
+    }
+    
+    
+    public function action_importservices()
+    {
+        $this->action = 'import';
     }
     
 }
