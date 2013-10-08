@@ -152,10 +152,123 @@ class Clients_Controller extends Base_Controller{
         //
     }
     
+    public function action_importsave()
+    {
+        $success = false;
+        $result  = '<span style="color:red">Не удалось импортировать контакты.</span>';
+        
+        $list = isset($_POST['contacts_list']) ? $_POST['contacts_list'] : NULL;
+        
+        if (!empty($list)) {
+            $list = explode("\n", $list);
+            if (is_array($list) AND count($list) > 0) {
+                
+                $total = count($list); // общее количество email
+                $added = 0;            // добавлено в базу
+                $novalid = 0;          // невалидных
+                $skipped = 0;          // пропущено - уже существуют в базе
+                
+                
+                foreach ($list AS $email) {
+                    
+                    $email = trim($email);
+                    
+                    $row = $this->db->get_var("SELECT `id` FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `email` = '{$email}'");
+            
+                    $valid = preg_match('/([a-zA-Z0-9-_.]+)@([a-z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+/', $email);
+                    
+                    if (!empty($email) AND $valid) {
+                        if ($row === NULL) {
+                            $this->db->insert(TABLE_CLIENTS_CONTACTS, array('email' => $email));
+                            $added++;
+                        } else {
+                            $skipped++;
+                        }
+                    } else {
+                        $novalid++;
+                    }                    
+                }
+                
+                if ($added > 0) {
+                    $success = true;
+                    $result  = '<span style="color:green">Передано контактов - '.$total.', неваледных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
+                } else {
+                    $result  = '<span style="color:red">Передано контактов - '.$total.', неваледных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
+                }
+            }
+        }
+        
+        echo json_encode(array(
+            'success' => $success,
+            'result'  => $result
+        ));
+        
+        return false;
+    }
+    
     
     public function action_importfile()
     {
         $this->action = 'import';
+    }
+    
+    
+    public function action_importfilesave()
+    {
+        $success = false;
+        $result  = '<span style="color:red">Не удалось импортировать контакты.</span>';
+        
+        $file = isset($_FILES['contacts_file']) ? $_FILES['contacts_file'] : NULL;
+        
+        $total = 0; // общее количество email
+        $added = 0;            // добавлено в базу
+        $novalid = 0;          // невалидных
+        $skipped = 0;          // пропущено - уже существуют в базе
+        
+        if ($file) {
+            $file_lines = array();
+            
+            $f = fopen($file['tmp_name'], 'r+');
+            if ($f) {
+                while (($data = fgetcsv($f, 1000, ';')) !== FALSE) {
+                    $total++;
+                    $email = isset($data[0]) ? trim($data[0]) : NULL;
+                    $name  = isset($data[1]) ? trim($data[1]) : '';
+                    if (!empty($email)) {
+                        $row = $this->db->get_var("SELECT `id` FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `email` = '{$email}'");
+                        $valid = preg_match('/([a-zA-Z0-9-_.]+)@([a-z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+/', $email);
+                        
+                        if ($valid) {
+                            if ($row === NULL) {
+                                $this->db->insert(TABLE_CLIENTS_CONTACTS, array('email' => $email, 'name' => $name));
+                                $added++;
+                            } else {
+                                $skipped++;
+                            }
+                        } else {
+                            $novalid++;
+                        } 
+                    } else {
+                        $novalid++;
+                    }
+                }
+                
+                if ($added > 0) {
+                    $success = true;
+                    $result  = '<span style="color:green">Передано контактов - '.$total.', неваледных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
+                } else {
+                    $result  = '<span style="color:red">Передано контактов - '.$total.', неваледных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
+                }
+                
+            }
+        }
+        
+        echo json_encode(array(
+            'success' => $success,
+            'result'  => $result
+        ));
+        
+        return false;
     }
     
     

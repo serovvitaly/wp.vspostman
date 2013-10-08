@@ -5,7 +5,7 @@
 </h2>
 
 <div class="tab-container">
-
+  <h1 style="color:red">Сервис в разработке.</h1>
   <div style="vertical-align: top; display: inline-block; width: 200px; margin-right: 10px;">
     <strong style="vertical-align: top;">Импортировать контакты из аккаунта:</strong>
   </div>

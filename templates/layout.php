@@ -3,6 +3,20 @@
 
 <script>
 $ = jQuery;
+
+function ajaxForm(opts){
+    this.targer = opts.id;
+    delete opts.id;
+    
+    this.config = $.extend({
+        url: '/wp-content/plugins/vspostman/ajax.php',
+        type: 'POST',
+        dataType: 'json',
+    }, opts);
+    
+    $('#'+this.targer).ajaxForm(this.config);
+}
+
 </script>
 
 <style>
@@ -51,6 +65,16 @@ $ = jQuery;
     width: 100%;
     outline: 0;
     margin: 1px 0;
+}
+.progresser{
+    border: 1px solid #B6B6B6;
+    width: 246px;
+    margin-top: 10px;
+}
+.progresser .inner{
+    height: 2px;
+    width: 0%;
+    background: red;
 }
 </style>
 
