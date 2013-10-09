@@ -355,7 +355,7 @@ class Clients_Controller extends Base_Controller{
                     $removal_at = date('Y-m-d H:i:s');
                     
                     if ($funnel_id > 0) {
-                        //
+                        $this->db->query("INSERT INTO ".TABLE_CONTACTS_FUNNELS." (funnel_id,is_removal,removal_type,removal_at,contact_id) SELECT {$funnel_id},1,1,'{$removal_at}',id FROM ".TABLE_CLIENTS_CONTACTS." WHERE `email` IN({$elist})");
                     } else {
                         $this->db->query("UPDATE " . TABLE_CLIENTS_CONTACTS . " SET `is_removal` = 1, `removal_type` = 1, `removal_at` = '{$removal_at}', `removal_reason` = '{$reason}' WHERE `email` IN({$elist})");
                     }
@@ -454,7 +454,56 @@ class Clients_Controller extends Base_Controller{
     
     public function action_blacklist()
     {
-        //
+        $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
+    }
+    
+    
+    public function action_blacklistgo()
+    {
+        $success = false;
+        $result = '<span style="color: red">Не удалось добавить контакты в черный список.</span>';
+        
+        $removal_list = trim($this->_input('removal_list'));
+        $funnel_id    = trim($this->_input('funnel_id'));
+        
+        if (!empty($removal_list)) {
+            
+            $removal_list = explode("\n", $removal_list);
+            if (count($removal_list) > 0) {
+                $elist = array();
+                foreach ($removal_list AS $contact) {
+                    $elist[] = "'{$contact}'";
+                }
+                if (count($elist) > 0) {
+                    $elist = implode(',', $elist);
+                    
+                    $blacklist_at = date('Y-m-d H:i:s');
+                    
+                    if ($funnel_id > 0) {
+                        $this->db->query("INSERT INTO ".TABLE_CONTACTS_FUNNELS." (funnel_id,in_blacklist,blacklist_at,contact_id) SELECT {$funnel_id},1,'{$blacklist_at}',id FROM ".TABLE_CLIENTS_CONTACTS." WHERE `email` IN({$elist})");
+                    } else {
+                        $this->db->query("UPDATE " . TABLE_CLIENTS_CONTACTS . " SET `in_blacklist` = 1, `blacklist_at` = '{$blacklist_at}' WHERE `email` IN({$elist})");
+                    }
+                    
+                    $result = '<span style="color: green">Контакты добавлены в черный список.</span>';    
+                } else {
+                    $result = '<span style="color: red">Список контактов - пуст.</span>';
+                }
+                
+            } else {
+                $result = '<span style="color: red">Список контактов - пуст.</span>';
+            }
+            
+        } else {
+            $result = '<span style="color: red">Список контактов - пуст.</span>';
+        }
+        
+        echo json_encode(array(
+            'success' => $success,
+            'result'  => $result
+        ));
+        
+        return false;
     }
     
 }

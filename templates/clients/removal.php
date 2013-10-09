@@ -19,6 +19,7 @@
         <textarea name="reason" style="width: 300px; height: 50px;" cols="" rows="" placeholder="Причина удаления"></textarea><br>
         <div class="info"></div>
         <input type="submit" class="button" value="Выполнить">
+        <a href="#" onclick="$('#removal-box').toggleClass('hidden');return false;" style="color:red">отмена</a>
       </form>
     </div>
     
