@@ -455,6 +455,8 @@ class Clients_Controller extends Base_Controller{
     public function action_blacklist()
     {
         $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
+        
+        $this->list = $this->db->get_results("SELECT * FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `in_blacklist` = 1 AND id IN(SELECT contact_id FROM ".TABLE_CONTACTS_FUNNELS." WHERE `in_blacklist` = 1)");
     }
     
     

@@ -57,8 +57,8 @@
           <td><?= $item->name ?></td>
           <td><?= $item->email ?></td>
           <td>---</td>
-          <td><?= $item->removal_at ?></td>
-          <td><a href="#">удалить из списка</a></td>
+          <td><?= $item->blacklist_at ?></td>
+          <td><!--a href="#">удалить из списка</a--></td>
         </tr>
         <?
             }
