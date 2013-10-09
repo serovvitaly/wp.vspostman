@@ -11,7 +11,7 @@
     <input type="hidden" name="id" value="0">
   
   <label>Фильтры: 
-    <select style="width: 200px;">
+    <select id="clients-filters-list" style="width: 200px;">
       <option value=""></option>
       <?
         if (count($filters) > 0) {
@@ -24,7 +24,7 @@
       ?>
     </select>
   </label>
-  <a href="#" class="button" onclick="return false;">Загрузить фильтр</a>
+  <a href="#" class="button" onclick="loadFilter(); return false;">Загрузить фильтр</a>
   
 
   <div style="float: right;">
@@ -52,6 +52,37 @@
 
 
 <script>
+
+function loadFilter(){
+    var filter_id = $('#clients-filters-list').val();
+    
+    if (filter_id < 1) return false;
+    
+    $.ajax({
+        url: '/wp-content/plugins/vspostman/ajax.php',
+        dataType: 'json',
+        type: 'POST',
+        data: {
+            controller: 'clients',
+            act: 'loadfilter',
+            filter_id: filter_id
+        },
+        success: function(data){
+            if (data.success === true) {
+                $('.filter-items').html('');
+                $.each(data.result.data, function(index, item){
+                    addConditionsGroup({uid: index});
+                    $.each(item, function(ind, it){
+                        var innn = '#filter-item-' + index + ' input[name="'+ind+'['+index+']"]';
+                        console.log( $(innn) );
+                        $('#filter-item-' + index + ' input[name="'+ind+'['+index+']"]').val(it);
+                    })
+                    
+                });
+            }
+        }
+    });
+}
 
 $(document).ready(function(){
     addConditionsGroup();
@@ -97,9 +128,15 @@ function checkConditionsGroupRemover(){
     }
 }
 
-function addConditionsGroup(){
-    var tpl = $.tmpl( $('#tpl-filter-item').html().trim(), {uid: getUniqueId()} );
+function addConditionsGroup(data){
+    var mix = $.extend({
+        uid: getUniqueId()
+    }, data);
+    var tpl = $.tmpl( $('#tpl-filter-item').html().trim(), mix );
     tpl.appendTo('.filter-items');
+    tpl.find('.datepicker').datepicker({
+        dateFormat: 'dd.mm.yy'
+    });
     tpl.slideDown(200);
     addConditionsGroupField(null, tpl);
     checkConditionsGroupRemover(null, tpl);
@@ -153,7 +190,7 @@ function goSearch(){
 
 
 <script id="tpl-filter-item" type="text/x-jquery-tmpl">
-    <div data-uid="${uid}" class="filter-item">
+    <div id="filter-item-${uid}" class="filter-item">
   
         <table class="filter-params">
           <tr>
@@ -205,8 +242,8 @@ function goSearch(){
           <tr>
             <td>Свой диапазон дат:</td>
             <td>
-              <input name="date_start[${uid}]" type="text" style="width: 68px;"> - 
-              <input name="date_end[${uid}]" type="text" style="width: 68px;">
+              <input class="datepicker" name="date_start[${uid}]" type="text" style="width: 70px;"> - 
+              <input class="datepicker" name="date_end[${uid}]" type="text" style="width: 70px;">
             </td>
           </tr>
         </table>

@@ -1,6 +1,10 @@
 <script src="/wp-content/plugins/vspostman/libs/jquery.tmpl.min.js"></script>
 <script src="/wp-content/plugins/vspostman/libs/jquery.form.min.js"></script>
 
+<script src="/wp-content/plugins/vspostman/libs/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/wp-content/plugins/vspostman/libs/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
+<link rel="stylesheet" type="text/css" href="/wp-content/plugins/vspostman/libs/jquery-ui/css/flick/jquery-ui-1.10.3.custom.min.css">
+
 <script>
 $ = jQuery;
 

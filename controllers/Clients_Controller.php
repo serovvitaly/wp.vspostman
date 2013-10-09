@@ -42,6 +42,41 @@ class Clients_Controller extends Base_Controller{
         ),
     );
     
+    
+    public function action_loadfilter()
+    {
+        $filter_id = $this->_input('filter_id');
+        
+        $success = false;
+        $result  = NULL;
+        
+        if ($filter_id > 0) {
+            
+            $filter = $this->db->get_row("SELECT * FROM ".TABLE_CLIENTS_FILTERS." WHERE `id` = {$filter_id}");
+            
+            if ($filter AND $filter->id > 0) {
+                
+                $data = json_decode($filter->data);
+                
+                $result = array(
+                    'id' => $filter->id,
+                    'data' => $data
+                );
+                
+                $success = true;
+            }
+            
+        }
+        
+        echo json_encode(array(
+            'success' => $success,
+            'result'  => $result
+        ));
+        
+        return false;
+    }
+    
+    
     public function action_index()
     {
         $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
