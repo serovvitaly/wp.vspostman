@@ -108,11 +108,22 @@ class Clients_Controller extends Base_Controller{
         $name  = isset($input['first_name'])  ? trim($input['first_name'])  : NULL;
         $email = isset($input['email']) ? trim($input['email']) : NULL;
         
+        $funnel_id = isset($input['funnel_id']) ? trim($input['funnel_id']) : NULL;
+        
         $this->db->insert(TABLE_CLIENTS_CONTACTS, array(
             'name'  => $name,
             'email' => $email,
         ));
         
+        if ($funnel_id > 0) {
+            
+            $contact_id = $this->db->insert_id;
+            
+            $this->db->insert(TABLE_CONTACTS_FUNNELS, array(
+                'contact_id' => $contact_id,
+                'funnel_id'  => $funnel_id,
+            ));
+        }        
         
         echo json_encode(array(
             'success' => true
@@ -275,6 +286,133 @@ class Clients_Controller extends Base_Controller{
     public function action_importservices()
     {
         $this->action = 'import';
+    }
+    
+    
+    public function action_duplicate()
+    {
+        $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
+    }
+    
+    
+    public function action_duplicatesave()
+    {
+        $success = false;
+        $result  = NULL;
+        
+        $operation = $this->_input('operation');
+        $op_from   = $this->_input('op_from');
+        $op_to     = $this->_input('op_to');
+        
+        if ($op_from > 0 AND $op_to > 0 AND $op_from != $op_to ) {
+            switch ($operation) {
+                case 'copy':
+                    $sql = "INSERT INTO ".TABLE_CONTACTS_FUNNELS." (funnel_id,contact_id) SELECT {$op_to},contact_id FROM ".TABLE_CONTACTS_FUNNELS." WHERE `funnel_id` = {$op_from}";
+                    $this->db->query($sql);
+                    $success = true;
+                    $result = '<span style="color: green">Контакты скопированы удачно.</span>';
+                    break;
+                case 'move':
+                    $this->db->update(TABLE_CONTACTS_FUNNELS, array('funnel_id' => $op_to), array('funnel_id', $op_from));
+                    $success = true;
+                    $result = '<span style="color: green">Контакты перенесены удачно.</span>';
+                    break;
+                    
+            }
+        } else {
+            $result = '<span style="color: red">Не удалось перенести контакты.</span>';
+        }
+        
+        echo json_encode(array(
+            'success' => $success,
+            'result'  => $result
+        ));
+        
+        return false;
+    }
+    
+    
+    public function action_removalgo()
+    {
+        $success = false;
+        $result = '<span style="color: red">Не удалось отписать контакты.</span>';
+        
+        $removal_list = trim($this->_input('removal_list'));
+        $funnel_id    = trim($this->_input('funnel_id'));
+        $reason       = trim($this->_input('reason'));
+        
+        if (!empty($removal_list)) {
+            
+            $removal_list = explode("\n", $removal_list);
+            if (count($removal_list) > 0) {
+                $elist = array();
+                foreach ($removal_list AS $contact) {
+                    $elist[] = "'{$contact}'";
+                }
+                if (count($elist) > 0) {
+                    $elist = implode(',', $elist);
+                    
+                    $removal_at = date('Y-m-d H:i:s');
+                    
+                    if ($funnel_id > 0) {
+                        //
+                    } else {
+                        $this->db->query("UPDATE " . TABLE_CLIENTS_CONTACTS . " SET `is_removal` = 1, `removal_type` = 1, `removal_at` = '{$removal_at}', `removal_reason` = '{$reason}' WHERE `email` IN({$elist})");
+                    }
+                    
+                    $result = '<span style="color: green">Контакты удачно отписаны.</span>';    
+                } else {
+                    $result = '<span style="color: red">Список контактов - пуст.</span>';
+                }
+                
+            } else {
+                $result = '<span style="color: red">Список контактов - пуст.</span>';
+            }
+            
+        } else {
+            $result = '<span style="color: red">Список контактов - пуст.</span>';
+        }
+        
+        echo json_encode(array(
+            'success' => $success,
+            'result'  => $result
+        ));
+        
+        return false;
+    }
+    
+    
+    public function action_removal()
+    {
+        $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
+    }
+    
+    
+    public function action_removal2()
+    {
+        $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
+        
+        $this->action = 'removal';
+    }
+    
+    
+    public function action_removal3()
+    {
+        $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
+        
+        $this->action = 'removal';
+    }
+    
+    
+    public function action_undelivered()
+    {
+        //
+    }
+    
+    
+    public function action_blacklist()
+    {
+        //
     }
     
 }

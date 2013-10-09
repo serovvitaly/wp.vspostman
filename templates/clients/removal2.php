@@ -26,8 +26,8 @@
 </div>
 
 <h2 class="nav-tab-wrapper">
-  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal" class="nav-tab nav-tab-active">Удалены вручную (0)</a>
-  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal2" class="nav-tab">Удалены автоматически (0)</a>
+  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal" class="nav-tab">Удалены вручную (0)</a>
+  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal2" class="nav-tab nav-tab-active">Удалены автоматически (0)</a>
   <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal3" class="nav-tab">Удалены, нажав ссылку (0)</a>
 </h2>
 

@@ -19,6 +19,23 @@ abstract class Base_Controller {
     }
     
     
+    protected function _input($field, $default = NULL, $source = NULL)
+    {
+        switch ( strtoupper($source) ) {
+            case 'GET':
+                $source = $_GET;
+                break;
+            case 'POST':
+                $source = $_POST;
+                break;
+            default:
+                $source = $_REQUEST;
+        }
+        
+        return isset($source[$field]) ? $source[$field] : $default;
+    }
+    
+    
     public function action($action_name = NULL)
     {
         if (empty($action_name)) {

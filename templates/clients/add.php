@@ -5,7 +5,7 @@
     <input type="hidden" name="controller" value="clients">
     <input type="hidden" name="act" value="contactadd">
   <div style="margin-bottom: 20px">Воронка: 
-    <select>
+    <select name="funnel_id">
       <option></option>
     <?
       if (count($funnels_list) > 0) {
