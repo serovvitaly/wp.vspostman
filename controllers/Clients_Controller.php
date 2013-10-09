@@ -382,9 +382,43 @@ class Clients_Controller extends Base_Controller{
     }
     
     
+    protected function _get_removal_counts()
+    {
+        $total_direct = $this->db->get_results("SELECT `removal_type`, COUNT(`id`) as count FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `is_removal` = 1 GROUP BY `removal_type` = 1");
+    
+        $totals = array();
+        if ($total_direct AND count($total_direct) > 0) {
+            foreach ($total_direct AS $_total) {
+                $totals[$_total->removal_type] = $_total->count;
+            }
+        }
+        
+        $total_associated = $this->db->get_results("SELECT `removal_type`, COUNT(`id`) as count FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `is_removal` = 1 GROUP BY `removal_type` = 1");
+        
+        if ($total_associated AND count($total_associated) > 0) {
+            foreach ($total_associated AS $_total) {
+                if (isset($totals[$_total->removal_type])) {
+                    $totals[$_total->removal_type] += $_total->count;
+                } else {
+                    $totals[$_total->removal_type] = $_total->count;
+                }
+                
+            }
+        }
+        
+        $this->totals = $totals;
+        
+        return $totals;
+    }
+    
+    
     public function action_removal()
     {
         $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
+        
+        $this->_get_removal_counts();        
+        
+        $this->list = $this->db->get_results("SELECT * FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `is_removal` = 1 AND `removal_type` = 1");
     }
     
     
@@ -393,6 +427,10 @@ class Clients_Controller extends Base_Controller{
         $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
         
         $this->action = 'removal';
+        
+        $this->_get_removal_counts();
+        
+        $this->list = $this->db->get_results("SELECT * FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `is_removal` = 1 AND `removal_type` = 2");
     }
     
     
@@ -401,6 +439,10 @@ class Clients_Controller extends Base_Controller{
         $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
         
         $this->action = 'removal';
+        
+        $this->_get_removal_counts();
+        
+        $this->list = $this->db->get_results("SELECT * FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `is_removal` = 1 AND `removal_type` = 3");
     }
     
     

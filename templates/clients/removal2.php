@@ -26,9 +26,9 @@
 </div>
 
 <h2 class="nav-tab-wrapper">
-  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal" class="nav-tab">Удалены вручную (0)</a>
-  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal2" class="nav-tab nav-tab-active">Удалены автоматически (0)</a>
-  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal3" class="nav-tab">Удалены, нажав ссылку (0)</a>
+  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal" class="nav-tab">Удалены вручную (<?= isset($totals[1]) ? $totals[1] : 0 ?>)</a>
+  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal2" class="nav-tab nav-tab-active">Удалены автоматически (<?= isset($totals[2]) ? $totals[2] : 0 ?>)</a>
+  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal3" class="nav-tab">Удалены, нажав ссылку (<?= isset($totals[3]) ? $totals[3] : 0 ?>)</a>
 </h2>
 
 <div class="tab-container">
@@ -60,8 +60,8 @@
         <tr>
           <td><?= $item->name ?></td>
           <td><?= $item->email ?></td>
-          <td></td>
-          <td></td>
+          <td><?= $item->removal_reason ?></td>
+          <td><?= $item->removal_at ?></td>
         </tr>
         <?
             }
