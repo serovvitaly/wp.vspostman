@@ -12,7 +12,7 @@
   
   <label>Фильтры: 
     <select id="clients-filters-list" style="width: 200px;">
-      <option value=""></option>
+      <option value="0"></option>
       <?
         if (count($filters) > 0) {
             foreach ($filters AS $filter) {
@@ -28,7 +28,7 @@
   
 
   <div style="float: right;">
-      <input type="submit" class="button button-primary" value="Добавить новый фильтр">
+      <a href="#" class="button button-primary" onclick="addNewFilter(); return false;">Добавить новый фильтр</a>
   
       <label style="padding-left: 30px;">Сахранить фильтр как:
         <input name="filter_name" type="text" style="width: 200px;">
@@ -53,7 +53,12 @@
 
 <script>
 
-function loadFilter(){
+function loadFilter(fid){
+    
+    if (fid && fid > 0) {
+        $('#clients-filters-list').val(fid);
+    }
+    
     var filter_id = $('#clients-filters-list').val();
     
     if (filter_id < 1) return false;
@@ -70,22 +75,114 @@ function loadFilter(){
         success: function(data){
             if (data.success === true) {
                 $('.filter-items').html('');
+                $('#filter-form input[name="id"]').val(data.result.id);
+                $('#filter-form input[name="filter_name"]').val(data.result.name);
                 $.each(data.result.data, function(index, item){
-                    addConditionsGroup({uid: index});
-                    $.each(item, function(ind, it){
-                        var innn = '#filter-item-' + index + ' input[name="'+ind+'['+index+']"]';
-                        console.log( $(innn) );
-                        $('#filter-item-' + index + ' input[name="'+ind+'['+index+']"]').val(it);
-                    })
-                    
+                    addConditionsGroup({uid: index, mix: item});                    
                 });
             }
         }
     });
 }
 
-$(document).ready(function(){
+function addNewFilter(){
+    $('.filter-items').html('');
+    $('#clients-filters-list').val(0);
+    $('#filter-form input[name="id"]').val(0);
+    $('#filter-form input[name="filter_name"]').val('');
     addConditionsGroup();
+}
+
+function getUniqueId(){
+    var d = new Date();
+    return d.valueOf() + '' + d.getUTCMilliseconds();
+}
+
+function checkConditionsGroupRemover(){
+    var items = $('.filter-item');
+    if (items.length > 1) {
+        items.find('.remove-button').show();
+        items.find('.conditions-list').show();
+    } else {
+        items.find('.remove-button').fadeOut(200);
+        items.find('.conditions-list').fadeOut(200);
+    }
+}
+
+function addConditionsGroup(data){
+    var mix = $.extend({
+        uid: getUniqueId(),
+        mix: {
+            dates_range: 'custom'
+        }
+    }, data);
+    var tpl = $.tmpl( $('#tpl-filter-item').html().trim(), mix );
+    tpl.appendTo('.filter-items');
+    tpl.find('.datepicker').datepicker({
+        dateFormat: 'dd.mm.yy'
+    });
+    tpl.slideDown(200);
+    if (mix.mix && mix.mix.fields) {
+        $.each(data.mix.fields, function(index, item){
+            mix.fid = index;
+            mix.mix = item;
+            addConditionsGroupField(null, tpl, mix);
+        });
+    } else {
+        addConditionsGroupField(null, tpl, mix);
+    }
+    checkConditionsGroupRemover(null, tpl);
+}
+
+function removeConditionsGroup(el){
+    var tpl = $(el).parent('.filter-item');
+    tpl.slideUp(200, function(){
+        tpl.remove();
+        checkConditionsGroupRemover(null, tpl);
+    });
+}
+
+function checkConditionsGroupFieldRemover(el, parent){
+    var fieldsCnt = parent ? parent.find('.filter-item-fields') : $(el).parent('.filter-item-fields');
+    var items = fieldsCnt.find('.filter-item-field');
+    if (items.length > 1) {
+        items.find('.field-remove-button').show();
+    } else {
+        items.find('.field-remove-button').fadeOut(200);
+    }
+}
+
+function addConditionsGroupField(el, parent, data){
+    var mix = $.extend({
+        fid: getUniqueId()
+    }, data);
+    var tpl = $.tmpl( $('#tpl-filter-item-field').html().trim(), mix );    
+    var fieldsCnt = parent ? parent.find('.filter-item-fields') : $(el).parents('.filter-item-fields');
+    fieldsCnt.append(tpl);
+    checkConditionsGroupFieldRemover(el, parent);
+}
+
+function removeConditionsGroupField(el){
+    var tpl = $(el).parents('.filter-item-field');
+    tpl.fadeOut(200, function(){
+        tpl.remove();
+        checkConditionsGroupFieldRemover(el);
+    });
+}
+
+function getFilterData(){
+    var data = $('#filter-form').serializeArray();
+    
+    return data;
+}
+
+function goSearch(){
+    getFilterData();
+}
+
+$(document).ready(function(){
+    
+    <? if ($current_filter > 0) { ?>loadFilter(<?= $current_filter ?>);<? } else { ?>addConditionsGroup();<? } ?>
     
     $('#filter-form').ajaxForm({
         dataType: 'json',
@@ -111,81 +208,6 @@ $(document).ready(function(){
     });
      
 });
-
-function getUniqueId(){
-    var d = new Date();
-    return d.valueOf() + '' + d.getUTCMilliseconds();
-}
-
-function checkConditionsGroupRemover(){
-    var items = $('.filter-item');
-    if (items.length > 1) {
-        items.find('.remove-button').show();
-        items.find('.conditions-list').show();
-    } else {
-        items.find('.remove-button').fadeOut(200);
-        items.find('.conditions-list').fadeOut(200);
-    }
-}
-
-function addConditionsGroup(data){
-    var mix = $.extend({
-        uid: getUniqueId()
-    }, data);
-    var tpl = $.tmpl( $('#tpl-filter-item').html().trim(), mix );
-    tpl.appendTo('.filter-items');
-    tpl.find('.datepicker').datepicker({
-        dateFormat: 'dd.mm.yy'
-    });
-    tpl.slideDown(200);
-    addConditionsGroupField(null, tpl);
-    checkConditionsGroupRemover(null, tpl);
-}
-
-function removeConditionsGroup(el){
-    var tpl = $(el).parent('.filter-item');
-    tpl.slideUp(200, function(){
-        tpl.remove();
-        checkConditionsGroupRemover(null, tpl);
-    });
-}
-
-function checkConditionsGroupFieldRemover(el, parent){
-    var fieldsCnt = parent ? parent.find('.filter-item-fields') : $(el).parent('.filter-item-fields');
-    var items = fieldsCnt.find('.filter-item-field');
-    if (items.length > 1) {
-        items.find('.field-remove-button').show();
-    } else {
-        items.find('.field-remove-button').fadeOut(200);
-    }
-}
-
-function addConditionsGroupField(el, parent){
-    var tpl = $.tmpl( $('#tpl-filter-item-field').html().trim(), {} );    
-    var fieldsCnt = parent ? parent.find('.filter-item-fields') : $(el).parents('.filter-item-fields');
-    fieldsCnt.append(tpl);
-    checkConditionsGroupFieldRemover(el, parent);
-}
-
-function removeConditionsGroupField(el){
-    var tpl = $(el).parents('.filter-item-field');
-    tpl.fadeOut(200, function(){
-        tpl.remove();
-        checkConditionsGroupFieldRemover(el);
-    });
-}
-
-function getFilterData(){
-    var data = $('#filter-form').serializeArray();
-    
-    return data;
-}
-
-
-function goSearch(){
-    getFilterData();
-}
-
 </script>
 
 
@@ -197,9 +219,9 @@ function goSearch(){
             <td style="width: 80px;">Контакты:</td>
             <td>
             <select name="contacts_type[${uid}]" style="width: 200px;">
-              <option value="all">Все</option>
-              <option value="rec">Получающие рассылку</option>
-              <option value="no_rec">Не получающие рассылку</option>
+              <option{{if mix.contacts_type == 'all'}} selected="selected"{{/if}} value="all">Все</option>
+              <option{{if mix.contacts_type == 'rec'}} selected="selected"{{/if}} value="rec">Получающие рассылку</option>
+              <option{{if mix.contacts_type == 'no_rec'}} selected="selected"{{/if}} value="no_rec">Не получающие рассылку</option>
             </select>        
             </td>
           </tr>
@@ -211,7 +233,7 @@ function goSearch(){
                   if (count($funnels_list) > 0) {
                       foreach ($funnels_list AS $funnel) {
                   ?>
-                <li><label><input type="checkbox" value="funnels[${uid}][<?= $funnel->id ?>]"> - <?= $funnel->name ?></label></li>  
+                <li><label><input{{if mix.funnels && mix.funnels[<?= $funnel->id ?>] && mix.funnels[<?= $funnel->id ?>] == 1}} checked="checked"{{/if}} type="checkbox" name="funnels[${uid}][<?= $funnel->id ?>]" value="1"> - <?= $funnel->name ?></label></li>  
                   <?
                       }
                   }
@@ -226,24 +248,25 @@ function goSearch(){
             <td style="width: 130px;">Диапазон дат:</td>
             <td>
             <select type="text" name="dates_range[${uid}]" id="basicTermsRange_3_1" class="selWithOtherEl basicTermsRange" onfocus="javascript:$(this).parents('.fieldLine').find('input:radio').attr(&quot;checked&quot;,true);">
-              <option value="today">Сегодня</option>
-              <option value="yesterday">Вчера</option>
-              <option value="this_week">На этой неделе</option>
-              <option value="last_week">На прошлой неделе</option>
-              <option value="last_7_days">Последние 7 дней</option>
-              <option value="last_30_days">Последние 30 дней</option>
-              <option value="this_month">В этом месяце</option>
-              <option value="last_month">В прошлом месяце</option>
-              <option value="last_2_months">Последние 2 месяца</option>
-              <option value="all_time" selected="selected">Все время</option>
+              <option{{if mix.dates_range == 'today'}} selected="selected"{{/if}} value="today">Сегодня</option>
+              <option{{if mix.dates_range == 'yesterday'}} selected="selected"{{/if}} value="yesterday">Вчера</option>
+              <option{{if mix.dates_range == 'this_week'}} selected="selected"{{/if}} value="this_week">На этой неделе</option>
+              <option{{if mix.dates_range == 'last_week'}} selected="selected"{{/if}} value="last_week">На прошлой неделе</option>
+              <option{{if mix.dates_range == 'last_7_days'}} selected="selected"{{/if}} value="last_7_days">Последние 7 дней</option>
+              <option{{if mix.dates_range == 'last_30_days'}} selected="selected"{{/if}} value="last_30_days">Последние 30 дней</option>
+              <option{{if mix.dates_range == 'this_month'}} selected="selected"{{/if}} value="this_month">В этом месяце</option>
+              <option{{if mix.dates_range == 'last_month'}} selected="selected"{{/if}} value="last_month">В прошлом месяце</option>
+              <option{{if mix.dates_range == 'last_2_months'}} selected="selected"{{/if}} value="last_2_months">Последние 2 месяца</option>
+              <option{{if mix.dates_range == 'all_time'}} selected="selected"{{/if}} value="all_time">Все время</option>
+              <option{{if mix.dates_range == 'custom'}} selected="selected"{{/if}} value="custom">Свой диапазон</option>
             </select>       
             </td>
           </tr>
           <tr>
             <td>Свой диапазон дат:</td>
             <td>
-              <input class="datepicker" name="date_start[${uid}]" type="text" style="width: 70px;"> - 
-              <input class="datepicker" name="date_end[${uid}]" type="text" style="width: 70px;">
+              <input class="datepicker" name="date_start[${uid}]"{{if mix.dates_range == 'custom'}} value="${mix.date_start}"{{/if}} type="text" style="width: 70px;"> - 
+              <input class="datepicker" name="date_end[${uid}]"{{if mix.dates_range == 'custom'}} value="${mix.date_end}"{{/if}} type="text" style="width: 70px;">
             </td>
           </tr>
         </table>
@@ -252,17 +275,16 @@ function goSearch(){
           <tr>
             <td style="width: 130px;">Соответствует</td>
             <td>
-            <select value="match[${uid}]">
-              <option value="and">Всем</option>
-              <option value="or">Одному из</option>
+            <select name="match[${uid}]">
+              <option{{if mix.match == 'and'}} selected="selected"{{/if}} value="and">Всем</option>
+              <option{{if mix.match == 'or'}} selected="selected"{{/if}} value="or">Одному из</option>
             </select>
             из следующих:       
             </td>
           </tr>
           <tr>
             <td colspan="2">
-              <table class="filter-item-fields">
-              
+              <table class="filter-item-fields">              
               </table>
             </td>
           </tr>
@@ -289,41 +311,41 @@ function goSearch(){
 <script id="tpl-filter-item-field" type="text/x-jquery-tmpl">
 <tr class="filter-item-field">
   <td>
-    <select>
-      <option value="name" selected="selected">Name</option>
-      <option value="email">Email</option>
-      <option value="geo">Geolocation</option>
-      <option value="custom">Custom Field</option>
-      <option value="goal">Goals</option>
-      <option value="created_on">Subscription Date</option>
-      <option value="origin">Subscription Method</option>
-      <option value="last_followup">Last Autoresponder Date</option>
-      <option value="last_broadcast">Last Newsletter Date</option>
-      <option value="last_open">Last Open Date</option>
-      <option value="last_click">Last Click Date</option>
-      <option value="message_open">Message Opened</option>
-      <option value="message_not_open">Message Not Opened</option>
-      <option value="link_clicked">Link Clicked</option>
-      <option value="link_not_clicked">Link Not Clicked</option>
+    <select name="fields[${uid}][${fid}][name]">
+      <option{{if mix.name == 'name'}} selected="selected"{{/if}} value="name">Name</option>
+      <option{{if mix.name == 'email'}} selected="selected"{{/if}} value="email">Email</option>
+      <option{{if mix.name == 'geo'}} selected="selected"{{/if}} value="geo">Geolocation</option>
+      <option{{if mix.name == 'custom'}} selected="selected"{{/if}} value="custom">Custom Field</option>
+      <option{{if mix.name == 'goal'}} selected="selected"{{/if}} value="goal">Goals</option>
+      <option{{if mix.name == 'created_on'}} selected="selected"{{/if}} value="created_on">Subscription Date</option>
+      <option{{if mix.name == 'origin'}} selected="selected"{{/if}} value="origin">Subscription Method</option>
+      <option{{if mix.name == 'last_followup'}} selected="selected"{{/if}} value="last_followup">Last Autoresponder Date</option>
+      <option{{if mix.name == 'last_broadcast'}} selected="selected"{{/if}} value="last_broadcast">Last Newsletter Date</option>
+      <option{{if mix.name == 'last_open'}} selected="selected"{{/if}} value="last_open">Last Open Date</option>
+      <option{{if mix.name == 'last_click'}} selected="selected"{{/if}} value="last_click">Last Click Date</option>
+      <option{{if mix.name == 'message_open'}} selected="selected"{{/if}} value="message_open">Message Opened</option>
+      <option{{if mix.name == 'message_not_open'}} selected="selected"{{/if}} value="message_not_open">Message Not Opened</option>
+      <option{{if mix.name == 'link_clicked'}} selected="selected"{{/if}} value="link_clicked">Link Clicked</option>
+      <option{{if mix.name == 'link_not_clicked'}} selected="selected"{{/if}} value="link_not_clicked">Link Not Clicked</option>
     </select>
   </td>
   <td>
-    <select>
-      <option value="eq" selected="selected">is</option>
-      <option value="not_eq">is not</option>
-      <option value="co">contains</option>
-      <option value="not_co">does not contain</option>
-      <option value="start">start with</option>
-      <option value="end">ends with</option>
-      <option value="not_start">does not start with</option>
-      <option value="not_end">does not end with</option>
+    <select name="fields[${uid}][${fid}][exp]">
+      <option{{if mix.exp == 'eq'}} selected="selected"{{/if}} value="eq" selected="selected">равно</option>
+      <option{{if mix.exp == 'not_eq'}} selected="selected"{{/if}} value="not_eq">НЕ равно</option>
+      <option{{if mix.exp == 'co'}} selected="selected"{{/if}} value="co">содержит</option>
+      <option{{if mix.exp == 'not_co'}} selected="selected"{{/if}} value="not_co">НЕ содержит</option>
+      <option{{if mix.exp == 'start'}} selected="selected"{{/if}} value="start">начинается с</option>
+      <option{{if mix.exp == 'end'}} selected="selected"{{/if}} value="end">заканчивается на</option>
+      <option{{if mix.exp == 'not_start'}} selected="selected"{{/if}} value="not_start">НЕ начинается с</option>
+      <option{{if mix.exp == 'not_end'}} selected="selected"{{/if}} value="not_end">НЕ заканчивается на</option>
     </select>
   </td>
   <td>
-    <input type="text" style="width:140px">
+    <input name="fields[${uid}][${fid}][value]" type="text" style="width:140px" value="${mix.value}">
   </td>
   <td>
-    <a class="button button-small button-primary" href="#" onclick="addConditionsGroupField(this); return false;">+</a>
+    <a class="button button-small button-primary" href="#" onclick="addConditionsGroupField(this, null, {uid:${uid}}); return false;">+</a>
     <a class="button button-small field-remove-button" href="#" onclick="removeConditionsGroupField(this); return false;">-</a>
   </td>
 </tr>

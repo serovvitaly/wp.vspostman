@@ -35,8 +35,8 @@
           <td><?= $filter->created ?></td>
           <td>
           <div class="row-actions-visible">
-              <span class="edit"><a href="/wp-admin/admin.php?page=vspostman-mails&amp;act=edit&amp;uid=7">Редактировать</a> | </span>
-              <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-mails&amp;act=delete&amp;uid=7" class="delete" onclick="if (!confirm('Точно удалить?')) return false;">Удалить</a></span>
+              <span class="edit"><a href="/wp-admin/admin.php?page=vspostman-clients&act=filteredit&uid=<?= $filter->id ?>">Редактировать</a> | </span>
+              <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-clients&act=filterdelete&uid=<?= $filter->id ?>" class="delete" onclick="if (!confirm('Точно удалить?')) return false;">Удалить</a></span>
           </div>
           </td>
         </tr>

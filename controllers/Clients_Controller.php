@@ -59,7 +59,8 @@ class Clients_Controller extends Base_Controller{
                 $data = json_decode($filter->data);
                 
                 $result = array(
-                    'id' => $filter->id,
+                    'id'   => $filter->id,
+                    'name' => $filter->name,
                     'data' => $data
                 );
                 
@@ -79,6 +80,8 @@ class Clients_Controller extends Base_Controller{
     
     public function action_index()
     {
+        $this->current_filter = $this->_input('filter', 0);
+        
         $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
         
         $this->filters = $this->db->get_results("SELECT `id`,`name`,`created` FROM " . TABLE_CLIENTS_FILTERS);
@@ -99,6 +102,30 @@ class Clients_Controller extends Base_Controller{
     }
     
     
+    public function action_filteredit()
+    {
+        $id = $this->_input('uid');
+        if ($id > 0) {
+            //
+        }
+        $redirect_to = '/wp-admin/admin.php?page=vspostman-clients&filter=' . $id;
+        include(VSP_DIR . '/templates/redirect.php');
+        return false;
+    }
+    
+    
+    public function action_filterdelete()
+    {
+        $id = $this->_input('uid');
+        if ($id > 0) {
+            $this->db->delete(TABLE_CLIENTS_FILTERS, array('id' => $id));
+        }
+        $redirect_to = '/wp-admin/admin.php?page=vspostman-clients&act=filterlist';
+        include(VSP_DIR . '/templates/redirect.php');
+        return false;
+    }
+    
+    
     public function action_filtersave()
     {
         $input = $_POST;
@@ -106,7 +133,7 @@ class Clients_Controller extends Base_Controller{
         $id   = isset($input['id'])   ? $input['id'] : 0;
         $name = isset($input['filter_name']) ? $input['filter_name'] : NULL;
         
-        $allowable_fields = array('contacts_type','funnels','dates_range','date_start','date_end','match');
+        $allowable_fields = array('contacts_type','funnels','dates_range','date_start','date_end','match','fields');
         
         $mix = array();
         foreach ($input AS $key => $value) {
