@@ -373,21 +373,20 @@ $(document).ready(function(){
 <tr class="filter-item-field">
   <td>
     <select name="fields[${uid}][${fid}][name]">
-      <option{{if mix.name == 'name'}} selected="selected"{{/if}} value="name">Name</option>
+      <option{{if mix.name == 'first_name'}} selected="selected"{{/if}} value="first_name">ФИО</option>
       <option{{if mix.name == 'email'}} selected="selected"{{/if}} value="email">Email</option>
-      <option{{if mix.name == 'geo'}} selected="selected"{{/if}} value="geo">Geolocation</option>
-      <option{{if mix.name == 'custom'}} selected="selected"{{/if}} value="custom">Custom Field</option>
-      <option{{if mix.name == 'goal'}} selected="selected"{{/if}} value="goal">Goals</option>
-      <option{{if mix.name == 'created_on'}} selected="selected"{{/if}} value="created_on">Subscription Date</option>
-      <option{{if mix.name == 'origin'}} selected="selected"{{/if}} value="origin">Subscription Method</option>
-      <option{{if mix.name == 'last_followup'}} selected="selected"{{/if}} value="last_followup">Last Autoresponder Date</option>
-      <option{{if mix.name == 'last_broadcast'}} selected="selected"{{/if}} value="last_broadcast">Last Newsletter Date</option>
-      <option{{if mix.name == 'last_open'}} selected="selected"{{/if}} value="last_open">Last Open Date</option>
-      <option{{if mix.name == 'last_click'}} selected="selected"{{/if}} value="last_click">Last Click Date</option>
-      <option{{if mix.name == 'message_open'}} selected="selected"{{/if}} value="message_open">Message Opened</option>
-      <option{{if mix.name == 'message_not_open'}} selected="selected"{{/if}} value="message_not_open">Message Not Opened</option>
-      <option{{if mix.name == 'link_clicked'}} selected="selected"{{/if}} value="link_clicked">Link Clicked</option>
-      <option{{if mix.name == 'link_not_clicked'}} selected="selected"{{/if}} value="link_not_clicked">Link Not Clicked</option>
+      <option{{if mix.name == 'country'}} selected="selected"{{/if}} value="country">Страна</option>
+      <option{{if mix.name == 'city'}} selected="selected"{{/if}} value="city">Город</option>
+      <option{{if mix.name == 'address'}} selected="selected"{{/if}} value="address">Адрес доставки</option>
+      <option{{if mix.name == 'phone'}} selected="selected"{{/if}} value="phone">Телефон</option>
+      <option{{if mix.name == 'skype'}} selected="selected"{{/if}} value="skype">Skype</option>
+      <option{{if mix.name == 'icq'}} selected="selected"{{/if}} value="icq">ICQ</option>
+      <option{{if mix.name == 'facebook'}} selected="selected"{{/if}} value="facebook">Facebook</option>
+      <option{{if mix.name == 'vk'}} selected="selected"{{/if}} value="vk">Вконтакте</option>
+      <option{{if mix.name == 'google'}} selected="selected"{{/if}} value="google">Google+</option>
+      <option{{if mix.name == 'web'}} selected="selected"{{/if}} value="web">Веб-сайт</option>
+      <option{{if mix.name == 'birthdate'}} selected="selected"{{/if}} value="birthdate">Дата рождения</option>
+      <option{{if mix.name == 'information'}} selected="selected"{{/if}} value="information">Доп. информация</option>
     </select>
   </td>
   <td>
@@ -415,7 +414,7 @@ $(document).ready(function(){
 <script id="tpl-result-item" type="text/x-jquery-tmpl">
 <tr class="result-item">
   <th scope="row" class="check-column"><input type="checkbox" name="checked[]" value="${id}"></th>
-  <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard&cid=${id}">${name}</a></td>
+  <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard&cid=${id}">${first_name}</a></td>
   <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard&cid=${id}">${email}</a></td>
   <td>${created}</td>
 </tr>

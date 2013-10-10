@@ -16,6 +16,7 @@ textarea.edit-view{
 <h2 class="nav-tab-wrapper">
   <a href="#" class="nav-tab nav-tab-active">Общие</a>
   <a href="#" class="nav-tab">Письма</a>
+  <a href="#" class="nav-tab">Комментарии</a>
 </h2>
 
 <div class="tab-container">
