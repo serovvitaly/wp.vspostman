@@ -30,7 +30,7 @@
             foreach ($filters AS $filter) {
         ?>
         <tr>
-          <th scope="row" class="check-column"><input type="checkbox" name="checked[]" value="7"></th>
+          <th scope="row" class="check-column"><input type="checkbox" name="checked[]" value="<?= $filter->id ?>"></th>
           <td><?= $filter->name ?></td>
           <td><?= $filter->created ?></td>
           <td>

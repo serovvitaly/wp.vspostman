@@ -48,10 +48,51 @@
   </div>
   </div>
   </form>
+  
+  <div id="clients-search-result" style="display: none;">
+    <div style="text-align: right;">
+      <a href="#" onclick="backToSearch(); return false;">Вернуться к поиску</a>
+    </div>
+    <table class="wp-list-table widefat" cellspacing="0" style="margin-top: 20px;">
+    
+    <thead>
+      <tr>
+        <th scope="col" class="manage-column column-cb check-column" style=""><input id="cb-select-all-1" type="checkbox"></th>
+        <th scope="col" class="manage-column column-name" style="width: 300px;">Имя</th>
+        <th scope="col" class="manage-column column-name" style="width: 300px;">Email</th>
+        <th scope="col" class="manage-column column-name" style="width: 150px;">Добавлен</th>
+      </tr>
+    </thead>
+
+    <tfoot>
+      <tr>
+        <th scope="col" class="manage-column column-cb check-column" style=""><input id="cb-select-all-1" type="checkbox"></th>
+        <th scope="col" class="manage-column column-name">Имя</th>
+        <th scope="col" class="manage-column column-name">Email</th>
+        <th scope="col" class="manage-column column-name">Добавлен</th>
+      </tr>
+    </tfoot>
+    
+      <tbody></tbody>
+    </table>
+  </div>  
+  
 </div>
 
 
+
+
+
+
 <script>
+
+function backToSearch(){
+    $('#clients-search-result').slideUp(null, function(){
+        $('#clients-search-result table tbody').html('');
+    });
+    
+    $('#filter-form').slideDown();
+}
 
 function loadFilter(fid){
     
@@ -177,7 +218,27 @@ function getFilterData(){
 }
 
 function goSearch(){
-    getFilterData();
+    $('#filter-form input[name="act"]').val('search');
+    $('#filter-form').ajaxSubmit({
+        dataType: 'json',
+        beforeSubmit: function(formData, jqForm, options){
+            $('#clients-search-result table tbody').html('');
+        },
+        success: function(data, statusText, xhr, $form){
+            
+            $('#filter-form').slideUp();
+            
+            if (data.success === true) {
+                if (data.result && data.result.length > 0) {
+                    for(var i = 0; i < data.result.length; i++){
+                        $.tmpl( $('#tpl-result-item').html().trim(), data.result[i] ).appendTo('#clients-search-result table tbody');
+                    }
+                }
+            }
+            
+            $('#clients-search-result').slideDown();
+        }
+    });
 }
 
 $(document).ready(function(){
@@ -187,6 +248,7 @@ $(document).ready(function(){
     $('#filter-form').ajaxForm({
         dataType: 'json',
         beforeSubmit: function(formData, jqForm, options){
+            $('#filter-form input[name="act"]').val('filtersave');
             for (var i = 0; i < formData.length; i++) {
                 var field = formData[i];
                 switch (field.name) {
@@ -199,8 +261,7 @@ $(document).ready(function(){
                 }
             }
         },
-        success: function(data){
-            console.log(data);
+        success: function(data, statusText, xhr, $form){
             if (data.success === true) {
                 window.location = '/wp-admin/admin.php?page=vspostman-clients&act=filterlist';
             }
@@ -348,5 +409,14 @@ $(document).ready(function(){
     <a class="button button-small button-primary" href="#" onclick="addConditionsGroupField(this, null, {uid:${uid}}); return false;">+</a>
     <a class="button button-small field-remove-button" href="#" onclick="removeConditionsGroupField(this); return false;">-</a>
   </td>
+</tr>
+</script>
+
+<script id="tpl-result-item" type="text/x-jquery-tmpl">
+<tr class="result-item">
+  <th scope="row" class="check-column"><input type="checkbox" name="checked[]" value="${id}"></th>
+  <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard&cid=${id}">${name}</a></td>
+  <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard&cid=${id}">${email}</a></td>
+  <td>${created}</td>
 </tr>
 </script>

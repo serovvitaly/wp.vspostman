@@ -43,6 +43,81 @@ class Clients_Controller extends Base_Controller{
     );
     
     
+    public function action_search()
+    {
+        $success = false;
+        $result  = NULL;
+        
+        $filter = $this->_get_filter();
+        
+        $success = true;
+        $result = $this->db->get_results('SELECT * FROM ' . TABLE_CLIENTS_CONTACTS);
+        
+        echo json_encode(array(
+            'success' => $success,
+            'result'  => $result,
+        ));
+        
+        return false;
+    }
+    
+    
+    public function action_clientcard()
+    {
+        $contact_id = $this->_input('cid');
+        
+        if ($contact_id > 0) {
+            $contact = $this->db->get_row("SELECT * FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `id` = {$contact_id}");
+            
+            if ($contact AND count($contact) > 0) {
+                foreach ($contact AS $field_name => $field_val) {
+                    $this->$field_name = $field_val;
+                }
+            }
+        }
+        
+    }
+    
+    
+    public function action_savecontact()
+    {
+        $success = false;
+        $result  = NULL;
+        
+        $allowable_fields = array('first_name','email','country','city','address','phone','skype','icq','facebook','vk','google','web','birthdate','information');
+        
+        $input = $_POST;
+        
+        $id = $this->_input('cid');
+        
+        if ($id > 0 AND count($input) > 0) {
+            $data = array();
+            foreach ($input AS $key => $value) {
+                if (in_array($key, $allowable_fields)) {
+                    $data[$key] = $value;
+                }
+            }
+            
+            if (count($data) > 0) {
+                $this->db->update(TABLE_CLIENTS_CONTACTS, $data, array('id' => $id));
+                
+                $success = true;
+            } else {
+                $result = 'Не удалось сохранить данные.';
+            }
+        } else {
+            $result = 'Не удалось сохранить данные.';
+        }
+        
+        echo json_encode(array(
+            'success' => $success,
+            'result'  => $result
+        ));
+        
+        return false;
+    }
+    
+    
     public function action_loadfilter()
     {
         $filter_id = $this->_input('filter_id');
@@ -126,27 +201,35 @@ class Clients_Controller extends Base_Controller{
     }
     
     
-    public function action_filtersave()
+    protected function _get_filter()
     {
         $input = $_POST;
-        
-        $id   = isset($input['id'])   ? $input['id'] : 0;
-        $name = isset($input['filter_name']) ? $input['filter_name'] : NULL;
         
         $allowable_fields = array('contacts_type','funnels','dates_range','date_start','date_end','match','fields');
         
         $mix = array();
-        foreach ($input AS $key => $value) {
-            if (in_array($key, $allowable_fields) AND is_array($value) AND count($value) > 0) {
-                foreach ($value AS $unique_id => $val) {
-                    $mix[$unique_id][$key] = $val;
+        if (count($input) > 0) {
+            foreach ($input AS $key => $value) {
+                if (in_array($key, $allowable_fields) AND is_array($value) AND count($value) > 0) {
+                    foreach ($value AS $unique_id => $val) {
+                        $mix[$unique_id][$key] = $val;
+                    }
                 }
-            }
+            }    
         }
+        
+        return $mix;
+    }
+    
+    
+    public function action_filtersave()
+    {        
+        $id   = $this->_input('id', 0);
+        $name = $this->_input('filter_name');
         
         $data = array(
             'name' => $name,
-            'data' => json_encode($mix)
+            'data' => json_encode($this->_get_filter())
         );
         
         if ($id > 0) {

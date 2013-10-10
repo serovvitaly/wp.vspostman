@@ -24,6 +24,9 @@ function ajaxForm(opts){
 </script>
 
 <style>
+.widefat tbody th.check-column {
+    padding: 9px 0 7px;
+}
 .wrap table td{
     vertical-align: top;
 }
