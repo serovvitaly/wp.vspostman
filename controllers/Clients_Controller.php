@@ -250,13 +250,13 @@ class Clients_Controller extends Base_Controller{
     {
         $input = $_POST;
         
-        $name  = isset($input['first_name'])  ? trim($input['first_name'])  : NULL;
+        $first_name  = isset($input['first_name'])  ? trim($input['first_name'])  : NULL;
         $email = isset($input['email']) ? trim($input['email']) : NULL;
         
         $funnel_id = isset($input['funnel_id']) ? trim($input['funnel_id']) : NULL;
         
         $this->db->insert(TABLE_CLIENTS_CONTACTS, array(
-            'name'  => $name,
+            'first_name'  => $first_name,
             'email' => $email,
         ));
         
@@ -396,7 +396,7 @@ class Clients_Controller extends Base_Controller{
                         
                         if ($valid) {
                             if ($row === NULL) {
-                                $this->db->insert(TABLE_CLIENTS_CONTACTS, array('email' => $email, 'name' => $name));
+                                $this->db->insert(TABLE_CLIENTS_CONTACTS, array('email' => $email, 'first_name' => $name));
                                 $added++;
                             } else {
                                 $skipped++;
