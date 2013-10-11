@@ -15,8 +15,8 @@ textarea.edit-view{
 
 <h2 class="nav-tab-wrapper">
   <a href="#" class="nav-tab nav-tab-active">Общие</a>
-  <a href="#" class="nav-tab">Письма</a>
-  <a href="#" class="nav-tab">Комментарии</a>
+  <a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard_mails&cid=<?= $id ?>" class="nav-tab">Письма</a>
+  <a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard_comments&cid=<?= $id ?>" class="nav-tab">Комментарии</a>
 </h2>
 
 <div class="tab-container">
@@ -27,10 +27,10 @@ textarea.edit-view{
     <legend style="margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #D0D0D0; width: 100%;">
       <span style="font-size: 20px;">Анкета</span>
       <span style="float: right;">
-        <span class="clients-editable-act hidden">
-          <a href="unsubscribe?cid=<?= $id ?>" onclick="return confirm('Точно отписать?')">отписать</a> |  
+        <!--span class="clients-editable-act hidden">
+          <a href="remove?cid=<?= $id ?>" onclick="return confirm('Точно отписать?')">отписать</a> |  
           <a href="delete?cid=<?= $id ?>" onclick="return confirm('Точно удалить?')">удалить</a> | 
-        </span>     
+        </span-->     
         <a href="#" onclick="editContact(this); return false;">изменить</a>
         <a href="#" class="button button-small clients-editable-act hidden" onclick="saveContact(this); return false;">Сохранить</a>
       </span>
@@ -150,17 +150,21 @@ textarea.edit-view{
     <legend style="margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #D0D0D0; width: 100%;">
       <span style="font-size: 20px; padding: 0 196px 0 0">Комментарии</span>
     </legend>
-    <table>
+    <table style="width: 400px;">
+<?
+    if (count($comments) > 0) {
+        foreach ($comments AS $com) {
+    ?>
       <tr><td>
-        <strong>Иван Драго</strong> <i>12.14.1333</i>
-        <p>Туристический отдел создает и реализует групповые<br> и индивидуальные туры, ориентирован<br> на работу с туристическими агентствами</p>
+        <strong><?= $com->user_name ?></strong> <i><?= $com->created ?></i>
+        <p style="margin: 5px 0 15px;"><?= $com->content ?></p>
       </td></tr>
-      <tr><td>
-        <strong>некто</strong> <i>12.14.1333</i>
-        <p>Отдел кураторов осуществляет помощь в работе агентств<br> с компанией "ИнтАэр", призваны сделать нашу совместную<br> работу максимально приятной и продуктивной.<br> Решают все вопросы агентств: оплата, подтверждение туров,<br> цены, бонусы, услуги сервиса и многие другие.</p>
-      </td></tr>
+    <?
+        }
+    }
+?>
     </table>
-    <a href="#">показать все комментарии</a>
+    <a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard_comments&cid=<?= $id ?>">показать все комментарии</a>
   </fieldset>
   
   </div>

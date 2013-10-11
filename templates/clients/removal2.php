@@ -59,7 +59,7 @@
             foreach ($list AS $item) {
         ?>
         <tr>
-          <td><?= $item->name ?></td>
+          <td><?= $item->first_name ?></td>
           <td><?= $item->email ?></td>
           <td><?= $item->removal_reason ?></td>
           <td><?= $item->removal_at ?></td>

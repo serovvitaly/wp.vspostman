@@ -50,7 +50,7 @@ class Clients_Controller extends Base_Controller{
         
         $filter = $this->_get_filter();
         
-        $total = $this->db->get_var('SELECT COUNT(id) as count FROM ' . TABLE_CLIENTS_CONTACTS);
+        $total = $this->db->get_var('SELECT COUNT(id) as count FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0");
         
         $limit = (int) $this->_input('limit', 20);
         if ($limit < 1) $limit = 1;
@@ -64,7 +64,7 @@ class Clients_Controller extends Base_Controller{
         $start = $limit * ($page - 1);        
         
         $success = true;
-        $result = $this->db->get_results('SELECT * FROM ' . TABLE_CLIENTS_CONTACTS . " LIMIT {$start},{$limit}");
+        $result = $this->db->get_results('SELECT * FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0 LIMIT {$start},{$limit}");
         
         echo json_encode(array(
             'success' => $success,
@@ -91,8 +91,36 @@ class Clients_Controller extends Base_Controller{
                     $this->$field_name = $field_val;
                 }
             }
+            
+            $this->comments = $this->db->get_results("SELECT *, 'Администратор' as `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " WHERE `contact_id` = {$contact_id} ORDER BY created DESC LIMIT 2");
         }
         
+    }
+    
+    
+    public function action_clientcard_mails()
+    {
+        $contact_id = $this->_input('cid');
+        
+        $this->id = $contact_id;
+        
+        if ($contact_id > 0) {
+            //
+        }
+    }
+    
+    
+    public function action_clientcard_comments()
+    {
+        $contact_id = $this->_input('cid');
+        
+        $this->id = $contact_id;
+        
+        $this->comments = array();
+        
+        if ($contact_id > 0) {
+            $this->comments = $this->db->get_results("SELECT *, 'Администратор' as `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " WHERE `contact_id` = {$contact_id} ORDER BY created DESC");
+        }
     }
     
     
