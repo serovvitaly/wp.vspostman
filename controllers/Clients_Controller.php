@@ -50,7 +50,21 @@ class Clients_Controller extends Base_Controller{
         
         $filter = $this->_get_filter();
         
-        print_r($filter);
+        $prepare_group = function($group){
+            $group_sql = '';
+            
+            
+            return $group_sql;
+        };
+        
+        //print_r($filter);
+        $where_sql = '';
+        if (count($filter) > 0) {
+            foreach ($filter AS $group) {
+                $condition = ( isset($group['condition']) AND strtolower($group['condition']) == 'or' ) ? ' OR ' : ' AND '; 
+                $where_sql .= $prepare_group($group) . $condition;
+            }
+        }
         
         $total = $this->db->get_var('SELECT COUNT(id) as count FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0");
         
