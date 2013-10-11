@@ -50,14 +50,30 @@
   </form>
   
   <div id="clients-search-result" style="display: none;">
-    <div style="text-align: right;">
+    <div style="text-align: left;">
       <a href="#" onclick="backToSearch(); return false;">Вернуться к поиску</a>
     </div>
-    <table class="wp-list-table widefat" cellspacing="0" style="margin-top: 20px;">
+    
+  <div class="tablenav top">
+
+    <!--div class="alignleft actions">
+      <select name="action">
+        <option value="-1" selected="selected">Действия</option>
+        <option value="edit" class="hide-if-no-js">Изменить</option>
+        <option value="trash">Удалить</option>
+      </select>
+      <input type="submit" name="" id="doaction" class="button action" value="Применить">
+    </div-->
+
+    <div class="tablenav-pages"></div>
+    <br class="clear">
+  </div>
+    
+    <table class="wp-list-table widefat" cellspacing="0">
     
     <thead>
       <tr>
-        <th scope="col" class="manage-column column-cb check-column" style=""><input id="cb-select-all-1" type="checkbox"></th>
+        <!--th scope="col" class="manage-column column-cb check-column" style=""><input id="cb-select-all-1" type="checkbox"></th-->
         <th scope="col" class="manage-column column-name" style="width: 300px;">Имя</th>
         <th scope="col" class="manage-column column-name" style="width: 300px;">Email</th>
         <th scope="col" class="manage-column column-name" style="width: 150px;">Добавлен</th>
@@ -66,7 +82,7 @@
 
     <tfoot>
       <tr>
-        <th scope="col" class="manage-column column-cb check-column" style=""><input id="cb-select-all-1" type="checkbox"></th>
+        <!--th scope="col" class="manage-column column-cb check-column" style=""><input id="cb-select-all-1" type="checkbox"></th-->
         <th scope="col" class="manage-column column-name">Имя</th>
         <th scope="col" class="manage-column column-name">Email</th>
         <th scope="col" class="manage-column column-name">Добавлен</th>
@@ -75,6 +91,23 @@
     
       <tbody></tbody>
     </table>
+    
+<div class="tablenav bottom">
+
+        <!--div class="alignleft actions">
+            <select name="action2">
+            <option value="-1" selected="selected">Действия</option>
+                <option value="edit" class="hide-if-no-js">Изменить</option>
+                <option value="trash">Удалить</option>
+            </select>
+            <input type="submit" name="" id="doaction2" class="button action" value="Применить">
+        </div-->
+        <!--div class="alignleft actions">
+        </div-->
+        <div class="tablenav-pages"></div>
+        <br class="clear">
+    </div>
+    
   </div>  
   
 </div>
@@ -87,6 +120,8 @@
 <script>
 
 function backToSearch(){
+    $('#filter-form input[name="act"]').val('filtersave');
+    
     $('#clients-search-result').slideUp(null, function(){
         $('#clients-search-result table tbody').html('');
     });
@@ -95,6 +130,8 @@ function backToSearch(){
 }
 
 function loadFilter(fid){
+    
+    $('#filter-form input[name="act"]').val('filtersave');
     
     if (fid && fid > 0) {
         $('#clients-filters-list').val(fid);
@@ -127,6 +164,7 @@ function loadFilter(fid){
 }
 
 function addNewFilter(){
+    $('#filter-form input[name="act"]').val('filtersave');
     $('.filter-items').html('');
     $('#clients-filters-list').val(0);
     $('#filter-form input[name="id"]').val(0);
@@ -211,16 +249,13 @@ function removeConditionsGroupField(el){
     });
 }
 
-function getFilterData(){
-    var data = $('#filter-form').serializeArray();
-    
-    return data;
-}
-
-function goSearch(){
+function goSearch(page){
     $('#filter-form input[name="act"]').val('search');
     $('#filter-form').ajaxSubmit({
         dataType: 'json',
+        data: {
+            page: page ? page : 1
+        },
         beforeSubmit: function(formData, jqForm, options){
             $('#clients-search-result table tbody').html('');
         },
@@ -235,6 +270,9 @@ function goSearch(){
                     }
                 }
             }
+            
+            $('.tablenav-pages').html(''); 
+            $.tmpl( $('#tpl-result-paginator').html().trim(), data).appendTo('.tablenav-pages');
             
             $('#clients-search-result').slideDown();
         }
@@ -413,9 +451,22 @@ $(document).ready(function(){
 
 <script id="tpl-result-item" type="text/x-jquery-tmpl">
 <tr class="result-item">
-  <th scope="row" class="check-column"><input type="checkbox" name="checked[]" value="${id}"></th>
+  <!--th scope="row" class="check-column"><input type="checkbox" name="checked[]" value="${id}"></th-->
   <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard&cid=${id}">${first_name}</a></td>
   <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard&cid=${id}">${email}</a></td>
   <td>${created}</td>
 </tr>
+</script>
+
+<script id="tpl-result-paginator" type="text/x-jquery-tmpl">
+<span class="displaying-num">${total} элементов</span>
+<span class="pagination-links">
+    <a class="first-page" title="Перейти на первую страницу" onclick="goSearch(1); return false;" href="#">«</a>
+    <a class="prev-page" title="Перейти на предыдущую страницу" onclick="goSearch(${page} - 1); return false;" href="#">‹</a>
+    <span class="paging-input">
+      <input class="current-page" title="Текущая страница" type="text" name="paged" value="${page}" size="1"> из <span class="total-pages">${pages}</span>
+    </span>
+    <a class="next-page" title="Перейти на следующую страницу" onclick="goSearch(${page} + 1); return false;" href="#">›</a>
+    <a class="last-page" title="Перейти на последнюю страницу" onclick="goSearch(${pages}); return false;" href="#">»</a>
+</span>
 </script>

@@ -50,12 +50,29 @@ class Clients_Controller extends Base_Controller{
         
         $filter = $this->_get_filter();
         
+        $total = $this->db->get_var('SELECT COUNT(id) as count FROM ' . TABLE_CLIENTS_CONTACTS);
+        
+        $limit = (int) $this->_input('limit', 20);
+        if ($limit < 1) $limit = 1;
+        
+        $pages = ceil($total / $limit);
+        
+        $page = (int) $this->_input('page', 1);
+        if ($page < 1) $page = 1;
+        if ($page > $pages) $page = $pages;
+        
+        $start = $limit * ($page - 1);        
+        
         $success = true;
-        $result = $this->db->get_results('SELECT * FROM ' . TABLE_CLIENTS_CONTACTS);
+        $result = $this->db->get_results('SELECT * FROM ' . TABLE_CLIENTS_CONTACTS . " LIMIT {$start},{$limit}");
         
         echo json_encode(array(
             'success' => $success,
             'result'  => $result,
+            'total'   => $total,
+            'limit'   => $limit,
+            'page'    => $page,
+            'pages'   => $pages,
         ));
         
         return false;
