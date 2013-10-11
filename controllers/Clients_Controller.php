@@ -50,6 +50,8 @@ class Clients_Controller extends Base_Controller{
         
         $filter = $this->_get_filter();
         
+        print_r($filter);
+        
         $total = $this->db->get_var('SELECT COUNT(id) as count FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0");
         
         $limit = (int) $this->_input('limit', 20);
@@ -255,7 +257,7 @@ class Clients_Controller extends Base_Controller{
     {
         $input = $_POST;
         
-        $allowable_fields = array('contacts_type','funnels','dates_range','date_start','date_end','match','fields');
+        $allowable_fields = array('contacts_type','funnels','dates_range','date_start','date_end','match','fields','condition');
         
         $mix = array();
         if (count($input) > 0) {

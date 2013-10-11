@@ -158,6 +158,7 @@ function loadFilter(fid){
                 $.each(data.result.data, function(index, item){
                     addConditionsGroup({uid: index, mix: item});                    
                 });
+                checkConditionsGroupRemover();
             }
         }
     });
@@ -181,6 +182,8 @@ function checkConditionsGroupRemover(){
         items.find('.remove-button').fadeOut(200);
         items.find('.conditions-list').fadeOut(200);
     }
+    
+    $('.filter-item:last').find('.conditions-list').hide();
 }
 
 function addConditionsGroup(data){
@@ -205,7 +208,6 @@ function addConditionsGroup(data){
     } else {
         addConditionsGroupField(null, tpl, mix);
     }
-    checkConditionsGroupRemover(null, tpl);
 }
 
 function removeConditionsGroup(el){
@@ -228,7 +230,8 @@ function checkConditionsGroupFieldRemover(el, parent){
 
 function addConditionsGroupField(el, parent, data){
     var mix = $.extend({
-        fid: getUniqueId()
+        fid: getUniqueId(),
+        mix: {}
     }, data);
     var tpl = $.tmpl( $('#tpl-filter-item-field').html().trim(), mix );    
     var fieldsCnt = parent ? parent.find('.filter-item-fields') : $(el).parents('.filter-item-fields');
@@ -389,13 +392,13 @@ $(document).ready(function(){
         
         </div>
         
-        <a class="button" href="#" onclick="addConditionsGroup(); return false;">Добавить группу условий</a>
-        <a class="remove-button" href="#" onclick="removeConditionsGroup(this); return false;">удалить</a>
+        <a class="button" href="#" onclick="addConditionsGroup(); checkConditionsGroupRemover(); return false;">Добавить группу условий</a>
+        <a class="remove-button hidden" href="#" onclick="removeConditionsGroup(this); return false;">удалить</a>
   
-        <label class="conditions-list" style="padding-left:200px">Выберите ИЛИ, И между оператором "Условия Групп":
-          <select>
-            <option value="and">И</option>
-            <option value="or">ИЛИ</option>
+        <label class="conditions-list hidden" style="padding-left:200px">Выберите оператором ИЛИ, И между "Группами условий":
+          <select name="condition[${uid}]">
+            <option{{if mix.condition == 'and'}} selected="selected"{{/if}} value="and">И</option>
+            <option{{if mix.condition == 'or'}} selected="selected"{{/if}} value="or">ИЛИ</option>
           </select>
         </label>
         
