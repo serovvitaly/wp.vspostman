@@ -172,11 +172,6 @@ function addNewFilter(){
     addConditionsGroup();
 }
 
-function getUniqueId(){
-    var d = new Date();
-    return d.valueOf() + '' + d.getUTCMilliseconds();
-}
-
 function checkConditionsGroupRemover(){
     var items = $('.filter-item');
     if (items.length > 1) {

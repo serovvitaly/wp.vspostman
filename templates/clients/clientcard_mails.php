@@ -5,5 +5,5 @@
 </h2>
 
 <div class="tab-container">
-
+  <p>Список писем пуст</p>
 </div>

@@ -4,8 +4,12 @@
     line-height: 25px;
     padding-left: 5px;
 }
+td.td-title{
+    line-height: 25px;
+}
 .edit-view{
     border-color: #AFC8DB !important;
+    width: 210px;
 }
 textarea.edit-view{
     width: 210px;
@@ -20,7 +24,6 @@ textarea.edit-view{
 </h2>
 
 <div class="tab-container">
-
   <div style="display: inline-block; vertical-align: top; margin-right: 20px; padding-right: 20px; border-right: 1px solid #E6E6E6; width: 400px;">
 
   <fieldset>
@@ -44,61 +47,86 @@ textarea.edit-view{
         <col>
       </colgroup>
       <tr<?= (!isset($first_name) OR empty($first_name)) ? ' class="hidden"' : '' ?>>
-        <td>ФИО</td>
+        <td class="td-title">ФИО</td>
         <td><span class="pre-view"><?= $first_name ?></span><input name="first_name" value="<?= $first_name ?>" class="edit-view hidden" type="text"></td>
       </tr>
       <tr<?= (!isset($country) OR empty($country)) ? ' class="hidden"' : '' ?>>
-        <td>Страна</td>
+        <td class="td-title">Страна</td>
         <td><span class="pre-view"><?= $country ?></span><input name="country" value="<?= $country ?>" class="edit-view hidden" type="text"></td>
       </tr>
       <tr<?= (!isset($city) OR empty($city)) ? ' class="hidden"' : '' ?>>
-        <td>Город</td>
+        <td class="td-title">Город</td>
         <td><span class="pre-view"><?= $city ?></span><input name="city" value="<?= $city ?>" class="edit-view hidden" type="text"></td>
       </tr>
       <tr<?= (!isset($address) OR empty($address)) ? ' class="hidden"' : '' ?>>
-        <td>Адрес доставки (полный)</td>
+        <td class="td-title">Адрес доставки (полный)</td>
         <td><span class="pre-view"><?= $address ?></span><input name="address" value="<?= $address ?>" class="edit-view hidden" type="text"></td>
       </tr>
       <tr<?= (!isset($phone) OR empty($phone)) ? ' class="hidden"' : '' ?>>
-        <td>Телефон</td>
+        <td class="td-title">Телефон</td>
         <td><span class="pre-view"><?= $phone ?></span><input name="phone" value="<?= $phone ?>" class="edit-view hidden" type="text"></td>
       </tr>
       <tr<?= (!isset($email) OR empty($email)) ? ' class="hidden"' : '' ?>>
-        <td>Email</td>
+        <td class="td-title">Email</td>
         <td><span class="pre-view"><?= $email ?></span><input name="email" value="<?= $email ?>" class="edit-view hidden" type="text"></td>
       </tr>
       <tr<?= (!isset($skype) OR empty($skype)) ? ' class="hidden"' : '' ?>>
-        <td>Skype</td>
+        <td class="td-title">Skype</td>
         <td><span class="pre-view"><?= $skype ?></span><input name="skype" value="<?= $skype ?>" class="edit-view hidden" type="text"></td>
       </tr>
       <tr<?= (!isset($icq) OR empty($icq)) ? ' class="hidden"' : '' ?>>
-        <td>ICQ</td>
+        <td class="td-title">ICQ</td>
         <td><span class="pre-view"><?= $icq ?></span><input name="icq" value="<?= $icq ?>" class="edit-view hidden" type="text"></td>
       </tr>
       <tr<?= (!isset($facebook) OR empty($facebook)) ? ' class="hidden"' : '' ?>>
-        <td>Facebook</td>
+        <td class="td-title">Facebook</td>
         <td><span class="pre-view"><?= $facebook ?></span><input name="facebook" value="<?= $facebook ?>" class="edit-view hidden" type="text"></td>
       </tr>
       <tr<?= (!isset($vk) OR empty($vk)) ? ' class="hidden"' : '' ?>>
-        <td>Вконтакте</td>
+        <td class="td-title">Вконтакте</td>
         <td><span class="pre-view"><?= $vk ?></span><input name="vk" value="<?= $vk ?>" class="edit-view hidden" type="text"></td>
       </tr>
       <tr<?= (!isset($google) OR empty($google)) ? ' class="hidden"' : '' ?>>
-        <td>Google+</td>
+        <td class="td-title">Google+</td>
         <td><span class="pre-view"><?= $google ?></span><input name="google" value="<?= $google ?>" class="edit-view hidden" type="text"></td>
       </tr>
       <tr<?= (!isset($web) OR empty($web)) ? ' class="hidden"' : '' ?>>
-        <td>Веб-сайт</td>
+        <td class="td-title">Веб-сайт</td>
         <td><span class="pre-view"><?= $web ?></span><input name="web" value="<?= $web ?>" class="edit-view hidden" type="text"></td>
       </tr>
       <tr<?= (!isset($birthdate) OR empty($birthdate)) ? ' class="hidden"' : '' ?>>
-        <td>Дата рождения</td>
-        <td><span class="pre-view"><?= $birthdate ?></span><input name="birthdate" name="" value="<?= $birthdate ?>" class="edit-view hidden datepicker" type="text"></td>
+        <td class="td-title">Дата рождения</td>
+        <td><span class="pre-view"><?= $birthdate ?></span><input name="birthdate" value="<?= $birthdate ?>" class="edit-view hidden datepicker" type="text"></td>
       </tr>
       <tr<?= (!isset($information) OR empty($information)) ? ' class="hidden"' : '' ?>>
-        <td>Дополнительная информация</td>
+        <td class="td-title">Дополнительная информация</td>
         <td><span class="pre-view"><?= $information ?></span><textarea name="information" class="edit-view hidden" cols="" rows=""><?= $information ?></textarea></td>
       </tr>
+      
+      <?
+          if (isset($cost_fields) AND !empty($cost_fields)) {
+              $cost_fields = json_decode($cost_fields);
+              if (count($cost_fields) > 0) {
+                  foreach ($cost_fields AS $cfield_key => $cfield_val) {
+          ?>
+      <tr<?= empty($cfield_val) ? ' class="hidden"' : '' ?>>
+        <td class="td-title">
+          <span class="pre-view"><?= $cfield_val->key ?></span>
+          <input placeholder="Имя поля" style="width: 160px;" name="cost_fields[<?= $cfield_key ?>][key]" value="<?= $cfield_val->key ?>" class="edit-view hidden" type="text">
+        </td>
+        <td>
+          <span class="pre-view"><?= $cfield_val->value ?></span>
+          <input placeholder="Значение поля" name="cost_fields[<?= $cfield_key ?>][value]" value="<?= $cfield_val->value ?>" class="edit-view hidden" type="text">
+        </td>
+      </tr>
+          <?
+                  }
+              }
+          }
+      ?>
+      
+      <tr class="clients-editable-act hidden"><td colspan="2"><a href="#" onclick="createNewField(this); return false;">Добавить новое поле</a></td></tr>
+      
     </table>
     </form>
   </fieldset>
@@ -118,7 +146,7 @@ textarea.edit-view{
       </tr>
       <tr>
         <td>Страница перехода (УРЛ)</td>
-        <td><a href="#">http://yandex.ru/market/foo-bar.html</a></td>
+        <td><a target="_blank" href="<?= $conversion_page ?>"><?= $conversion_page ?></a></td>
       </tr>
     </table>
   </fieldset>
@@ -172,6 +200,13 @@ textarea.edit-view{
 
 <script>
 
+function createNewField(el){
+    
+    var uniqueId = getUniqueId();
+    
+    $(el).parents('tr').before('<tr><td class="td-title"><input placeholder="Имя нового поля" style="width: 160px;" name="cost_fields['+uniqueId+'][key]" class="edit-view" type="text"></td><td><input placeholder="Значение нового поля" name="cost_fields['+uniqueId+'][value]" value="" class="edit-view" type="text"></td></tr>');
+}
+
 function saveContact(){
     $('#clients-editable-form').ajaxSubmit({
         url: '/wp-content/plugins/vspostman/ajax.php',
@@ -180,6 +215,9 @@ function saveContact(){
         data: {
             controller: 'clients',
             act: 'savecontact'
+        },
+        beforeSubmit: function(formData, jqForm, options){
+            //
         },
         success: function(data){
             if (data.success === true) {

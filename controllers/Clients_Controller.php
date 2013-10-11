@@ -143,6 +143,11 @@ class Clients_Controller extends Base_Controller{
                 }
             }
             
+            $cost_fields = $this->_input('cost_fields');
+            if ($cost_fields AND count($cost_fields) > 0) {
+                $data['cost_fields'] = json_encode($cost_fields);
+            }
+            
             if (count($data) > 0) {
                 $this->db->update(TABLE_CLIENTS_CONTACTS, $data, array('id' => $id));
                 

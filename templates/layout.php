@@ -21,6 +21,11 @@ function ajaxForm(opts){
     $('#'+this.targer).ajaxForm(this.config);
 }
 
+function getUniqueId(){
+    var d = new Date();
+    return d.valueOf() + '' + d.getUTCMilliseconds();
+}
+
 </script>
 
 <style>
