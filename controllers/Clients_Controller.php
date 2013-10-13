@@ -57,6 +57,8 @@ class Clients_Controller extends Base_Controller{
             return $group_sql;
         };
         
+        $re = $this->db->query('SELECT * as count FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0");
+        
         //print_r($filter);
         $where_sql = '';
         if (count($filter) > 0) {
