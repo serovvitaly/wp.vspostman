@@ -197,7 +197,7 @@ class Clients_Controller extends Base_Controller{
         }
         
         $sql = 'SELECT COUNT(id) as count FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0{$where_sql}";
-        echo $sql . "\n\n";
+        //echo $sql . "\n\n";
         $total = $this->db->get_var($sql);
         
         $limit = (int) $this->_input('limit', 20);
