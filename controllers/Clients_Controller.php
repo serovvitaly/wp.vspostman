@@ -173,10 +173,9 @@ class Clients_Controller extends Base_Controller{
                 if (count($fields) > 0) {
                     $conditions[] = '(' . implode($match, $fields) . ')';
                 }
-            }
-            $group_sql = "({$funnels_condition}{$dates_range}{$fields})";            
+            }          
             
-            return '(' . implode(' AND ', $conditions) . ')';
+            return implode(' AND ', $conditions);
         };
         
         $re = $this->db->query('SELECT * as count FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0");
@@ -198,7 +197,7 @@ class Clients_Controller extends Base_Controller{
         }
         
         $sql = 'SELECT COUNT(id) as count FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0{$where_sql}";
-        //echo $sql . "\n\n";
+        echo $sql . "\n\n";
         $total = $this->db->get_var($sql);
         
         $limit = (int) $this->_input('limit', 20);
