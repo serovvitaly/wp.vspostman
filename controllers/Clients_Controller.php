@@ -51,10 +51,132 @@ class Clients_Controller extends Base_Controller{
         $filter = $this->_get_filter();
         
         $prepare_group = function($group){
-            $group_sql = '';
+            
+            $conditions = array();
+            
+            $funnels_condition = NULL;
+            if (isset($group['funnels']) AND is_array($group['funnels']) AND count($group['funnels']) > 0) {
+                $funnels = implode(',', $group['funnels']);
+                $conditions[] = "`id` IN(SELECT `contact_id` FROM `".TABLE_CONTACTS_FUNNELS."` WHERE `funnel_id` IN({$funnels}))";
+            }
+            
+            $dates_range = NULL;
+            if (isset($group['dates_range']) AND $group['dates_range'] != 'all_time') {
+                switch ($group['dates_range']) {
+                    case 'today':
+                        $date_start = date('Y-m-d 00:00:00');
+                        $date_end   = date('Y-m-d 23:59:59');
+                        break;
+                    case 'yesterday':
+                        $date_start = date('Y-m-d 00:00:00', time() - 3600*24);
+                        $date_end   = date('Y-m-d 00:00:00', time());
+                        break;
+                    case 'this_week':
+                        $date_start = date('Y-m-d 00:00:00');
+                        $date_end   = date('Y-m-d 23:59:59');
+                        break;
+                    case 'last_week':
+                        // TODO: сделать !!!
+                        break;
+                    case 'last_7_days':
+                        $date_start = date('Y-m-d 00:00:00', time() - 3600*24*7);
+                        $date_end   = date('Y-m-d 00:00:00', time());
+                        break;
+                    case 'last_30_days':
+                        $date_start = date('Y-m-d 00:00:00', time() - 3600*24*30);
+                        $date_end   = date('Y-m-d 00:00:00', time());
+                        break;
+                    case 'this_month':
+                        $date_start = date('Y-m-1 00:00:00');
+                        $date_end   = date('Y-m-d 23:59:59');
+                        break;
+                    case 'last_month':
+                        $this_month = date('n');
+                        $this_year  = date('Y');
+                        $last_year  = date('Y');
+                        if ($this_month > 1) {
+                            $last_month = $this_month - 1;
+                        } else {
+                            $last_month = 12;
+                            $last_year = $last_year - 1;
+                        }
+                        $date_start = date("{$last_year}-{$last_month}-1 00:00:00");
+                        $date_end   = date("{$this_year}-{$this_month}-1 00:00:00");
+                        break;
+                    case 'last_2_months':
+                        $this_month = date('n');
+                        $this_year  = date('Y');
+                        $last_year  = date('Y');
+                        if ($this_month > 2) {
+                            $last_month = $this_month - 2;
+                        } else {
+                            $last_month = 10 + $this_month;
+                            $last_year = $last_year - 1;
+                        }
+                        $date_start = date("{$last_year}-{$last_month}-1 00:00:00");
+                        $date_end   = date("{$this_year}-{$this_month}-1 00:00:00");
+                        break;
+                    case 'custom':
+                        $date_start = (isset($group['date_start']) AND !empty($group['date_start'])) ? $group['date_start'] : date('Y-m-d 00:00:00');
+                        $date_end   = (isset($group['date_end'])   AND !empty($group['date_end']))   ? $group['date_end']   : date('Y-m-d 23:59:59');
+                        break;
+                }
+                
+                $conditions[] = "(`created` >= '{$date_start}' AND created <= '{$date_end}')";
+            }
             
             
-            return $group_sql;
+            $match = ' AND ';
+            if (isset($group['match']) AND $group['match'] == 'or') {
+                $match = ' OR ';
+            }
+            $fields = array();
+            if (isset($group['fields']) AND is_array($group['fields']) AND count($group['fields']) > 0) {
+                foreach ($group['fields'] AS $field) {
+                    $value = trim($field['value']);
+                    if (!empty($value)) {
+                        switch ($field['exp']) {
+                            case 'eq':
+                                $expression = "= '{$value}'";
+                                break;
+                            case 'not_eq':
+                                $expression = "!= '{$value}'";
+                                break;
+                            case 'co':
+                                $expression = "LIKE '%{$value}%'";
+                                break;
+                            case 'not_co':
+                                $expression = "NOT LIKE '%{$value}%'";
+                                break;
+                            case 'start':
+                                $expression = "LIKE '{$value}%'";
+                                break;
+                            case 'end':
+                                $expression = "LIKE '%{$value}'";
+                                break;
+                            case 'not_start':
+                                $expression = "NOT LIKE '{$value}%'";
+                                break;
+                            case 'not_end':
+                                $expression = "NOT LIKE '%{$value}'";
+                                break;
+                            default:
+                                $expression = NULL;
+                        }
+                        
+                        if ($expression !== NULL) {
+                            $fields[] = "`{$field['name']}` {$expression}";
+                        }
+                    }
+                }
+            
+                if (count($fields) > 0) {
+                    $conditions[] = '(' . implode($match, $fields) . ')';
+                }
+            }
+            $group_sql = "({$funnels_condition}{$dates_range}{$fields})";            
+            
+            return '(' . implode(' AND ', $conditions) . ')';
         };
         
         $re = $this->db->query('SELECT * as count FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0");
@@ -68,7 +190,16 @@ class Clients_Controller extends Base_Controller{
             }
         }
         
-        $total = $this->db->get_var('SELECT COUNT(id) as count FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0");
+        $where_sql = rtrim($where_sql, ' AND ');
+        $where_sql = rtrim($where_sql, ' OR ');
+        
+        if (!empty($where_sql)) {
+            $where_sql = " AND ({$where_sql})";
+        }
+        
+        $sql = 'SELECT COUNT(id) as count FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0{$where_sql}";
+        //echo $sql . "\n\n";
+        $total = $this->db->get_var($sql);
         
         $limit = (int) $this->_input('limit', 20);
         if ($limit < 1) $limit = 1;
@@ -82,7 +213,7 @@ class Clients_Controller extends Base_Controller{
         $start = $limit * ($page - 1);        
         
         $success = true;
-        $result = $this->db->get_results('SELECT * FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0 LIMIT {$start},{$limit}");
+        $result = $this->db->get_results('SELECT * FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0{$where_sql} LIMIT {$start},{$limit}");
         
         echo json_encode(array(
             'success' => $success,
@@ -280,6 +411,9 @@ class Clients_Controller extends Base_Controller{
             foreach ($input AS $key => $value) {
                 if (in_array($key, $allowable_fields) AND is_array($value) AND count($value) > 0) {
                     foreach ($value AS $unique_id => $val) {
+                        if ($key == 'funnels') {
+                            $val = array_keys($val);
+                        }
                         $mix[$unique_id][$key] = $val;
                     }
                 }
