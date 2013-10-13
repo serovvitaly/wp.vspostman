@@ -40,7 +40,7 @@ class Clients_Controller extends Base_Controller{
             'act'  => 'blacklist',
             'href' => '/wp-admin/admin.php?page=vspostman-clients&act=blacklist'
         ),
-    );
+    ); 
     
     
     public function action_search()
@@ -50,7 +50,14 @@ class Clients_Controller extends Base_Controller{
         
         $filter = $this->_get_filter();
         
-        $prepare_group = function($group){
+        $convert_date = function($date){
+            $date = explode('.', $date);
+            $date = array_reverse($date);
+            $date = implode('-', $date);
+            return $date;
+        };
+        
+        $prepare_group = function($group) use ($convert_date){
             
             $conditions = array();
             
@@ -117,8 +124,8 @@ class Clients_Controller extends Base_Controller{
                         $date_end   = date("{$this_year}-{$this_month}-1 00:00:00");
                         break;
                     case 'custom':
-                        $date_start = (isset($group['date_start']) AND !empty($group['date_start'])) ? $group['date_start'] : date('Y-m-d 00:00:00');
-                        $date_end   = (isset($group['date_end'])   AND !empty($group['date_end']))   ? $group['date_end']   : date('Y-m-d 23:59:59');
+                        $date_start = (isset($group['date_start']) AND !empty($group['date_start'])) ? $convert_date($group['date_start']) : date('Y-m-d 00:00:00');
+                        $date_end   = (isset($group['date_end'])   AND !empty($group['date_end']))   ? $convert_date($group['date_end'])   : date('Y-m-d 23:59:59');
                         break;
                 }
                 
