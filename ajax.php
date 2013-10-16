@@ -23,6 +23,9 @@ switch ($controller) {
     case 'clients':
         _controller('Clients_Controller')->action($action);
         break;
+    case 'stats':
+        _controller('Stats_Controller')->action($action);
+        break;
 }
 
 $out = array(

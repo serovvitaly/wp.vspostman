@@ -5,6 +5,8 @@
 <link rel="stylesheet" type="text/css" href="/wp-content/plugins/vspostman/libs/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
 <link rel="stylesheet" type="text/css" href="/wp-content/plugins/vspostman/libs/jquery-ui/css/flick/jquery-ui-1.10.3.custom.min.css">
 
+<script src="/wp-content/plugins/vspostman/libs/Chart.min.js"></script>
+
 <script>
 $ = jQuery;
 
@@ -87,6 +89,19 @@ function getUniqueId(){
     height: 2px;
     width: 0%;
     background: red;
+}
+.chart-table{
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 40px;
+}
+.chart-table td{
+    font-size: 14px;
+    padding: 5px;
+}
+.chart-table td.value{
+    font-weight: bold;
+    font-size: 18px;
 }
 </style>
 
