@@ -56,7 +56,7 @@ function importFromGoogleDrive(){
   <div style="vertical-align: top; display: inline-block; width: 200px; margin-right: 10px;">
     <strong style="vertical-align: top;">Импортировать контакты из аккаунта:</strong>
   </div>
-  <div id="clients-importservices-links">
+  <div id="clients-importservices-links" style="display: inline-block;">
     <img style="cursor: pointer;" onclick="importFromGoogleDrive();" src="/wp-content/plugins/vspostman/img/google-docs.png" alt="">
     <img style="cursor: pointer;" onclick="importFromGoogleContacts();" src="/wp-content/plugins/vspostman/img/google-contacts.png" alt="">
   </div>
