@@ -641,6 +641,15 @@ class Clients_Controller extends Base_Controller{
         $this->action = 'import';
     }
     
+    public function action_load_google_drive()
+    {
+        $url = $this->_input('url');
+        
+        if (!empty($url)) {
+            $doc = file_get_contents($url);
+            file_put_contents('', $doc);
+        }
+    }
     
     public function action_duplicate()
     {

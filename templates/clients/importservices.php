@@ -27,6 +27,34 @@ function importFromGoogleDrive(){
                       $('#clients-importservices-results .files-list').html(content);
                       $('#clients-importservices-results .files-list').on('change', function(){
                           console.log( $(this).val() );
+                          
+                          gapi.client.request({
+                              path: 'drive/v2/files',
+                              params: {
+                                  maxResults: 1000,
+                                  q: "mimeType = 'application/vnd.google-apps.spreadsheet'"
+                                  //q: "mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
+                              },
+                              callback: function(data){
+                                  if (data.items && data.items.length > 0) {
+                                      var content = '<option>-- выберите файл из списка --</option>';
+                                      for (var i = 0; i < data.items.length; i++) {
+                                          var item = data.items[i];
+                                          content += '<option value="'+item.id+'">'+item.title+'</option>';
+                                      }
+                                      $('#clients-importservices-results .files-list').html(content);
+                                      $('#clients-importservices-results .files-list').on('change', function(){
+                                          console.log( $(this).val() );
+                                      });
+                                  } else {
+                                      //
+                                  }
+                                  
+                                  $('#clients-importservices-links').slideUp();
+                                  $('#clients-importservices-results').slideDown();
+                              }
+                          });
+                          
                       });
                   } else {
                       //
