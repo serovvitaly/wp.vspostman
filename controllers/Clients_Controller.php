@@ -647,10 +647,11 @@ class Clients_Controller extends Base_Controller{
         $url = $this->_input('url');
         
         if (!empty($url) AND !empty($fileId)) {
-            echo "DATA:";
+            $target_fale = VSP_DIR . '/data/google_drive/' . $fileId;
+            echo "DATA TO: {$target_fale}";
             $doc = file_get_contents($url);
             //
-            file_put_contents(VSP_DIR . '/data/google_drive/' . $fileId, $doc);
+            file_put_contents($target_fale, $doc);
         }
         
         return false;
