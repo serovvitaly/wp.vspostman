@@ -19,12 +19,15 @@ function importFromGoogleDrive(){
               },
               callback: function(data){
                   if (data.items && data.items.length > 0) {
-                      var content = '';
+                      var content = '<option>-- выберите файл из списка --</option>';
                       for (var i = 0; i < data.items.length; i++) {
                           var item = data.items[i];
                           content += '<option value="'+item.id+'">'+item.title+'</option>';
                       }
                       $('#clients-importservices-results .files-list').html(content);
+                      $('#clients-importservices-results .files-list').on('change', function(){
+                          console.log( $(this).val() );
+                      });
                   } else {
                       //
                   }
@@ -61,7 +64,7 @@ function importFromGoogleDrive(){
   
   <div id="clients-importservices-results" style="padding: 10px 0 0 214px; display: none;">
     <div style="margin: 0 0 30px;">
-      <select class="files-list"><option></option></select>
+      <select class="files-list"></select>
     </div>
     <input type="submit" class="button button-primary button-large" value="Импорт контактов">
   </div>
