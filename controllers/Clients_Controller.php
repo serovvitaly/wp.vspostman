@@ -647,9 +647,13 @@ class Clients_Controller extends Base_Controller{
         $url = $this->_input('url');
         
         if (!empty($url) AND !empty($fileId)) {
+            echo "DATA:";
             $doc = file_get_contents($url);
+            //
             file_put_contents(VSP_DIR . '/data/google_drive/' . $fileId, $doc);
         }
+        
+        return false;
     }
     
     public function action_duplicate()
