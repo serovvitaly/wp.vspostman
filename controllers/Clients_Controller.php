@@ -643,11 +643,12 @@ class Clients_Controller extends Base_Controller{
     
     public function action_load_google_drive()
     {
+        $fileId = $this->_input('fileId');
         $url = $this->_input('url');
         
-        if (!empty($url)) {
+        if (!empty($url) AND !empty($fileId)) {
             $doc = file_get_contents($url);
-            file_put_contents('', $doc);
+            file_put_contents(VSP_DIR . '/data/google_drive/' . $fileId, $doc);
         }
     }
     
