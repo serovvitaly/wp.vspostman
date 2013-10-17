@@ -650,7 +650,7 @@ class Clients_Controller extends Base_Controller{
             $target_fale = VSP_DIR . '/data/google_drive/' . $fileId . '.dat';
             echo "DATA TO: {$target_fale}\n";
             $doc = file_get_contents($url);
-            //
+            var_dump($doc);
             file_put_contents($target_fale, $doc);
         }
         
