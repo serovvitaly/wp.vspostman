@@ -640,7 +640,11 @@ class Clients_Controller extends Base_Controller{
     {   
         $code = $this->_input('code');
         
-        echo $code;
+        if ($code) {
+            include(VSP_DIR . "/google-api-php-client/src/Google_Client.php");
+            
+            $client = new Google_Client();
+        }
           
         $this->action = 'import';
     }
