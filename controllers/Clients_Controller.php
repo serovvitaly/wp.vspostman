@@ -641,6 +641,27 @@ class Clients_Controller extends Base_Controller{
         $this->action = 'import';
     }
     
+    
+    public function action_google_drive_auth()
+    {
+        include(VSP_DIR . "/google-api-php-client/src/Google_Client.php");
+        
+        $client = new Google_Client();
+        $client->setClientId('333945996610.apps.googleusercontent.com');
+        $client->setClientSecret('6m2TEqufA-iJ2yAu4Ac3KZjc');
+        $client->setRedirectUri('http://wordpress.appros.ru');
+        $client->setScopes(array('https://www.googleapis.com/auth/drive.readonly'));
+        $client->setUseObjects(true);
+        
+        $code = $this->_input('code');
+
+        $client->authenticate();
+        $tokens = $client->getAccessToken();
+        
+        echo 'TOKENS = ' . $tokens;
+    }
+    
+    
     public function action_load_google_drive()
     {
         $fileId = $this->_input('fileId');

@@ -8,6 +8,18 @@ function checkAuth(handler) {
         handler);
 }
 function importFromGoogleDrive(){
+    
+    $.ajax({
+        url: '/wp-content/plugins/vspostman/ajax.php',
+        type: 'GET',
+        data: {
+            controller: 'clients',
+            act: 'google_drive_auth'
+        }
+    });
+    
+    return;
+    
     checkAuth(function(authResult){
         if (authResult && !authResult.error) {
             gapi.client.request({
