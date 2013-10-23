@@ -637,16 +637,24 @@ class Clients_Controller extends Base_Controller{
     
     
     public function action_importservices()
-    {
-        print_r($_GET);
-        
+    {  
+        print_r($_SESSION);
+          
         $this->action = 'import';
     }
     
     
-    public function action_()
+    public function action_googledrive_code()
     {
-        //
+        $code = $this->_input('code');
+        
+        if ($code) {
+            $_SESSION['googledrive_code'] = $code;
+        }
+        
+        $redirect_to = '/wp-admin/admin.php?page=vspostman-clients&act=importservices';
+        include(VSP_DIR . '/templates/redirect.php');
+        return false;
     }
         
     
