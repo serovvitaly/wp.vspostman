@@ -642,6 +642,12 @@ class Clients_Controller extends Base_Controller{
         
         $this->action = 'import';
     }
+    
+    
+    public function action_()
+    {
+        //
+    }
         
     
     public function action_google_drive_auth()
@@ -651,7 +657,7 @@ class Clients_Controller extends Base_Controller{
         $client = new Google_Client();
         $client->setClientId('333945996610.apps.googleusercontent.com');
         $client->setClientSecret('6m2TEqufA-iJ2yAu4Ac3KZjc');
-        $client->setRedirectUri('http://wordpress.appros.ru/wp-admin/admin.php?page=vspostman-clients&act=importservices');
+        $client->setRedirectUri('http://wordpress.appros.ru/wp-admin/admin.php?page=vspostman-clients&act=googledrive_code');
         $client->setScopes(array('https://www.googleapis.com/auth/drive.readonly'));
         $client->setUseObjects(true);
         
