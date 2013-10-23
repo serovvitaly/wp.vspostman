@@ -638,7 +638,7 @@ class Clients_Controller extends Base_Controller{
     
     public function action_importservices()
     {  
-        print_r($_SESSION);
+        var_dump($_SESSION);
           
         $this->action = 'import';
     }
