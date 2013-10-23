@@ -637,7 +637,7 @@ class Clients_Controller extends Base_Controller{
     
     
     public function action_importservices()
-    {  
+    {   session_start();
         var_dump($_SESSION);
           
         $this->action = 'import';
@@ -649,6 +649,7 @@ class Clients_Controller extends Base_Controller{
         $code = $this->_input('code');
         
         if ($code) {
+            session_start();
             $_SESSION['googledrive_code'] = $code;
         }
         
