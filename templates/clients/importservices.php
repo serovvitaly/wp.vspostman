@@ -9,6 +9,10 @@ function checkAuth(handler) {
 }
 function importFromGoogleDrive(){
     
+    window.location = '/wp-content/plugins/vspostman/ajax.php?controller=clients&act=google_drive_auth';
+    
+    return;
+    
     $.ajax({
         url: '/wp-content/plugins/vspostman/ajax.php',
         type: 'GET',
