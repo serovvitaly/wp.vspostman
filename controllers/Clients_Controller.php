@@ -869,7 +869,7 @@ class Clients_Controller extends Base_Controller{
     
     public function action_undelivered()
     {
-        //
+        $this->list = $this->db->get_results("SELECT * FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 1");
     }
     
     

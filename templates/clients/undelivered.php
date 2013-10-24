@@ -1,5 +1,5 @@
 <div style="margin: 20px 0;">
-  <p>На этой странице показоны контакты, которые удалены после трех(3) неудачных попыток доставки.</p>
+  <p>В этом списке перечислены клиенты, которые были удалены после трех (3) неудачных попыток доставки письма.</p>
   
 <? if (count($list) > 0) { ?>  
 <table class="wp-list-table widefat" cellspacing="0">
@@ -24,7 +24,7 @@
         <tr>
           <td><?= $item->first_name ?></td>
           <td><?= $item->email ?></td>
-          <td><?= $item->removal_at ?></td>
+          <td><?= $item->deleted_at ?></td>
         </tr>
     <? } ?>
     </tbody>
