@@ -98,7 +98,7 @@ function importFromGoogleDrive(){
 <div class="tab-container">
   <h1 style="color:red">Сервис в разработке.</h1>
   <div style="vertical-align: top; display: inline-block; width: 200px; margin-right: 10px;">
-    <strong style="vertical-align: top;">Импортировать контакты из аккаунта:</strong>
+    <strong style="vertical-align: top;">Импортировать клиентов из аккаунта:</strong>
   </div>
   <div id="clients-importservices-links" style="display: inline-block;">
     <img style="cursor: pointer;" onclick="importFromGoogleDrive();" src="/wp-content/plugins/vspostman/img/google-docs.png" alt="">
