@@ -1,4 +1,4 @@
-<div style="margin: 10px 0; text-align: left"><a href="#" class="button button-primary" onclick="$('#removal-box').toggleClass('hidden');return false;">Отписать контакт</a></div>
+<div style="margin: 10px 0; text-align: left"><a href="#" class="button button-primary" onclick="$('#removal-box').toggleClass('hidden');return false;">Отписать клиента</a></div>
 <div id="removal-box" class="hidden">
   <div><span style="vertical-align: top; display: inline-block; width: 200px;">Введите список email для удаления, по одному на каждой строке.</span>
     <div style="display: inline-block;">
@@ -27,9 +27,9 @@
 </div>
 
 <h2 class="nav-tab-wrapper">
-  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal" class="nav-tab">Удалены вручную (<?= isset($totals[1]) ? $totals[1] : 0 ?>)</a>
-  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal2" class="nav-tab">Удалены автоматически (<?= isset($totals[2]) ? $totals[2] : 0 ?>)</a>
-  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal3" class="nav-tab nav-tab-active">Удалены, нажав ссылку (<?= isset($totals[3]) ? $totals[3] : 0 ?>)</a>
+  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal" class="nav-tab">Отписаны вручную (<?= isset($totals[1]) ? $totals[1] : 0 ?>)</a>
+  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal2" class="nav-tab">Отписаны автоматически (<?= isset($totals[2]) ? $totals[2] : 0 ?>)</a>
+  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal3" class="nav-tab nav-tab-active">Отписаны, нажав ссылку (<?= isset($totals[3]) ? $totals[3] : 0 ?>)</a>
 </h2>
 
 <div class="tab-container">
