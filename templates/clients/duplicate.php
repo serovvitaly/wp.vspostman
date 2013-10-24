@@ -1,39 +1,53 @@
 
 
 <div style="margin: 20px 0;">
+
+<p style="color: gray; padding-bottom: 10px;">Укажите из какой воронки в какую вы хотите скопировать или перенести клиенты.</p>
+
 <form id="contacta-duplicate-form" action="" method="POST">
-  <div style="margin-bottom: 20px">Источник: 
-    <select name="op_from">
-    <?
-      if (count($funnels_list) > 0) {
-          foreach ($funnels_list AS $funnel) {
-      ?>
-      <option value="<?= $funnel->id ?>"><?= $funnel->name ?></option>
-      <?
+  <table>
+    <tr>
+      <td style="text-align: right; line-height: 27px; padding-bottom: 20px;">Текущая воронка:</td>
+      <td>
+        <select name="op_from">
+        <?
+          if (count($funnels_list) > 0) {
+              foreach ($funnels_list AS $funnel) {
+          ?>
+          <option value="<?= $funnel->id ?>"><?= $funnel->name ?></option>
+          <?
+              }
           }
-      }
-    ?>
-    </select>
-  </div>
-  <div style="margin-bottom: 20px">Операция: 
-    <select name="operation">
-      <option value="copy">копировать</option>
-      <option value="move">перенести</option>
-    </select>
-  </div>
-  <div style="margin-bottom: 20px">Воронка: 
-    <select name="op_to">
-    <?
-      if (count($funnels_list) > 0) {
-          foreach ($funnels_list AS $funnel) {
-      ?>
-      <option value="<?= $funnel->id ?>"><?= $funnel->name ?></option>
-      <?
+        ?>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: right; line-height: 27px; padding-bottom: 20px;">Операция:</td>
+      <td>
+        <select name="operation">
+          <option value="copy">копировать</option>
+          <option value="move">перенести</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: right; line-height: 27px; padding-bottom: 10px;">Желаемая воронка:</td>
+      <td>
+        <select name="op_to">
+        <?
+          if (count($funnels_list) > 0) {
+              foreach ($funnels_list AS $funnel) {
+          ?>
+          <option value="<?= $funnel->id ?>"><?= $funnel->name ?></option>
+          <?
+              }
           }
-      }
-    ?>
-    </select>
-  </div>
+        ?>
+        </select>
+      </td>
+    </tr>
+  </table>
   
   <div class="info"></div>
   
