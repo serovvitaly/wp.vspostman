@@ -164,7 +164,7 @@ textarea.edit-view{
       <span style="font-size: 20px; padding: 0 196px 0 0">Воронки</span>
     </legend>
     <? if (count($this->funnels) > 0) { ?>
-    <table style="width: 100%;">
+    <table style="width: 100%;" id="client-funnels-list">
     <?
       $statuses = array(
           0 => 'отписан',
@@ -184,13 +184,16 @@ textarea.edit-view{
     ?>
     </table>
     <? } else { ?>
-    <p style="color: gray;">Нет связанных воронок</p>
+    <table style="width: 100%;" id="client-funnels-list">
+    </table>
+    <p class="client-flist-empty" style="color: gray;">Нет связанных воронок</p>
     <? } ?>
     
+    <div id="clients-clientcard-finfo"></div>
     <div style="margin: 5px 0;background: #EBEBEB;padding: 3px 5px;border: 1px solid #D6D6D6;">
       <label>Добавить в воронку:
-        <select style="width: 250px;">
-          <option value="">-- выберите воронку --</option>
+        <select style="width: 250px;" id="clients-clientcard-fselect">
+          <option value="0">-- выберите воронку --</option>
           <?
           foreach ($flist AS $fitem) {
           ?>
@@ -261,17 +264,35 @@ function unsubscribeContact(funnel_id, funnel_name){
 }
 
 function addContactToFunnel(){
-    //
+    var funnel_id   = $('#clients-clientcard-fselect').val();
+    var funnel_name = $('#clients-clientcard-fselect option[value="'+funnel_id+'"]').text();
+    
+    if (funnel_id < 1) {
+        alert('Не выбрана воронка для добавления.');
+        return;
+    }
+    
+    $('#clients-clientcard-finfo').html('<p style="color:gray"><i>выполняется операция...</i></p>');
     
     $.ajax({
         url: '/wp-content/plugins/vspostman/ajax.php',
         dataType: 'json',
         type: 'POST',
         data: {
-            //
+            controller: 'clients',
+            act: 'add_contact_to_funnel',
+            funnel_id: funnel_id,
+            contact_id: '<?= $contact_id ?>'
         },
         success: function(data){
-            //
+            $('#clients-clientcard-fselect').val(0);
+            $('.client-flist-empty').remove();
+            if (data.success === true) {
+                $('#clients-clientcard-finfo').html('');
+                $('#client-funnels-list').append('<tr id="clients-funnel-item-'+funnel_id+'"><td>'+funnel_name+'</td><td class="updated_at">'+data.result.updated_at+'</td><td class="actto">активен <a class="clients-unsubscribe-contact" title="Отписаться" href="#" onclick="unsubscribeContact('+funnel_id+', \''+funnel_name+'\'); return false;">x</a></td></tr>');
+            } else {
+                $('#clients-clientcard-finfo').html('<p style="color:red">'+data.result+'</p>');
+            }
         }
     });
 }

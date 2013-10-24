@@ -981,4 +981,37 @@ class Clients_Controller extends Base_Controller{
         //
     }
     
+    
+    public function action_add_contact_to_funnel()
+    {
+        $funnel_id  = $this->_input('funnel_id');
+        $contact_id = $this->_input('contact_id');
+        
+        $out = array(
+            'success' => false,
+            'result'  => 'Не удалось привязать контакт к выбранной воронке.'
+        );
+        
+        if ($funnel_id > 0 AND $contact_id > 0) {
+            
+            if ($this->db->get_var("SELECT COUNT(contact_id) FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `funnel_id` = {$funnel_id} AND `contact_id` = {$contact_id}")) {
+                $out['result']  = 'Данный контакт уже привязан к выбранной воронке.';
+            } else {
+                $this->db->insert(TABLE_CONTACTS_FUNNELS, array(
+                    'funnel_id'  => $funnel_id,
+                    'contact_id' => $contact_id,
+                ));
+                
+                $out['success'] = true;
+                $out['result']  = array(
+                    'updated_at' => $this->db->get_var("SELECT `updated_at` FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `funnel_id` = {$funnel_id} AND `contact_id` = {$contact_id}")
+                );
+            }
+        }
+        
+        echo json_encode($out);
+        
+        return false;
+    }
+    
 }
