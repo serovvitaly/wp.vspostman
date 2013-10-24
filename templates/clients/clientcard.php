@@ -230,6 +230,11 @@ textarea.edit-view{
 <script>
 
 function unsubscribeContact(funnel_id){
+    
+    if (!confirm('Подтвердите операцию')) {
+        return;
+    }
+    
     if (funnel_id < 1) {
         return;
     }

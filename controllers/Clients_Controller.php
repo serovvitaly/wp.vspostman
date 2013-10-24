@@ -895,6 +895,7 @@ class Clients_Controller extends Base_Controller{
                 'is_removal'   => 1,
                 'removal_type' => 1,
                 'removal_at'   => date('Y-m-d H:i:s'),
+                'updated_at'   => date('Y-m-d H:i:s'),
                 'status' => 0
             ), array('contact_id' => $contact_id, 'funnel_id' => $funnel_id));
             
