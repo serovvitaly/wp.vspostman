@@ -569,9 +569,9 @@ class Clients_Controller extends Base_Controller{
                 
                 if ($added > 0) {
                     $success = true;
-                    $result  = '<span style="color:green">Передано контактов - '.$total.', неваледных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
+                    $result  = '<span style="color:green">Передано контактов - '.$total.', невалидных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
                 } else {
-                    $result  = '<span style="color:red">Передано контактов - '.$total.', неваледных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
+                    $result  = '<span style="color:red">Передано контактов - '.$total.', невалидных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
                 }
             }
         }
@@ -633,9 +633,9 @@ class Clients_Controller extends Base_Controller{
                 
                 if ($added > 0) {
                     $success = true;
-                    $result  = '<span style="color:green">Передано контактов - '.$total.', неваледных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
+                    $result  = '<span style="color:green">Передано контактов - '.$total.', невалидных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
                 } else {
-                    $result  = '<span style="color:red">Передано контактов - '.$total.', неваледных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
+                    $result  = '<span style="color:red">Передано контактов - '.$total.', невалидных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
                 }
                 
             }
