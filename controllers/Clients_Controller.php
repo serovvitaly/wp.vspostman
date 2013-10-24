@@ -258,6 +258,10 @@ class Clients_Controller extends Base_Controller{
             }
             
             $this->comments = $this->db->get_results("SELECT *, 'Администратор' as `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " WHERE `contact_id` = {$contact_id} ORDER BY created DESC LIMIT 2");
+            
+            $this->funnels = $this->db->get_results("SELECT cont.updated_at,cont.status,funn.name FROM " . TABLE_CONTACTS_FUNNELS . " as cont JOIN " . TABLE_FUNNELS . " as funn ON cont.funnel_id = funn.id WHERE cont.contact_id = {$contact_id}");
+            
+            //print_r($this->funnels);
         }
         
     }

@@ -155,23 +155,29 @@ textarea.edit-view{
     <legend style="margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #D0D0D0; width: 100%;">
       <span style="font-size: 20px; padding: 0 196px 0 0">Воронки</span>
     </legend>
+    <? if (count($this->funnels) > 0) { ?>
     <table style="width: 100%;">
+    <?
+      $statuses = array(
+          0 => 'отписался',
+          1 => 'активен',
+          2 => 'купил',
+      );
+    
+      foreach ($this->funnels AS $funnel) {
+      ?>
       <tr>
-        <td>Первая воронка</td>
-        <td>12.07.2013 12:14:23</td>
-        <td>активен</td>
+        <td><?= $funnel->name ?></td>
+        <td><?= $funnel->updated_at ?></td>
+        <td><?= $statuses[$funnel->status] ?></td>
       </tr>
-      <tr>
-        <td>вторая воронка</td>
-        <td>12.07.2013 12:14:23</td>
-        <td>отписался</td>
-      </tr>
-      <tr>
-        <td>третья воронка</td>
-        <td>12.07.2013 12:14:23</td>
-        <td>купил</td>
-      </tr>
+      <?
+      }  
+    ?>
     </table>
+    <? } else { ?>
+    <p style="color: gray;">Нет связанных воронок</p>
+    <? } ?>
   </fieldset>
     
   <fieldset>
