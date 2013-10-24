@@ -100,7 +100,7 @@ $(document).ready(function(){
                     case 'first_name':
                         if (field.value.replace(' ','') == '') {
                             jqForm.find('input[name="name"]').css('border-color', 'red');
-                            flag = false;
+                            //flag = false;
                         } else {
                             jqForm.find('input[name="name"]').css('border-color', '#DFDFDF');
                         }
@@ -112,7 +112,7 @@ $(document).ready(function(){
         success: function(data){
             console.log(data);
             if (data.success === true) {
-                window.location = '/wp-admin/admin.php?page=vspostman-clients';
+                window.location = '/wp-admin/admin.php?page=vspostman-clients&act=clientcard&cid=' + data.result;
             }
         }
     });

@@ -501,7 +501,8 @@ class Clients_Controller extends Base_Controller{
         }        
         
         echo json_encode(array(
-            'success' => true
+            'success' => true,
+            'result' => $this->db->insert_id
         ));
         
         return false;
