@@ -349,7 +349,7 @@ $(document).ready(function(){
          
         <table class="filter-params">
           <tr>
-            <td style="width: 130px;">Диапазон дат:</td>
+            <td style="width: 130px;">Зарегистрирован:</td>
             <td>
             <select name="dates_range[${uid}]" onchange="onChangeDatesRange(this)">
               <option{{if mix.dates_range == 'today'}} selected="selected"{{/if}} value="today">Сегодня</option>
@@ -362,15 +362,15 @@ $(document).ready(function(){
               <option{{if mix.dates_range == 'last_month'}} selected="selected"{{/if}} value="last_month">В прошлом месяце</option>
               <option{{if mix.dates_range == 'last_2_months'}} selected="selected"{{/if}} value="last_2_months">Последние 2 месяца</option>
               <option{{if mix.dates_range == 'all_time'}} selected="selected"{{/if}} value="all_time">Все время</option>
-              <option{{if mix.dates_range == 'custom'}} selected="selected"{{/if}} value="custom">Свой диапазон</option>
+              <option{{if mix.dates_range == 'custom'}} selected="selected"{{/if}} value="custom">Другой диапазон</option>
             </select>       
             </td>
           </tr>
           <tr class="clients-custom-dates-range" style="display: none">
             <td>Свой диапазон дат:</td>
             <td>
-              <input class="datepicker" name="date_start[${uid}]"{{if mix.dates_range == 'custom'}} value="${mix.date_start}"{{/if}} type="text" style="width: 70px;"> - 
-              <input class="datepicker" name="date_end[${uid}]"{{if mix.dates_range == 'custom'}} value="${mix.date_end}"{{/if}} type="text" style="width: 70px;">
+              с <input class="datepicker" name="date_start[${uid}]"{{if mix.dates_range == 'custom'}} value="${mix.date_start}"{{/if}} type="text" style="width: 70px;">  
+              по <input class="datepicker" name="date_end[${uid}]"{{if mix.dates_range == 'custom'}} value="${mix.date_end}"{{/if}} type="text" style="width: 70px;">
             </td>
           </tr>
         </table>
