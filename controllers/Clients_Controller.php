@@ -914,6 +914,13 @@ class Clients_Controller extends Base_Controller{
     
     public function action_blacklist()
     {
+        $cid = $this->_input('cid');
+        
+        if ($cid > 0) {            
+            $this->db->query("UPDATE " . TABLE_CONTACTS_FUNNELS . " SET `in_blacklist` = 0 WHERE `contact_id` = {$cid}");
+            $this->db->query("UPDATE " . TABLE_CLIENTS_CONTACTS . " SET `in_blacklist` = 0 WHERE `id` = {$cid}");
+        }
+        
         $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
         
         $this->list = $this->db->get_results("SELECT * FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `in_blacklist` = 1 OR id IN(SELECT contact_id FROM ".TABLE_CONTACTS_FUNNELS." WHERE `in_blacklist` = 1)");

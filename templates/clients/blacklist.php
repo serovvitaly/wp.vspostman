@@ -56,7 +56,7 @@
           <td><?= $item->email ?></td>
           <td>---</td>
           <td><?= $item->blacklist_at ?></td>
-          <td><!--a href="#">удалить из списка</a--></td>
+          <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=blacklist&cid=<?= $item->id ?>" onclick="return confirm('Вы уверены?')">удалить из списка</a></td>
         </tr>
     <? } ?>
     </tbody>
