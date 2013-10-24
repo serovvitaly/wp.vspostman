@@ -115,9 +115,16 @@
 
 
 
-
-
 <script>
+
+function onChangeDatesRange(el){
+    var hiddenRow = $(el).parents('table.filter-params').find('.clients-custom-dates-range');
+    if ($(el).val() == 'custom') {
+        hiddenRow.fadeIn(100);
+    } else {
+        hiddenRow.fadeOut(100);
+    }
+}
 
 function backToSearch(){
     $('#filter-form input[name="act"]').val('filtersave');
@@ -190,7 +197,7 @@ function addConditionsGroup(data){
     var mix = $.extend({
         uid: getUniqueId(),
         mix: {
-            dates_range: 'custom'
+            dates_range: 'all_time'
         }
     }, data);
     var tpl = $.tmpl( $('#tpl-filter-item').html().trim(), mix );
@@ -344,7 +351,7 @@ $(document).ready(function(){
           <tr>
             <td style="width: 130px;">Диапазон дат:</td>
             <td>
-            <select type="text" name="dates_range[${uid}]" id="basicTermsRange_3_1" class="selWithOtherEl basicTermsRange" onfocus="javascript:$(this).parents('.fieldLine').find('input:radio').attr(&quot;checked&quot;,true);">
+            <select name="dates_range[${uid}]" onchange="onChangeDatesRange(this)">
               <option{{if mix.dates_range == 'today'}} selected="selected"{{/if}} value="today">Сегодня</option>
               <option{{if mix.dates_range == 'yesterday'}} selected="selected"{{/if}} value="yesterday">Вчера</option>
               <option{{if mix.dates_range == 'this_week'}} selected="selected"{{/if}} value="this_week">На этой неделе</option>
@@ -359,7 +366,7 @@ $(document).ready(function(){
             </select>       
             </td>
           </tr>
-          <tr>
+          <tr class="clients-custom-dates-range" style="display: none">
             <td>Свой диапазон дат:</td>
             <td>
               <input class="datepicker" name="date_start[${uid}]"{{if mix.dates_range == 'custom'}} value="${mix.date_start}"{{/if}} type="text" style="width: 70px;"> - 
