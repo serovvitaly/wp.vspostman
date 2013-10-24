@@ -20,6 +20,8 @@ textarea.edit-view{
     font-weight: bold;
     text-decoration: none;
     color: #F00;
+    display: inline-block;
+    margin: -3px 0 0 2px;
 }
 </style>
 
@@ -175,7 +177,7 @@ textarea.edit-view{
       <tr id="clients-funnel-item-<?= $funnel->funnel_id ?>">
         <td><?= $funnel->name ?></td>
         <td class="updated_at"><?= $funnel->updated_at ?></td>
-        <td class="actto"><?= $statuses[$funnel->status] ?><?= $funnel->status == 1 ? ' <a class="clients-unsubscribe-contact" title="Отписаться" href="#" onclick="unsubscribeContact('.$funnel->funnel_id.'); return false;">x</a>' : '' ?></td>
+        <td class="actto"><?= $statuses[$funnel->status] ?><?= $funnel->status == 1 ? ' <a class="clients-unsubscribe-contact" title="Отписаться" href="#" onclick="unsubscribeContact('.$funnel->funnel_id.', \''.$funnel->name.'\'); return false;">x</a>' : '' ?></td>
       </tr>
       <?
       }  
@@ -229,9 +231,9 @@ textarea.edit-view{
 
 <script>
 
-function unsubscribeContact(funnel_id){
+function unsubscribeContact(funnel_id, funnel_name){
     
-    if (!confirm('Подтвердите операцию')) {
+    if (!confirm('Клиент <?= $first_name ?> <<?= $email ?>> будет удален из воронки "'+funnel_name+'". Продолжить?')) {
         return;
     }
     
