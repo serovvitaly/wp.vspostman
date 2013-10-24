@@ -16,7 +16,7 @@
           }
         ?>
         </select><br>
-        <div class="info"></div>
+        <div class="info" style="margin: 5px 0;"></div>
         <input type="submit" class="button" value="Выполнить">
         <a href="#" onclick="$('#removal-box').toggleClass('hidden');return false;" style="color:red">отмена</a>
       </form>
