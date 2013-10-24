@@ -275,6 +275,22 @@ class Clients_Controller extends Base_Controller{
     }
     
     
+    public function action_client_remove()
+    {
+        $cid = $this->_input('cid');
+        
+        if ($cid > 0) {
+            $this->db->delete(TABLE_CLIENTS_CONTACTS,  array('id' => $cid));
+            $this->db->delete(TABLE_CONTACTS_FUNNELS,  array('contact_id' => $cid));
+            $this->db->delete(TABLE_CONTACTS_COMMENTS, array('contact_id' => $cid));
+        }
+        
+        $redirect_to = '/wp-admin/admin.php?page=vspostman-clients';
+        include(VSP_DIR . '/templates/redirect.php');
+        return false;
+    }
+    
+    
     public function action_clientcard_mails()
     {
         $contact_id = $this->_input('cid');

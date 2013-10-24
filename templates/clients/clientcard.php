@@ -37,12 +37,11 @@ textarea.edit-view{
   <fieldset>
     <legend style="margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #D0D0D0; width: 100%;">
       <span style="font-size: 20px;">Анкета</span>
-      <span style="float: right;">
-        <!--span class="clients-editable-act hidden">
-          <a href="remove?cid=<?= $id ?>" onclick="return confirm('Точно отписать?')">отписать</a> |  
-          <a href="delete?cid=<?= $id ?>" onclick="return confirm('Точно удалить?')">удалить</a> | 
-        </span-->     
+      <span style="float: right;">   
         <a href="#" onclick="editContact(this); return false;">изменить</a>
+        
+        <span class="clients-editable-act-remove"> | <a href="/wp-admin/admin.php?page=vspostman-clients&act=client_remove&cid=<?= $id ?>" onclick="return confirm('Клиент <?= $first_name ?> <<?= $email ?>> будет удален из базы данных вместе со всей связанной с ним информацией. Продолжить?')">удалить</a></span>
+        
         <a href="#" class="button button-small clients-editable-act hidden" onclick="saveContact(this); return false;">Сохранить</a>
       </span>
       
@@ -334,11 +333,13 @@ function editContact(el){
         $('#clients-editable-fields').removeClass('on-edit');
         $('#clients-editable-fields tr.hidden').hide();
         $('.clients-editable-act').hide();
+        $('.clients-editable-act-remove').show();
         $(el).html('изменить');        
     } else {
         $('#clients-editable-fields').addClass('on-edit');
         $('#clients-editable-fields tr.hidden').show();
         $('.clients-editable-act').show();
+        $('.clients-editable-act-remove').hide();
         $(el).html('отмена');
     }
     
