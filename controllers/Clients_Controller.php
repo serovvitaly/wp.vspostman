@@ -124,12 +124,22 @@ class Clients_Controller extends Base_Controller{
                         $date_end   = date("{$this_year}-{$this_month}-1 00:00:00");
                         break;
                     case 'custom':
-                        $date_start = (isset($group['date_start']) AND !empty($group['date_start'])) ? $convert_date($group['date_start']) : date('Y-m-d 00:00:00');
-                        $date_end   = (isset($group['date_end'])   AND !empty($group['date_end']))   ? $convert_date($group['date_end'])   : date('Y-m-d 23:59:59');
+                        $date_start = (isset($group['date_start']) AND !empty($group['date_start'])) ? $convert_date($group['date_start']) : NULL;
+                        $date_end   = (isset($group['date_end'])   AND !empty($group['date_end']))   ? $convert_date($group['date_end'])   : NULL;
                         break;
                 }
                 
-                $conditions[] = "(`created` >= '{$date_start}' AND created <= '{$date_end}')";
+                $dates_start_stop = array();
+                if (!empty($date_start)) {
+                    $dates_start_stop[] = "`created` >= '{$date_start}'";
+                }
+                if (!empty($date_end)) {
+                    $dates_start_stop[] = "`created` <= '{$date_end}'";
+                }
+                
+                if (count($dates_start_stop) > 0) {
+                    $conditions[] = '(' . implode(' AND ', $dates_start_stop) . ')';
+                }
             }
             
             
