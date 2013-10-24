@@ -15,7 +15,7 @@
   <textarea cols="" rows="" name="contacts_list" style="width: 400px; height: 400px;"></textarea>
   <div class="info" style="padding: 0 0 0 214px;"></div>
   <div style="padding: 10px 0 0 214px;">
-    <input type="submit" class="button button-primary button-large" value="Импорт контактов">
+    <input type="submit" class="button button-primary button-large" value="Импортировать клиентов">
   </div>
   
 </form>

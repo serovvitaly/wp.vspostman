@@ -110,7 +110,7 @@ function importFromGoogleDrive(){
     <div style="margin: 0 0 30px;">
       <select class="files-list"></select>
     </div>
-    <input type="submit" class="button button-primary button-large" value="Импорт контактов">
+    <input type="submit" class="button button-primary button-large" value="Импортировать клиентов">
   </div>
 
 </div>
