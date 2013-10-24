@@ -28,7 +28,7 @@
   
 
   <div style="float: right;">
-      <a href="#" class="button button-primary" onclick="addNewFilter(); return false;">Добавить новый фильтр</a>
+      <!--a href="#" class="button button-primary" onclick="addNewFilter(); return false;">Добавить новый фильтр</a-->
   
       <label style="padding-left: 30px;">Сохранить фильтр как:
         <input name="filter_name" type="text" style="width: 200px;">
