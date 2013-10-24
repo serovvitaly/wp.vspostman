@@ -34,6 +34,7 @@
 
 <div class="tab-container">
 
+<? if (count($list) > 0) { ?>
 <table class="wp-list-table widefat" cellspacing="0">
     <thead>
       <tr>
@@ -54,22 +55,19 @@
     </tfoot>
 
     <tbody id="the-list">
-    <?
-        if (count($list) > 0) {
-            foreach ($list AS $item) {
-        ?>
+    <? foreach ($list AS $item) { ?>
         <tr>
           <td><?= $item->first_name ?></td>
           <td><?= $item->email ?></td>
           <td><?= $item->removal_reason ?></td>
           <td><?= $item->removal_at ?></td>
         </tr>
-        <?
-            }
-        }
-    ?>
+    <? } ?>
     </tbody>
 </table>
+<? } else { ?>
+<p style="color: gray;">Нет результатов для отображения</p>
+<? } ?>
 
 </div>
 

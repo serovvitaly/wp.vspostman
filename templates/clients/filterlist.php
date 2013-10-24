@@ -5,6 +5,7 @@
 
 <div class="tab-container">
 
+<? if (count($filters) > 0) { ?>
 <table class="wp-list-table widefat" cellspacing="0">
     <thead>
       <tr>
@@ -25,10 +26,7 @@
     </tfoot>
 
     <tbody id="the-list">
-    <?
-        if (count($filters) > 0) {
-            foreach ($filters AS $filter) {
-        ?>
+    <? foreach ($filters AS $filter) { ?>
         <tr>
           <th scope="row" class="check-column"><input type="checkbox" name="checked[]" value="<?= $filter->id ?>"></th>
           <td><?= $filter->name ?></td>
@@ -40,11 +38,11 @@
           </div>
           </td>
         </tr>
-        <?
-            }
-        }
-    ?>
+        <? } ?>
     </tbody>
 </table>
+<? } else { ?>
+<p style="color: gray;">Нет результатов для отображения</p>
+<? } ?>
 
 </div>
