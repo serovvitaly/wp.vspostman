@@ -40,6 +40,11 @@ class Clients_Controller extends Base_Controller{
             'act'  => 'blacklist',
             'href' => '/wp-admin/admin.php?page=vspostman-clients&act=blacklist'
         ),
+        array(
+            'text' => 'Настраиваемые поля',
+            'act'  => 'custom_fields',
+            'href' => '/wp-admin/admin.php?page=vspostman-clients&act=custom_fields'
+        ),
     ); 
     
     
@@ -248,6 +253,8 @@ class Clients_Controller extends Base_Controller{
     {
         $contact_id = $this->_input('cid');
         
+        $this->contact_id = $contact_id;
+        
         if ($contact_id > 0) {
             $contact = $this->db->get_row("SELECT * FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `id` = {$contact_id}");
             
@@ -259,9 +266,10 @@ class Clients_Controller extends Base_Controller{
             
             $this->comments = $this->db->get_results("SELECT *, 'Администратор' as `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " WHERE `contact_id` = {$contact_id} ORDER BY created DESC LIMIT 2");
             
-            $this->funnels = $this->db->get_results("SELECT cont.updated_at,cont.status,funn.name FROM " . TABLE_CONTACTS_FUNNELS . " as cont JOIN " . TABLE_FUNNELS . " as funn ON cont.funnel_id = funn.id WHERE cont.contact_id = {$contact_id}");
+            $this->funnels  = $this->db->get_results("SELECT cont.contact_id,cont.funnel_id,cont.updated_at,cont.status,funn.name FROM " . TABLE_CONTACTS_FUNNELS . " as cont JOIN " . TABLE_FUNNELS . " as funn ON cont.funnel_id = funn.id WHERE cont.contact_id = {$contact_id}");
             
-            //print_r($this->funnels);
+            $this->flist    = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
+            
         }
         
     }
@@ -873,6 +881,35 @@ class Clients_Controller extends Base_Controller{
     }
     
     
+    public function action_unsubscribe_contact(){
+        $contact_id = $this->_input('contact_id');
+        $funnel_id  = $this->_input('funnel_id');
+        
+        $out = array(
+            'success' => false,
+            'result'  => NULL
+        );
+        
+        if ($contact_id > 0 AND $funnel_id > 0) {
+            $this->db->update(TABLE_CONTACTS_FUNNELS, array(
+                'is_removal'   => 1,
+                'removal_type' => 1,
+                'removal_at'   => date('Y-m-d H:i:s'),
+                'status' => 0
+            ), array('contact_id' => $contact_id, 'funnel_id' => $funnel_id));
+            
+            $out = array(
+                'success' => true,
+                'result'  => $this->db->get_row("SELECT `contact_id`,`status`,`removal_at` FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `contact_id`={$contact_id} AND `funnel_id`={$funnel_id}")
+            );
+        }
+        
+        echo json_encode($out);
+        
+        return false;
+    }
+    
+    
     public function action_blacklist()
     {
         $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
@@ -927,6 +964,12 @@ class Clients_Controller extends Base_Controller{
         ));
         
         return false;
+    }
+    
+    
+    public function action_custom_fields()
+    {
+        //
     }
     
 }

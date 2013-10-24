@@ -15,6 +15,12 @@ textarea.edit-view{
     width: 210px;
     height: 110px;
 }
+.clients-unsubscribe-contact{
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #F00;
+}
 </style>
 
 <h2 class="nav-tab-wrapper">
@@ -159,17 +165,17 @@ textarea.edit-view{
     <table style="width: 100%;">
     <?
       $statuses = array(
-          0 => 'отписался',
+          0 => 'отписан',
           1 => 'активен',
           2 => 'купил',
       );
     
       foreach ($this->funnels AS $funnel) {
       ?>
-      <tr>
+      <tr id="clients-funnel-item-<?= $funnel->funnel_id ?>">
         <td><?= $funnel->name ?></td>
-        <td><?= $funnel->updated_at ?></td>
-        <td><?= $statuses[$funnel->status] ?></td>
+        <td class="updated_at"><?= $funnel->updated_at ?></td>
+        <td class="actto"><?= $statuses[$funnel->status] ?><?= $funnel->status == 1 ? ' <a class="clients-unsubscribe-contact" title="Отписаться" href="#" onclick="unsubscribeContact('.$funnel->funnel_id.'); return false;">x</a>' : '' ?></td>
       </tr>
       <?
       }  
@@ -178,6 +184,23 @@ textarea.edit-view{
     <? } else { ?>
     <p style="color: gray;">Нет связанных воронок</p>
     <? } ?>
+    
+    <div style="margin: 5px 0;background: #EBEBEB;padding: 3px 5px;border: 1px solid #D6D6D6;">
+      <label>Добавить в воронку:
+        <select style="width: 250px;">
+          <option value="">-- выберите воронку --</option>
+          <?
+          foreach ($flist AS $fitem) {
+          ?>
+          <option value="<?= $fitem->id ?>"><?= $fitem->name ?></option>
+          <?
+          }
+          ?>
+        </select>
+      </label>
+      <button class="button" onclick="addContactToFunnel()">Добавить</button>
+    </div>
+    
   </fieldset>
     
   <fieldset>
@@ -205,6 +228,46 @@ textarea.edit-view{
 </div>
 
 <script>
+
+function unsubscribeContact(funnel_id){
+    if (funnel_id < 1) {
+        return;
+    }
+    
+    $.ajax({
+        url: '/wp-content/plugins/vspostman/ajax.php',
+        dataType: 'json',
+        type: 'POST',
+        data: {
+            controller: 'clients',
+            act: 'unsubscribe_contact',
+            funnel_id: funnel_id,
+            contact_id: '<?= $contact_id ?>'
+        },
+        success: function(data){
+            if (data.success === true) {
+                $('#clients-funnel-item-' + funnel_id + ' .updated_at').html(data.result.removal_at);
+                $('#clients-funnel-item-' + funnel_id + ' .actto').html('отписан');
+            }
+        }
+    });
+}
+
+function addContactToFunnel(){
+    //
+    
+    $.ajax({
+        url: '/wp-content/plugins/vspostman/ajax.php',
+        dataType: 'json',
+        type: 'POST',
+        data: {
+            //
+        },
+        success: function(data){
+            //
+        }
+    });
+}
 
 function createNewField(el){
     
