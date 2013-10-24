@@ -319,7 +319,7 @@ $(document).ready(function(){
     <div id="filter-item-${uid}" class="filter-item">
   
         <table class="filter-params">
-          <tr>
+          <!--tr>
             <td style="width: 80px;">Контакты:</td>
             <td>
             <select name="contacts_type[${uid}]" style="width: 200px;">
@@ -328,7 +328,7 @@ $(document).ready(function(){
               <option{{if mix.contacts_type == 'no_rec'}} selected="selected"{{/if}} value="no_rec">Не получающие рассылку</option>
             </select>        
             </td>
-          </tr>
+          </tr-->
           <tr>
             <td>Воронки:</td>
             <td>
