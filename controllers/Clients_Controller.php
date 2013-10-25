@@ -264,7 +264,7 @@ class Clients_Controller extends Base_Controller{
                 }
             }
             
-            $this->comments = $this->db->get_results("SELECT *, 'Администратор' as `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " WHERE `contact_id` = {$contact_id} ORDER BY created DESC LIMIT 2");
+            $this->comments = $this->db->get_results("SELECT comment.*, u.user_nicename as `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " AS comment JOIN " . TABLE_WP_USERS . " u ON comment.user_id = u.ID WHERE comment.`contact_id` = {$contact_id} ORDER BY comment.created DESC LIMIT 2");
             
             $this->funnels  = $this->db->get_results("SELECT cont.contact_id,cont.funnel_id,cont.updated_at,cont.status,funn.name FROM " . TABLE_CONTACTS_FUNNELS . " as cont JOIN " . TABLE_FUNNELS . " as funn ON cont.funnel_id = funn.id WHERE cont.contact_id = {$contact_id}");
             
@@ -307,13 +307,46 @@ class Clients_Controller extends Base_Controller{
     {
         $contact_id = $this->_input('cid');
         
-        $this->id = $contact_id;
+        $this->contact_id = $contact_id;
         
         $this->comments = array();
         
-        if ($contact_id > 0) {
-            $this->comments = $this->db->get_results("SELECT *, 'Администратор' as `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " WHERE `contact_id` = {$contact_id} ORDER BY created DESC");
+        if ($contact_id > 0) {        
+            $this->comments = $this->db->get_results("SELECT comment.*, u.user_nicename as `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " AS comment JOIN " . TABLE_WP_USERS . " u ON comment.user_id = u.ID WHERE comment.`contact_id` = {$contact_id} ORDER BY comment.created DESC");
         }
+    }
+    
+    
+    public function action_add_comment()
+    {
+        $comment    = $this->_input('comment', NULL);
+        $contact_id = $this->_input('contact_id', 0);
+        
+        $out = array(
+            'success' => false,
+            'result'  => NULL
+        );
+        
+        if (!empty($comment) AND $contact_id > 0) {
+            $this->db->insert(TABLE_CONTACTS_COMMENTS, array(
+                'user_id'    => wp_get_current_user()->ID,
+                'contact_id' => $contact_id,
+                'content'    => $comment,
+            ));
+            
+            $insert_id = $this->db->insert_id;
+            
+            if ($insert_id > 0) {
+                $out = array(
+                    'success' => true,
+                    'result'  => $this->db->get_row("SELECT * FROM " . TABLE_CONTACTS_COMMENTS . " WHERE `id` = {$insert_id}")
+                );
+            }
+        }
+        
+        echo json_encode($out);
+        
+        return false;
     }
     
     

@@ -211,7 +211,7 @@ textarea.edit-view{
     <legend style="margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #D0D0D0; width: 100%;">
       <span style="font-size: 20px; padding: 0 196px 0 0">Комментарии</span>
     </legend>
-    <table style="width: 400px;">
+    <table style="width: 400px;" id="clients-comments-list">
 <?
     if (count($comments) > 0) {
         foreach ($comments AS $com) {
@@ -226,12 +226,66 @@ textarea.edit-view{
 ?>
     </table>
     <a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard_comments&cid=<?= $id ?>">показать все комментарии</a>
+    <button id="clients-comment-toggle" onclick="displayCommentForm();" style="float: right;" class="button button-small button-primary">Добавить комментарий</button>
+    <table id="clients-comment-buttons" style="float: right; display: none;"><tr>
+       <td><button onclick="sendCommentForm();" style="float: right;" class="button button-small button-primary">Отправить</button></td>
+       <td><a href="#" onclick="hideCommentForm(); return false;">отмена</a></td>
+    </tr></table>
+    
+    <div id="clients-comment-form" style="margin: 10px 0 5px; display: none;">
+      <strong><?= wp_get_current_user()->display_name ?></strong>
+      <textarea cols="" rows="" style="height: 100px; width: 100%;" placeholder="Введите текст комментария"></textarea>
+    </div>
+    
   </fieldset>
   
   </div>
 </div>
 
 <script>
+
+function displayCommentForm(){
+    $('#clients-comment-form textarea').css('border-color', '');
+    $('#clients-comment-toggle').hide();
+    $('#clients-comment-buttons').show();
+    $('#clients-comment-form').slideDown(100);
+}
+
+function hideCommentForm(){
+    $('#clients-comment-toggle').show();
+    $('#clients-comment-buttons').hide();
+    $('#clients-comment-form').slideUp(100);
+    $('#clients-comment-form textarea').val('');
+}
+
+function sendCommentForm(){
+    var comment = $('#clients-comment-form textarea').val().trim();
+    $('#clients-comment-form textarea').css('border-color', '');
+    if (comment == '') {
+        $('#clients-comment-form textarea').css('border-color', 'red');
+        $('#clients-comment-form textarea').focus();
+        return;
+    }
+    
+    $.ajax({
+        url: '/wp-content/plugins/vspostman/ajax.php',
+        dataType: 'json',
+        type: 'POST',
+        data: {
+            controller: 'clients',
+            act: 'add_comment',
+            comment: comment,
+            contact_id: '<?= $contact_id ?>'
+        },
+        success: function(data){
+            if (data.success === true) {
+                $('#clients-comments-list').prepend('<tr><td><strong><?= wp_get_current_user()->display_name ?></strong> <i>'+data.result.created+'</i><p style="margin: 5px 0 15px;">'+data.result.content+'</p></td></tr>');
+                
+                hideCommentForm();
+            }
+        }
+    });
+}
 
 function unsubscribeContact(funnel_id, funnel_name){
     
