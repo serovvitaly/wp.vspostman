@@ -3,6 +3,19 @@
   <a href="/wp-admin/admin.php?page=vspostman-clients&act=filterlist" class="nav-tab">Список фильтров</a>
 </h2>
 
+<style>
+#clients-search-result .empty-text{
+    display: none;
+    color: gray;
+}
+#clients-search-result.list-empty .empty-text{
+    display: block;
+}
+#clients-search-result.list-empty table, #clients-search-result.list-empty .tablenav{
+    display: none;
+}
+</style>
+
 <div class="tab-container">
   <form id="filter-form" action="/wp-content/plugins/vspostman/ajax.php" method="POST">
   
@@ -54,6 +67,8 @@
       <a href="#" onclick="backToSearch(); return false;">Вернуться к поиску</a>
     </div>
     
+    <p class="empty-text">Нет результатов для отображения</p>
+    
   <div class="tablenav top">
 
     <!--div class="alignleft actions">
@@ -92,7 +107,7 @@
       <tbody></tbody>
     </table>
     
-<div class="tablenav bottom">
+    <div class="tablenav bottom">
 
         <!--div class="alignleft actions">
             <select name="action2">
@@ -255,6 +270,7 @@ function removeConditionsGroupField(el){
 }
 
 function goSearch(page){
+    $('#clients-search-result').removeClass('list-empty');
     $('#filter-form input[name="act"]').val('search');
     $('#filter-form').ajaxSubmit({
         dataType: 'json',
@@ -273,6 +289,8 @@ function goSearch(page){
                     for(var i = 0; i < data.result.length; i++){
                         $.tmpl( $('#tpl-result-item').html().trim(), data.result[i] ).appendTo('#clients-search-result table tbody');
                     }
+                } else {
+                    $('#clients-search-result').addClass('list-empty');
                 }
             }
             
