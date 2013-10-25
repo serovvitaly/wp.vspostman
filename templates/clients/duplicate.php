@@ -2,7 +2,7 @@
 
 <div style="margin: 20px 0;">
 
-<p style="color: gray; padding-bottom: 10px;">Укажите из какой воронки в какую вы хотите скопировать или перенести клиенты.</p>
+<p style="color: gray; padding-bottom: 10px;">Укажите из какой воронки в какую вы хотите скопировать или перенести клиентов.</p>
 
 <form id="contacta-duplicate-form" action="" method="POST">
   <table>
