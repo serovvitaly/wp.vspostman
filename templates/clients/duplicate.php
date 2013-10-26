@@ -75,6 +75,11 @@ $(document).ready(function(){
             act: 'duplicatesave'
         },
         beforeSubmit: function(formData, jqForm, options){
+            
+            if (!confirm('Будет скопировано (или перенесено) 34 клиентов')) {
+                return;
+            }
+            
             var infoBox = $('#contacta-duplicate-form .info');
             infoBox.html('');
             var vars = {};
