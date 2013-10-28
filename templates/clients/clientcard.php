@@ -3,6 +3,13 @@
 .pre-view{
     line-height: 25px;
     padding-left: 5px;
+    display: inline-block;
+}
+.pre-view.textarea{
+    line-height: 18px;
+}
+.pre-view.hidden{
+    display: none;
 }
 td.td-title{
     line-height: 25px;
@@ -107,32 +114,52 @@ textarea.edit-view{
       </tr>
       <tr<?= (!isset($information) OR empty($information)) ? ' class="hidden"' : '' ?>>
         <td class="td-title">Дополнительная информация</td>
-        <td><span class="pre-view"><?= $information ?></span><textarea name="information" class="edit-view hidden" cols="" rows=""><?= $information ?></textarea></td>
+        <td><span class="pre-view textarea"><?= $information ?></span><textarea name="information" class="edit-view hidden" cols="" rows=""><?= $information ?></textarea></td>
       </tr>
-      
-      <?
-          if (isset($cost_fields) AND !empty($cost_fields)) {
-              $cost_fields = json_decode($cost_fields);
-              if (count($cost_fields) > 0) {
-                  foreach ($cost_fields AS $cfield_key => $cfield_val) {
+      <tr class="hidden"><td colspan="2"><div style="font-weight: bold; border-bottom: 1px dotted #BEBEBE;padding-bottom: 3px;margin-bottom: 5px;">Настраиваемые поля</div></td></tr>
+      <?   
+          if (isset($cost_fields) AND count($cost_fields) > 0) {
+              foreach ($cost_fields AS $cfield) {
           ?>
-      <tr<?= empty($cfield_val) ? ' class="hidden"' : '' ?>>
+      <tr<?= empty($cfield->value) ? ' class="hidden"' : '' ?>>
         <td class="td-title">
-          <span class="pre-view"><?= $cfield_val->key ?></span>
-          <input placeholder="Имя поля" style="width: 160px;" name="cost_fields[<?= $cfield_key ?>][key]" value="<?= $cfield_val->key ?>" class="edit-view hidden" type="text">
+          <?= $cfield->field_label ?>
         </td>
         <td>
-          <span class="pre-view"><?= $cfield_val->value ?></span>
-          <input placeholder="Значение поля" name="cost_fields[<?= $cfield_key ?>][value]" value="<?= $cfield_val->value ?>" class="edit-view hidden" type="text">
+          <span class="pre-view"><?= $cfield->value ?></span>
+          <?
+          if (!empty($cfield->field_value)) {
+              $values = json_decode($cfield->field_value);
+              if (count($values) > 0) {
+                  foreach ($values AS $value) {
+                      if ($value == $cfield->value) {
+                          $checked = ' checked="checked"';
+                      } else {
+                          $checked = '';
+                      }
+                      switch ($cfield->field_type) {
+                          case 'radio':
+                              ?><label class="edit-view hidden"><input type="radio" name="cost_fields[<?= $cfield->id ?>][value]"> - <?= $value ?></label><br><?
+                              break;
+                          case 'checkbox':
+                              ?><label class="edit-view hidden"><input<?= $checked ?> type="checkbox" name="cost_fields[<?= $cfield->id ?>][value]"> - <?= $value ?></label><br><?
+                              break;
+                              
+                          default:
+                              ?><input name="cost_fields[<?= $cfield->id ?>][value]" value="<?= $cfield->value ?>" class="edit-view hidden" type="text"><?
+                      }
+                  }
+              }   
+          }
+          ?>
         </td>
       </tr>
           <?
-                  }
               }
           }
       ?>
       
-      <tr class="clients-editable-act hidden"><td colspan="2"><a href="#" onclick="createNewField(this); return false;">Добавить новое поле</a></td></tr>
+      <!--tr class="clients-editable-act hidden"><td colspan="2"><a href="#" onclick="createNewField(this); return false;">Добавить новое поле</a></td></tr-->
       
     </table>
     </form>
@@ -162,21 +189,31 @@ textarea.edit-view{
     <legend style="margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #D0D0D0; width: 100%;">
       <span style="font-size: 20px; padding: 0 196px 0 0">Воронки</span>
     </legend>
-    <? if (count($this->funnels) > 0) { ?>
+    <? if (count($funnels) > 0) { ?>
     <table style="width: 100%;" id="client-funnels-list">
     <?
       $statuses = array(
-          0 => 'отписан',
-          1 => 'активен',
-          2 => 'купил',
+          -1 => 'черный список',
+          0  => 'отписан',
+          1  => 'активен',
+          2  => 'купил',
       );
     
-      foreach ($this->funnels AS $funnel) {
+      foreach ($funnels AS $funnel) {
+          if ($funnel->is_removal == 1) {
+              $stat = 0;
+          }
+          elseif ($funnel->in_blacklist == 1) {
+              $stat = -1;
+          }
+          else {
+              $stat = 1;
+          }
       ?>
       <tr id="clients-funnel-item-<?= $funnel->funnel_id ?>">
         <td><?= $funnel->name ?></td>
         <td class="updated_at"><?= $funnel->updated_at ?></td>
-        <td class="actto"><?= $statuses[$funnel->status] ?><?= $funnel->status == 1 ? ' <a class="clients-unsubscribe-contact" title="Отписаться" href="#" onclick="unsubscribeContact('.$funnel->funnel_id.', \''.$funnel->name.'\'); return false;">x</a>' : '' ?></td>
+        <td class="actto"><?= $statuses[$stat] ?><?= $stat == 1 ? ' <a class="clients-unsubscribe-contact" title="Отписаться" href="#" onclick="unsubscribeContact('.$funnel->funnel_id.', \''.$funnel->name.'\'); return false;">x</a>' : '' ?></td>
       </tr>
       <?
       }  
@@ -342,7 +379,12 @@ function addContactToFunnel(){
             $('.client-flist-empty').remove();
             if (data.success === true) {
                 $('#clients-clientcard-finfo').html('');
-                $('#client-funnels-list').append('<tr id="clients-funnel-item-'+funnel_id+'"><td>'+funnel_name+'</td><td class="updated_at">'+data.result.updated_at+'</td><td class="actto">активен <a class="clients-unsubscribe-contact" title="Отписаться" href="#" onclick="unsubscribeContact('+funnel_id+', \''+funnel_name+'\'); return false;">x</a></td></tr>');
+                if (data.result.insert == 1) {
+                    $('#client-funnels-list').append('<tr id="clients-funnel-item-'+funnel_id+'"><td>'+funnel_name+'</td><td class="updated_at">'+data.result.updated_at+'</td><td class="actto">активен <a class="clients-unsubscribe-contact" title="Отписаться" href="#" onclick="unsubscribeContact('+funnel_id+', \''+funnel_name+'\'); return false;">x</a></td></tr>');
+                } else {
+                    $('#client-funnels-list #clients-funnel-item-' + funnel_id + ' .actto').html('активен <a class="clients-unsubscribe-contact" title="Отписаться" href="#" onclick="unsubscribeContact('+funnel_id+', \''+funnel_name+'\'); return false;">x</a>');
+                    $('#client-funnels-list #clients-funnel-item-' + funnel_id + ' .updated_at').html(data.result.updated_at);
+                }
             } else {
                 $('#clients-clientcard-finfo').html('<p style="color:red">'+data.result+'</p>');
             }

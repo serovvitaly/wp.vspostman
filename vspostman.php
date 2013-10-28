@@ -19,6 +19,7 @@ define('TABLE_CLIENTS_CONTACTS', $wpdb->prefix . 'vspostman_clients_contacts');
 define('TABLE_CONTACTS_FUNNELS', $wpdb->prefix . 'vspostman_contacts_funnels');
 define('TABLE_CONTACTS_COMMENTS', $wpdb->prefix . 'vspostman_clients_comments');
 define('TABLE_CLIENTS_CUSTOM_FIELDS', $wpdb->prefix . 'vspostman_clients_custom_fields');
+define('TABLE_CLIENTS_CUSTOM_FIELDS_VALUES', $wpdb->prefix . 'vspostman_clients_custom_fields_values');
 
 
 add_action('admin_menu', 'vspostman_admin_menu');

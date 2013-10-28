@@ -266,9 +266,11 @@ class Clients_Controller extends Base_Controller{
             
             $this->comments = $this->db->get_results("SELECT comment.*, u.user_nicename as `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " AS comment JOIN " . TABLE_WP_USERS . " u ON comment.user_id = u.ID WHERE comment.`contact_id` = {$contact_id} ORDER BY comment.created DESC LIMIT 2");
             
-            $this->funnels  = $this->db->get_results("SELECT cont.contact_id,cont.funnel_id,cont.updated_at,cont.status,funn.name FROM " . TABLE_CONTACTS_FUNNELS . " as cont JOIN " . TABLE_FUNNELS . " as funn ON cont.funnel_id = funn.id WHERE cont.contact_id = {$contact_id}");
+            $this->funnels  = $this->db->get_results("SELECT cont.*,funn.name FROM " . TABLE_CONTACTS_FUNNELS . " as cont JOIN " . TABLE_FUNNELS . " as funn ON cont.funnel_id = funn.id WHERE cont.contact_id = {$contact_id}");
             
             $this->flist    = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
+            
+            $this->cost_fields = $this->db->get_results('SELECT * FROM ' . TABLE_CLIENTS_CUSTOM_FIELDS . ' AS f LEFT JOIN ' . TABLE_CLIENTS_CUSTOM_FIELDS_VALUES . ' AS v ON f.id = v.field_id AND v.contact_id = ' . $contact_id);
             
         }
         
@@ -1031,6 +1033,48 @@ class Clients_Controller extends Base_Controller{
     }
     
     
+    public function action_save_custom_field()
+    {
+        $fid          = $this->_input('fid', 0);
+        $field_label  = $this->_input('field_label');
+        $field_type   = $this->_input('field_type');
+        $field_value  = $this->_input('field_value', array());
+        
+        $out = array(
+            'success' => false,
+            'result'  => NULL,
+        );
+        
+        if (is_array($field_value) AND count($field_value) > 0 AND !empty($field_label) AND !empty($field_type)) {
+            if ($fid > 0) {
+                $this->db->update(TABLE_CLIENTS_CUSTOM_FIELDS, array(
+                    'field_label' => $field_label,
+                    'field_type'  => $field_type,
+                    'field_value' => json_encode($field_value),
+                ), array(
+                    'id' => $fid
+                ));
+            } else {
+                $this->db->insert(TABLE_CLIENTS_CUSTOM_FIELDS, array(
+                    'field_label' => $field_label,
+                    'field_type'  => $field_type,
+                    'field_value' => json_encode($field_value),
+                ));
+                
+                $fid = $this->db->insert_id;
+            }
+            
+            $out['success'] = true;            
+            $out['result']  = $this->db->get_row("SELECT * FROM " . TABLE_CLIENTS_CUSTOM_FIELDS . " WHERE `id` = {$fid}");            
+        }
+        
+        
+        echo json_encode($out);
+        
+        return false;
+    }
+    
+    
     public function action_add_contact_to_funnel()
     {
         $funnel_id  = $this->_input('funnel_id');
@@ -1043,18 +1087,41 @@ class Clients_Controller extends Base_Controller{
         
         if ($funnel_id > 0 AND $contact_id > 0) {
             
-            if ($this->db->get_var("SELECT COUNT(contact_id) FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `funnel_id` = {$funnel_id} AND `contact_id` = {$contact_id}")) {
-                $out['result']  = 'Данный контакт уже привязан к выбранной воронке.';
-            } else {
+            $rols = $this->db->get_row("SELECT `is_removal`, `in_blacklist` FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `funnel_id` = {$funnel_id} AND `contact_id` = {$contact_id}");
+            
+            if ($rols === NULL) {
                 $this->db->insert(TABLE_CONTACTS_FUNNELS, array(
                     'funnel_id'  => $funnel_id,
                     'contact_id' => $contact_id,
                 ));
-                
                 $out['success'] = true;
-                $out['result']  = array(
-                    'updated_at' => $this->db->get_var("SELECT `updated_at` FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `funnel_id` = {$funnel_id} AND `contact_id` = {$contact_id}")
-                );
+                $out['result']  = $this->db->get_row("SELECT `updated_at`, `is_removal` FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `funnel_id` = {$funnel_id} AND `contact_id` = {$contact_id}");
+                $out['result']->insert = 1;
+                
+            }
+            elseif ($rols->is_removal != 0) {
+                $this->db->update(TABLE_CONTACTS_FUNNELS, array(
+                    'is_removal' => 0,
+                    'removal_type' => 0,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ), array(
+                    'funnel_id'  => $funnel_id,
+                    'contact_id' => $contact_id,
+                ));
+                $out['success'] = true;
+                $out['result']  = $this->db->get_row("SELECT `updated_at`, `is_removal` FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `funnel_id` = {$funnel_id} AND `contact_id` = {$contact_id}");
+                $out['result']->insert = 0;
+                                
+            }
+            elseif ($rols->in_blacklist != 0) {
+                
+                $out['result']  = 'Данный контакт находится в черном списке для этой воронки.';
+               
+            }
+            else {
+                
+                $out['result']  = 'Данный контакт уже привязан к выбранной воронке.';
+                
             }
         }
         
