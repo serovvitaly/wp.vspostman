@@ -771,6 +771,18 @@ class Clients_Controller extends Base_Controller{
     
     public function action_duplicate()
     {
+        $funnels_counts = $this->db->get_results("SELECT `funnel_id`, COUNT(`contact_id`) AS `count` FROM " . TABLE_CONTACTS_FUNNELS . " GROUP BY `funnel_id`");
+                
+        $op_nums = array();
+        
+        if ($funnels_counts AND count($funnels_counts) > 0) {
+            foreach ($funnels_counts AS $fcount) {
+                $op_nums[$fcount->funnel_id] = $fcount->count;
+            }
+        }
+        
+        $this->op_nums = $op_nums;
+        
         $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
     }
     

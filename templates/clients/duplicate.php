@@ -76,8 +76,26 @@ $(document).ready(function(){
         },
         beforeSubmit: function(formData, jqForm, options){
             
-            if (!confirm('Будет скопировано (или перенесено) 34 клиентов')) {
-                return;
+            var op_num_text   = 'клиентов',
+                operationText = 'скопировано',
+                operation     = $('#contacta-duplicate-form [name="operation"]').val(),
+                op_from_id    = $('#contacta-duplicate-form [name="op_from"]').val();
+            
+            if (operation == 'move') {
+                operationText = 'перенесено';
+            }
+            
+            var _op_nums = $.parseJSON('<?= json_encode($op_nums) ?>');
+            
+            if (_op_nums[op_from_id].substr(-1) == '1') {
+                op_num_text = 'клиент';
+            }
+            else if ($.inArray(_op_nums[op_from_id].substr(-1), [2,3,4])) {
+                op_num_text = 'клиента';
+            }
+            
+            if (!confirm('Будет ' + operationText + ' ' + _op_nums[op_from_id] + ' ' + op_num_text)) {
+                return false;
             }
             
             var infoBox = $('#contacta-duplicate-form .info');
