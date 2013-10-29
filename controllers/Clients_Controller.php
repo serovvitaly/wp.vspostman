@@ -799,15 +799,17 @@ class Clients_Controller extends Base_Controller{
         if ($op_from > 0 AND $op_to > 0 AND $op_from != $op_to ) {
             switch ($operation) {
                 case 'copy':
-                    $sql = "INSERT INTO ".TABLE_CONTACTS_FUNNELS." (funnel_id,contact_id) SELECT {$op_to},contact_id FROM ".TABLE_CONTACTS_FUNNELS." WHERE `funnel_id` = {$op_from}";
+                    $sql = "INSERT IGNORE INTO ".TABLE_CONTACTS_FUNNELS." (funnel_id,contact_id) SELECT {$op_to},contact_id FROM ".TABLE_CONTACTS_FUNNELS." WHERE `funnel_id` = {$op_from}";
                     $this->db->query($sql);
                     $success = true;
-                    $result = '<span style="color: green">Контакты скопированы удачно.</span>';
+                    $affected_rows = mysql_affected_rows();
+                    $result = '<span style="color: green">Скопировано клиентов - '.$affected_rows.'.</span>';
                     break;
                 case 'move':
                     $this->db->update(TABLE_CONTACTS_FUNNELS, array('funnel_id' => $op_to), array('funnel_id', $op_from));
                     $success = true;
-                    $result = '<span style="color: green">Контакты перенесены удачно.</span>';
+                    $affected_rows = mysql_affected_rows();
+                    $result = '<span style="color: green">Перенесено клиентов - '.$affected_rows.'.</span>';
                     break;
                     
             }
