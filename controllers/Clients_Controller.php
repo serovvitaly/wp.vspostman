@@ -835,10 +835,22 @@ class Clients_Controller extends Base_Controller{
                     
                     $removal_at = date('Y-m-d H:i:s');
                     
-                    if ($funnel_id > 0) {
-                        $this->db->query("INSERT INTO ".TABLE_CONTACTS_FUNNELS." (funnel_id,is_removal,removal_type,removal_at,contact_id) SELECT {$funnel_id},1,1,'{$removal_at}',id FROM ".TABLE_CLIENTS_CONTACTS." WHERE `email` IN({$elist})");
+                    $funnels = array();
+                    if ($funnel_id < 1) {
+                        $_tmp_funnels = $this->db->get_results("SELECT `id` FROM " . TABLE_FUNNELS);
+                        if ($_tmp_funnels AND count($_tmp_funnels) > 0) {
+                            foreach ($_tmp_funnels AS $funn) {
+                                $funnels[] = $funn->id;
+                            }
+                        }
                     } else {
-                        $this->db->query("UPDATE " . TABLE_CLIENTS_CONTACTS . " SET `is_removal` = 1, `removal_type` = 1, `removal_at` = '{$removal_at}', `removal_reason` = '{$reason}' WHERE `email` IN({$elist})");
+                        $funnels[] = $funnel_id;
+                    }
+                    
+                    if (count($funnels)) {
+                        foreach ($funnels AS $funn) {
+                            $this->db->query("INSERT INTO ".TABLE_CONTACTS_FUNNELS." (funnel_id,is_removal,removal_type,removal_at,contact_id) SELECT {$funn},1,1,'{$removal_at}',id FROM ".TABLE_CLIENTS_CONTACTS." WHERE `email` IN({$elist})");
+                        }
                     }
                     
                     $result = '<span style="color: green">Контакты удачно отписаны.</span>';    
@@ -863,6 +875,10 @@ class Clients_Controller extends Base_Controller{
     }
     
     
+    /**
+    * Возвращает массив с количеством отписанных клиентов по категориям отписания
+    * 
+    */
     protected function _get_removal_counts()
     {
         $total_direct = $this->db->get_results("SELECT `removal_type`, COUNT(`id`) as count FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `is_removal` = 1 GROUP BY `removal_type` = 1");
@@ -874,7 +890,10 @@ class Clients_Controller extends Base_Controller{
             }
         }
         
-        $total_associated = $this->db->get_results("SELECT `removal_type`, COUNT(`id`) as count FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `is_removal` = 1 GROUP BY `removal_type` = 1");
+        $sql = "SELECT `removal_type`, COUNT(`contact_id`) as count FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `is_removal` = 1 GROUP BY `removal_type`";
+        
+        
+        $total_associated = $this->db->get_results($sql);
         
         if ($total_associated AND count($total_associated) > 0) {
             foreach ($total_associated AS $_total) {
@@ -897,21 +916,25 @@ class Clients_Controller extends Base_Controller{
     {
         $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
         
-        $this->_get_removal_counts();        
+        $this->_get_removal_counts();
         
-        $this->list = $this->db->get_results("SELECT * FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `is_removal` = 1 AND `removal_type` = 1");
+        $sql = "SELECT f.contact_id, f.funnel_id, wvf.name, f.removal_at, f.removal_reason, c.email, c.first_name FROM ".TABLE_CONTACTS_FUNNELS." f JOIN ".TABLE_CLIENTS_CONTACTS." c ON f.contact_id = c.id JOIN ".TABLE_FUNNELS." wvf ON wvf.id = f.funnel_id  WHERE f.`is_removal` = 1 AND f.`removal_type` = 1";      
+        
+        $this->list = $this->db->get_results($sql);
     }
     
     
     public function action_removal2()
     {
-        $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
-        
         $this->action = 'removal';
+        
+        $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
         
         $this->_get_removal_counts();
         
-        $this->list = $this->db->get_results("SELECT * FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `is_removal` = 1 AND `removal_type` = 2");
+        $sql = "SELECT f.contact_id, f.funnel_id, wvf.name, f.removal_at, f.removal_reason, c.email, c.first_name FROM ".TABLE_CONTACTS_FUNNELS." f JOIN ".TABLE_CLIENTS_CONTACTS." c ON f.contact_id = c.id JOIN ".TABLE_FUNNELS." wvf ON wvf.id = f.funnel_id  WHERE f.`is_removal` = 1 AND f.`removal_type` = 2";      
+        
+        $this->list = $this->db->get_results($sql);
     }
     
     

@@ -27,9 +27,9 @@
 </div>
 
 <h2 class="nav-tab-wrapper">
-  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal" class="nav-tab">Отписаны вручную (<?= isset($totals[1]) ? $totals[1] : 0 ?>)</a>
-  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal2" class="nav-tab nav-tab-active">Отписаны автоматически (<?= isset($totals[2]) ? $totals[2] : 0 ?>)</a>
-  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal3" class="nav-tab">Отписаны, нажав ссылку (<?= isset($totals[3]) ? $totals[3] : 0 ?>)</a>
+  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal" class="nav-tab">Отписан мной (<?= isset($totals[1]) ? $totals[1] : 0 ?>)</a>
+  <a href="/wp-admin/admin.php?page=vspostman-clients&act=removal2" class="nav-tab nav-tab-active">Отписался сам (<?= isset($totals[2]) ? $totals[2] : 0 ?>)</a>
+  <!--a href="/wp-admin/admin.php?page=vspostman-clients&act=removal3" class="nav-tab">Отписаны, нажав ссылку (<?= isset($totals[3]) ? $totals[3] : 0 ?>)</a-->
 </h2>
 
 <div class="tab-container">
@@ -40,7 +40,8 @@
       <tr>
         <th scope="col" class="manage-column column-name" style="width: 200px;">Имя</th>
         <th scope="col" class="manage-column column-name" style="width: 200px;">Email</th>
-        <th scope="col" class="manage-column column-name" style="">Причина удаления</th>
+        <th scope="col" class="manage-column column-name">Воронка</th>
+        <th scope="col" class="manage-column column-name">Причина удаления</th>
         <th scope="col" class="manage-column column-name" style="width: 150px;">Дата удаления</th>
       </tr>
     </thead>
@@ -49,6 +50,7 @@
       <tr>
         <th scope="col" class="manage-column column-name">Имя</th>
         <th scope="col" class="manage-column column-name">Email</th>
+        <th scope="col" class="manage-column column-name">Воронка</th>
         <th scope="col" class="manage-column column-name">Причина удаления</th>
         <th scope="col" class="manage-column column-name">Дата удаления</th>
       </tr>
@@ -57,8 +59,9 @@
     <tbody id="the-list">
     <? foreach ($list AS $item) { ?>
         <tr>
-          <td><?= $item->first_name ?></td>
-          <td><?= $item->email ?></td>
+          <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard&cid=<?= $item->contact_id ?>"><?= $item->first_name ?></a></td>
+          <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard&cid=<?= $item->contact_id ?>"><?= $item->email ?></a></td>
+          <td><?= $item->name ?></td>
           <td><?= $item->removal_reason ?></td>
           <td><?= $item->removal_at ?></td>
         </tr>
