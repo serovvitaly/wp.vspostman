@@ -970,13 +970,12 @@ class Clients_Controller extends Base_Controller{
                 'is_removal'   => 1,
                 'removal_type' => 1,
                 'removal_at'   => date('Y-m-d H:i:s'),
-                'updated_at'   => date('Y-m-d H:i:s'),
-                'status' => 0
+                'updated_at'   => date('Y-m-d H:i:s')
             ), array('contact_id' => $contact_id, 'funnel_id' => $funnel_id));
             
             $out = array(
                 'success' => true,
-                'result'  => $this->db->get_row("SELECT `contact_id`,`status`,`removal_at` FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `contact_id`={$contact_id} AND `funnel_id`={$funnel_id}")
+                'result'  => $this->db->get_row("SELECT `contact_id`,`removal_at` FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `contact_id`={$contact_id} AND `funnel_id`={$funnel_id}")
             );
         }
         
