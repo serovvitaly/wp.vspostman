@@ -541,10 +541,9 @@ class Clients_Controller extends Base_Controller{
             'email' => $email,
         ));
         
-        if ($funnel_id > 0) {
-            
-            $contact_id = $this->db->insert_id;
-            
+        $contact_id = $this->db->insert_id;
+        
+        if ($funnel_id > 0) {            
             $this->db->insert(TABLE_CONTACTS_FUNNELS, array(
                 'contact_id' => $contact_id,
                 'funnel_id'  => $funnel_id,
@@ -553,7 +552,7 @@ class Clients_Controller extends Base_Controller{
         
         echo json_encode(array(
             'success' => true,
-            'result' => $this->db->insert_id
+            'result' => $contact_id
         ));
         
         return false;
