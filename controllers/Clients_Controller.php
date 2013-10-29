@@ -803,13 +803,23 @@ class Clients_Controller extends Base_Controller{
                     $this->db->query($sql);
                     $success = true;
                     $affected_rows = mysql_affected_rows();
-                    $result = '<span style="color: green">Скопировано клиентов - '.$affected_rows.'.</span>';
+                    if ($affected_rows > 0) {
+                        $result = '<span style="color: green">Скопировано клиентов - '.$affected_rows.'.</span>';
+                    } else {
+                        $result = '<span style="color: blue">Скопировано клиентов - 0.</span>'; 
+                    }
+                    
                     break;
                 case 'move':
                     $this->db->update(TABLE_CONTACTS_FUNNELS, array('funnel_id' => $op_to), array('funnel_id', $op_from));
                     $success = true;
                     $affected_rows = mysql_affected_rows();
-                    $result = '<span style="color: green">Перенесено клиентов - '.$affected_rows.'.</span>';
+                    if ($affected_rows > 0) {
+                        $result = '<span style="color: green">Перенесено клиентов - '.$affected_rows.'.</span>';
+                    } else {
+                        $result = '<span style="color: blue">Перенесено клиентов - 0.</span>'; 
+                    }
+                    
                     break;
                     
             }
