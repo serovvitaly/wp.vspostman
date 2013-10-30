@@ -584,6 +584,86 @@ class Clients_Controller extends Base_Controller{
     }
     
     
+    /**
+    * Импортирует список контактов в БД
+    * 
+    * @param mixed $list
+    */
+    protected function _import(array $list)
+    {
+        $_perse_contact = function($contact){
+            
+            $name  = '';
+            $email = NULL;
+            
+            if (is_array($contact)) {
+                $contact = trim($contact['email']);
+                $name    = trim($contact['name']); 
+            } else {
+                $contact = trim($contact);
+            }
+            
+            $valid1 = preg_match('/^([a-zA-Z0-9-_.]+)@([a-zA-Z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+$/', $contact, $matches1);
+            $valid2 = preg_match('/^(.+),[\s]{0,}(([a-zA-Z0-9-_.]+)@([a-zA-Z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+)$/', $contact, $matches2);
+            $valid3 = preg_match('/^(.+)\<(([a-zA-Z0-9-_.]+)@([a-zA-Z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+)\>$/', $contact, $matches3);
+            
+            if ($valid1) {
+                $email = $matches1[0];
+            } elseif ($valid2) {
+                $name  = $matches2[1];
+                $email = $matches2[2];
+            } elseif ($valid3) {
+                $name  = $matches3[1];
+                $email = $matches3[2];
+            }
+            
+            return array(
+                'name'  => $name,
+                'email' => $email,
+            );
+        };
+        
+        $total   = count($list); // общее количество email
+        $added   = 0;            // добавлено в базу
+        $novalid = 0;            // невалидных
+        $skipped = 0;            // пропущено - уже существуют в базе
+        
+        if (count($list) > 0) {
+            foreach ($list AS $contact) {
+                $contact = $_perse_contact($contact);
+                
+                $name  = $contact['name'];
+                $email = $contact['email'];
+                
+                if ($email) {
+                    $evalid = preg_match('/([a-zA-Z0-9-_.]+)@([a-zA-Z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+/', $email);
+                    
+                    if ($evalid) {
+                        $erow = $this->db->get_var("SELECT `id` FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `email` = '{$email}'");
+                        if ($erow === NULL) {
+                            $this->db->insert(TABLE_CLIENTS_CONTACTS, array('email' => $email, 'first_name' => $name));
+                            $added++;
+                        } else {
+                            $skipped++;
+                        }
+                    } else {
+                        $novalid++;
+                    }
+                } else {
+                    $novalid++;
+                }
+            }
+        }
+        
+        return array(
+            'total'   => $total,
+            'added'   => $added,
+            'novalid' => $novalid,
+            'skipped' => $skipped,
+        );
+    }
+    
+    
     public function action_import()
     {
         //
@@ -600,31 +680,7 @@ class Clients_Controller extends Base_Controller{
             $list = explode("\n", $list);
             if (is_array($list) AND count($list) > 0) {
                 
-                $total = count($list); // общее количество email
-                $added = 0;            // добавлено в базу
-                $novalid = 0;          // невалидных
-                $skipped = 0;          // пропущено - уже существуют в базе
-                
-                
-                foreach ($list AS $email) {
-                    
-                    $email = trim($email);
-                    
-                    $row = $this->db->get_var("SELECT `id` FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `email` = '{$email}'");
-            
-                    $valid = preg_match('/([a-zA-Z0-9-_.]+)@([a-z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+/', $email);
-                    
-                    if (!empty($email) AND $valid) {
-                        if ($row === NULL) {
-                            $this->db->insert(TABLE_CLIENTS_CONTACTS, array('email' => $email));
-                            $added++;
-                        } else {
-                            $skipped++;
-                        }
-                    } else {
-                        $novalid++;
-                    }                    
-                }
+                extract($this->_import($list));
                 
                 if ($added > 0) {
                     $success = true;
@@ -657,38 +713,32 @@ class Clients_Controller extends Base_Controller{
         
         $file = isset($_FILES['contacts_file']) ? $_FILES['contacts_file'] : NULL;
         
-        $total = 0; // общее количество email
-        $added = 0;            // добавлено в базу
-        $novalid = 0;          // невалидных
-        $skipped = 0;          // пропущено - уже существуют в базе
+        $total = 0;   // общее количество email
+        $added = 0;   // добавлено в базу
+        $novalid = 0; // невалидных
+        $skipped = 0; // пропущено - уже существуют в базе
         
         if ($file) {
             $file_lines = array();
             
             $f = fopen($file['tmp_name'], 'r+');
             if ($f) {
+                
+                $list = array();
+                
                 while (($data = fgetcsv($f, 1000, ';')) !== FALSE) {
                     $total++;
-                    $email = isset($data[0]) ? trim($data[0]) : NULL;
-                    $name  = isset($data[1]) ? trim($data[1]) : '';
-                    if (!empty($email)) {
-                        $row = $this->db->get_var("SELECT `id` FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `email` = '{$email}'");
-                        $valid = preg_match('/([a-zA-Z0-9-_.]+)@([a-z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+/', $email);
-                        
-                        if ($valid) {
-                            if ($row === NULL) {
-                                $this->db->insert(TABLE_CLIENTS_CONTACTS, array('email' => $email, 'first_name' => $name));
-                                $added++;
-                            } else {
-                                $skipped++;
-                            }
-                        } else {
-                            $novalid++;
-                        } 
-                    } else {
-                        $novalid++;
-                    }
+                    
+                    $name  = isset($data[0]) ? trim($data[0]) : '';
+                    $email = isset($data[1]) ? trim($data[1]) : NULL;
+                    
+                    $list[] = array(
+                        'name'  => $name,
+                        'email' => $email,
+                    );
                 }
+                
+                extract($this->_import($list));
                 
                 if ($added > 0) {
                     $success = true;
