@@ -670,6 +670,8 @@ class Clients_Controller extends Base_Controller{
     
     public function action_import_list()
     {
+        $this->action = 'import';
+        
         $list = $this->_input('list');
         
         if (!empty($list)) {
