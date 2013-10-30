@@ -628,6 +628,8 @@ class Clients_Controller extends Base_Controller{
         $novalid = 0;            // невалидных
         $skipped = 0;            // пропущено - уже существуют в базе
         
+        $inserted = array();
+        
         if (count($list) > 0) {
             foreach ($list AS $contact) {
                 $contact = $_perse_contact($contact);
@@ -642,6 +644,7 @@ class Clients_Controller extends Base_Controller{
                         $erow = $this->db->get_var("SELECT `id` FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `email` = '{$email}'");
                         if ($erow === NULL) {
                             $this->db->insert(TABLE_CLIENTS_CONTACTS, array('email' => $email, 'first_name' => $name));
+                            $inserted[] = $this->db->insert_id;
                             $added++;
                         } else {
                             $skipped++;
@@ -656,13 +659,23 @@ class Clients_Controller extends Base_Controller{
         }
         
         return array(
-            'total'   => $total,
-            'added'   => $added,
-            'novalid' => $novalid,
-            'skipped' => $skipped,
+            'total'    => $total,
+            'added'    => $added,
+            'novalid'  => $novalid,
+            'skipped'  => $skipped,
+            'inserted' => $inserted,
         );
     }
     
+    
+    public function action_import_list()
+    {
+        $list = $this->_input('list');
+        
+        if (!empty($list)) {
+            $this->list = $this->db->get_results("SELECT * FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `id` IN ({$list})");
+        }
+    }
     
     public function action_import()
     {
@@ -684,9 +697,10 @@ class Clients_Controller extends Base_Controller{
                 
                 if ($added > 0) {
                     $success = true;
+                    $added = '<a href="/wp-admin/admin.php?page=vspostman-clients&act=import_list&list=' . implode(',', $inserted) . '">' . $added . '</a>';
                     $result  = '<span style="color:green">Передано контактов - '.$total.', невалидных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
                 } else {
-                    $result  = '<span style="color:red">Передано контактов - '.$total.', невалидных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
+                    $result  = '<span style="color:red">Передано контактов - '.$total.', невалидных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - 0.</span>';
                 }
             }
         }
@@ -742,9 +756,10 @@ class Clients_Controller extends Base_Controller{
                 
                 if ($added > 0) {
                     $success = true;
+                    $added = '<a href="/wp-admin/admin.php?page=vspostman-clients&act=import_list&list=' . implode(',', $inserted) . '">' . $added . '</a>';
                     $result  = '<span style="color:green">Передано контактов - '.$total.', невалидных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
                 } else {
-                    $result  = '<span style="color:red">Передано контактов - '.$total.', невалидных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - '.$added.'.</span>';
+                    $result  = '<span style="color:red">Передано контактов - '.$total.', невалидных - '.$novalid.', есть в базе - '.$skipped.'. Импортировано - 0.</span>';
                 }
                 
             }
