@@ -1,15 +1,24 @@
+<style>
+.wrap .add-new-h2.active{
+    color: #F0F0F0;
+    background: #585858;
+    text-shadow: none;
+}
+</style>
+
 <div class="wrap">
   <div class="icon32"><img src="/wp-content/plugins/vspostman/img/blue-document-text-image.png" alt=""></div>
-  <h2>Письма 
+  <h2>Воронки продаж 
+    <a href="/wp-admin/admin.php?page=vspostman-mails" class="add-new-h2 active">Список воронок</a>
     <a href="/wp-admin/admin.php?page=vspostman-mails&act=add" class="add-new-h2">Добавить воронку</a>
   </h2>
 
 
-<ul class="subsubsub">
+<!--ul class="subsubsub">
     <li class="all"><a href="plugins.php?plugin_status=all" class="current">Все <span class="count">(4)</span></a> |</li>
     <li class="active"><a href="plugins.php?plugin_status=active">Активный <span class="count">(1)</span></a> |</li>
     <li class="inactive"><a href="plugins.php?plugin_status=inactive">Неактивные <span class="count">(3)</span></a></li>
-</ul>
+</ul-->
 
 
 <form method="post" action="">
@@ -31,7 +40,7 @@
             </select>
             <input type="submit" name="" id="doaction" class="button action" value="Применить">
         </div>
-    <div class="tablenav-pages one-page">
+    <div class="tablenav-pages one-page" style="display: none;">
         <span class="pagination-links"><a class="first-page disabled" title="Перейти на первую страницу" href="http://wordpress/wp-admin/plugins.php">«</a>
         <a class="prev-page disabled" title="Перейти на предыдущую страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">‹</a>
         <span class="paging-input"><input class="current-page" title="Текущая страница" type="text" name="paged" value="1" size="1"> из <span class="total-pages">1</span></span>

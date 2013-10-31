@@ -46,7 +46,7 @@ function _controller($controller){
 function vspostman_admin_menu() {
     add_menu_page('Почтовик', 'Почтовик', '', 'vspostman_admin', '', '/wp-content/plugins/vspostman/img/mail-air.png');
     
-    add_submenu_page('vspostman_admin', 'Письма', 'Письма', 'manage_options', 'vspostman-mails', 'vspostman_menu_mails');
+    add_submenu_page('vspostman_admin', 'Воронки', 'Воронки', 'manage_options', 'vspostman-mails', 'vspostman_menu_mails');
     add_submenu_page('vspostman_admin', 'Клиенты', 'Клиенты', 'manage_options', 'vspostman-clients', 'vspostman_menu_clients');
     add_submenu_page('vspostman_admin', 'Статистика', 'Статистика', 'manage_options', 'vspostman-stats', 'vspostman_menu_stats');
 }
