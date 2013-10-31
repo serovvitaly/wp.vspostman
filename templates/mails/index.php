@@ -33,12 +33,6 @@
               <a href="/wp-admin/admin.php?page=vspostman-mails&act=add" class="button button-primary">Добавить воронку</a>
             </div>
         
-            <select name="action">
-                <option value="activate-selected">Активировать</option>
-                <option value="deactivate-selected">Деактивировать</option>
-                <option value="delete-selected">Удалить</option>
-            </select>
-            <input type="submit" name="" id="doaction" class="button action" value="Применить">
         </div>
     <div class="tablenav-pages one-page" style="display: none;">
         <span class="pagination-links"><a class="first-page disabled" title="Перейти на первую страницу" href="http://wordpress/wp-admin/plugins.php">«</a>
@@ -52,19 +46,19 @@
 <table class="wp-list-table widefat" cellspacing="0">
     <thead>
       <tr>
-        <th scope="col" class="manage-column column-cb check-column" style=""><input id="cb-select-all-1" type="checkbox"></th>
+        <!--th scope="col" class="manage-column column-cb check-column" style=""><input id="cb-select-all-1" type="checkbox"></th-->
         <th scope="col" class="manage-column column-name" style="">Воронка</th>
-        <th scope="col" class="manage-column column-name" style="">Дата</th>
-        <th scope="col" class="manage-column column-name" style="">К-во подписчиков</th>
+        <th scope="col" class="manage-column column-name" style="">Создана</th>
+        <th scope="col" class="manage-column column-name" style="">Подписчики</th>
       </tr>
     </thead>
 
     <tfoot>
       <tr>
-        <th scope="col" class="manage-column column-cb check-column" style=""><input id="cb-select-all-1" type="checkbox"></th>
+        <!--th scope="col" class="manage-column column-cb check-column" style=""><input id="cb-select-all-1" type="checkbox"></th-->
         <th scope="col" class="manage-column column-name" style="">Воронка</th>
-        <th scope="col" class="manage-column column-name" style="">Дата</th>
-        <th scope="col" class="manage-column column-name" style="">К-во подписчиков</th>
+        <th scope="col" class="manage-column column-name" style="">Создана</th>
+        <th scope="col" class="manage-column column-name" style="">Подписчики</th>
       </tr>
     </tfoot>
 
@@ -75,14 +69,14 @@
             foreach ($items AS $item) {
     ?>
         <tr class="inactive">
-          <th scope="row" class="check-column"><input type="checkbox" name="checked[]" value="<?= $item->id ?>"></th>
+          <!--th scope="row" class="check-column"><input type="checkbox" name="checked[]" value="<?= $item->id ?>"></th-->
           <td class="title">
             <strong><?= $item->name ?></strong>
             <div class="row-actions-visible">
-              <span class="duplicate"><a href="/wp-admin/admin.php?page=vspostman-mails&act=duplicate&uid=<?= $item->id ?>" onclick="if (!confirm('Точно дублировать?')) return false;">Дублировать</a> | </span>
+              <span class="duplicate"><a href="/wp-admin/admin.php?page=vspostman-mails&act=duplicate&uid=<?= $item->id ?>" onclick="if (!confirm('Будет создана копия воронки “<?= $item->name ?>”, только без подписчиков. Продолжить?')) return false;">Дублировать</a> | </span>
               <span class="edit"><a href="/wp-admin/admin.php?page=vspostman-mails&act=edit&uid=<?= $item->id ?>">Редактировать</a> | </span>
               <span class="stat"><a href="/wp-admin/admin.php?page=vspostman-stats&act=stat&uid=<?= $item->id ?>">Статистика</a> | </span>
-              <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-mails&act=delete&uid=<?= $item->id ?>" class="delete" onclick="if (!confirm('Точно удалить?')) return false;">Удалить</a></span></div>
+              <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-mails&act=delete&uid=<?= $item->id ?>" class="delete" onclick="if (!confirm('Воронка “<?= $item->name ?>” будет удалена. Продолжить?')) return false;">Удалить</a></span></div>
           </td>
           
           <td class="">
@@ -106,12 +100,6 @@
             <div style="float: right;">
               <a href="/wp-admin/admin.php?page=vspostman-mails&act=add" class="button button-primary">Добавить воронку</a>
             </div> 
-            <select name="action2">
-                <option value="activate-selected">Активировать</option>
-                <option value="deactivate-selected">Деактивировать</option>
-                <option value="delete-selected">Удалить</option>
-            </select>
-            <input type="submit" name="" id="doaction2" class="button action" value="Применить">
         </div>
 <div class="tablenav-pages one-page">
 <span class="pagination-links"><a class="first-page disabled" title="Перейти на первую страницу" href="http://wordpress/wp-admin/plugins.php">«</a>
