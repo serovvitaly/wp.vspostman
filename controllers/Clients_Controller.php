@@ -1141,7 +1141,18 @@ class Clients_Controller extends Base_Controller{
     
     public function action_custom_fields()
     {
-        //
+        $edit   = $this->_input('edit');
+        $remove = $this->_input('remove');
+        
+        $this->field_edit = NULL;
+        
+        if ($remove > 0) {
+            $this->db->delete(TABLE_CLIENTS_CUSTOM_FIELDS, array('id' => $remove));
+        } elseif ($edit > 0) {
+            $this->field_edit = $this->db->get_row("SELECT * FROM " . TABLE_CLIENTS_CUSTOM_FIELDS . " WHERE `id` = {$edit}");
+        }
+        
+        $this->custom_fields = $this->db->get_results("SELECT * FROM " . TABLE_CLIENTS_CUSTOM_FIELDS);
     }
     
     

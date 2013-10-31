@@ -1,12 +1,13 @@
 <div style="margin: 20px 0;">
-  <button class="button">Добавить настраиваемое поле</button>
+  <button class="button" onclick="showFieldEditForm()">Добавить настраиваемое поле</button>
 </div>
 
-<div>
-  <table id="clients-custom-fields">
+<div id="clients-custom-fields" <?= $field_edit ? '' : ' style="display: none;"' ?>>
+  <input type="hidden" name="fid" value="<?= $field_edit->id ?>">
+  <table>
     <tr>
       <td>Наименование поля:</td>
-      <td><input type="text" style="width: 170px;" name="field_label"></td>
+      <td><input type="text" style="width: 170px;" name="field_label" value="<?= $field_edit->field_label ?>"></td>
     </tr>
     <!--tr>
       <td>Уникальное имя поля:</td>
@@ -32,10 +33,33 @@
       </td>
     </tr>
   </table>
-  <button class="button button-primary" onclick="saveCustomField()">Сохранить</button>
+  <button class="button button-primary" onclick="saveCustomField()">Сохранить</button> <a onclick="hideFieldEditForm(); return false;" href="#" style="padding: 0 0 3px 10px;">отмена</a>
 </div>
 
+<? if ($custom_fields AND count($custom_fields) > 0) { ?>
+<table class="wp-list-table widefat" style="margin-top: 20px; width: 500px;">
+  <? foreach ($custom_fields AS $fields) { ?>
+  <tr>
+    <td><?= $fields->field_label ?></td>
+    <td><?= $fields->field_type ?></td>
+    <td style="width: 60px;"><a href="/wp-admin/admin.php?page=vspostman-clients&act=custom_fields&edit=<?= $fields->id ?>" title="Редактировать">ред.</a> | <a onclick="return confirm('Вы уверены?')" href="/wp-admin/admin.php?page=vspostman-clients&act=custom_fields&remove=<?= $fields->id ?>" title="Удалить">уд.</a></td>
+  </tr>
+  <? } ?>
+</table>
+<? } else { ?>
+<p><i style="color: gray;">Список пуст</i></p>
+<? } ?>
+
 <script>
+function showFieldEditForm(){
+    $('#clients-custom-fields').slideDown(100);
+}
+function hideFieldEditForm(){
+    $('#clients-custom-fields').slideUp(100);
+    $('#clients-custom-fields [name="field_label"]').val('');
+    $('#clients-custom-fields [name="field_type"]').val('');
+    $('#clients-custom-fields .custom-field').remove();
+}
 function saveCustomField(){
     
     $('#clients-custom-fields [name="field_label"]').css('border-color', '');
@@ -78,12 +102,13 @@ function saveCustomField(){
             data: {
                 controller: 'clients',
                 act: 'save_custom_field',
+                fid: $('#clients-custom-fields [name="fid"]').val(),
                 field_label: field_label,
                 field_type: field_type,
                 field_value: values,
             },
             success: function(data){
-                //
+                window.location = '/wp-admin/admin.php?page=vspostman-clients&act=custom_fields';
             }
         });
     }
@@ -127,9 +152,16 @@ function ChangeFormElements(value){
             element = '<input name="field_value[]" type="text" style="width: 170px;">';
     }
     
-    $('#clients-custom-fields').append('<tr class="custom-field"><td>Значение:</td><td class="custom-field-wrapper">'+element+'</td></tr>');
+    $('#clients-custom-fields table').append('<tr class="custom-field"><td>Значение:</td><td class="custom-field-wrapper">'+element+'</td></tr>');
     $('.field-date').datepicker({
         dateFormat: 'dd.mm.yy'
     });
 }
+
+
+$(document).ready(function(){
+    $('#clients-custom-fields [name="field_type"]').val('<?= $field_edit->field_type ?>');
+    ChangeFormElements('<?= $field_edit->field_type ?>');
+});
+
 </script>
