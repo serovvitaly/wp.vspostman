@@ -10,6 +10,10 @@ abstract class Base_Controller {
     
     public $action = NULL;
     
+    public $icon = ' ';
+    
+    public $icon_id = 'icon-edit';
+    
     
     public function __construct()
     {

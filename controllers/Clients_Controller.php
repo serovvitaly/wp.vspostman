@@ -372,11 +372,23 @@ class Clients_Controller extends Base_Controller{
             }
             
             $cost_fields = $this->_input('cost_fields');
+            
             if ($cost_fields AND count($cost_fields) > 0) {
-                $data['cost_fields'] = json_encode($cost_fields);
+                foreach ($cost_fields AS $field_id => $field_value) {
+                    
+                    if (is_array($field_value)) {
+                        $field_value = implode("\n", $field_value);
+                    }
+                    
+                    $sql = "INSERT INTO " . TABLE_CLIENTS_CUSTOM_FIELDS_VALUES . " SET `contact_id` = {$id}, `field_id` = {$field_id}, `value` = '{$field_value}'  ON DUPLICATE KEY UPDATE `value` = `value`";
+                    $this->db->query($sql);
+                    $result = $sql;
+                }
+                
+                //$data['cost_fields'] = json_encode($cost_fields);
             }
             
-            if (count($data) > 0) {
+            if (count($data) > 0) {                              
                 $this->db->update(TABLE_CLIENTS_CONTACTS, $data, array('id' => $id));
                 
                 $success = true;

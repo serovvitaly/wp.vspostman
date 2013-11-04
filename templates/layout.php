@@ -106,7 +106,7 @@ function getUniqueId(){
 </style>
 
 <div class="wrap">
-  <div id="icon-edit" class="icon32 icon32-posts-post"><br></div>
+  <div<?= $icon_id ? ' id="'.$icon_id.'"' : '' ?> class="icon32"><img src="<?= $icon ?>" alt=""></div>
   <h2><?= $title ?> 
   <?
       if (isset($top_menu) AND is_array($top_menu) AND count($top_menu) > 0) {

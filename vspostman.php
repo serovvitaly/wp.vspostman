@@ -54,6 +54,10 @@ function vspostman_admin_menu() {
 
 function vspostman_menu_mails() {
     
+    echo _controller('Mails_Controller')->action($_REQUEST['act']);
+    
+    return;
+    
     global $wpdb;
     
     $act = isset($_REQUEST['act']) ? $_REQUEST['act'] : 'index';
@@ -65,14 +69,6 @@ function vspostman_menu_mails() {
     $_table_mail_links = $wpdb->prefix . 'vspostman_mail_links';    
     
     switch ($act) {
-        case 'add':
-            
-            $item = new stdClass();
-            $item->id = 0;
-            $item->title = 'Новая воронка';
-            
-            include  'templates/mails/funnel-form.php';
-            break;
         case 'edit':
             if ($uid < 1) {
                 //

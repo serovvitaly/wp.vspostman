@@ -19,14 +19,22 @@ $_table_mail_links = $wpdb->prefix . 'vspostman_mail_links';
 $action = isset($_REQUEST['act']) ? $_REQUEST['act'] : NULL;
 $controller = isset($_REQUEST['controller']) ? $_REQUEST['controller'] : NULL;
 
+$controller = ucfirst( strtolower($controller) ) . '_Controller';
+
+_controller($controller)->action($action);
+
+/*
 switch ($controller) {
+    case 'mails':
+        _controller('Mails_Controller')->action($action);
+        break;
     case 'clients':
         _controller('Clients_Controller')->action($action);
         break;
     case 'stats':
         _controller('Stats_Controller')->action($action);
         break;
-}
+} */
 
 $out = array(
     'success' => false,

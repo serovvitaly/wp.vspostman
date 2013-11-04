@@ -120,18 +120,30 @@ textarea.edit-view{
       <?   
           if (isset($cost_fields) AND count($cost_fields) > 0) {
               foreach ($cost_fields AS $cfield) {
+                  $render_value = json_decode($cfield->value);
+                  
+                  if (is_array($render_value)) {
+                      $render_value = implode('<br>', $render_value);
+                  }
+                  
           ?>
       <tr<?= empty($cfield->value) ? ' class="hidden"' : '' ?>>
         <td class="td-title">
           <?= $cfield->field_label ?>
         </td>
         <td>
-          <span class="pre-view"><?= $cfield->value ?></span>
+          <span class="pre-view"><?= $render_value ?></span>
           <?
+          
+          if (in_array($cfield->field_type, array('single_select', 'multi_select'))) {
+              ?><select<?= $cfield->field_type == 'multi_select' ? ' multiple="multiple"' : '' ?> class="edit-view hidden" name="cost_fields[<?= $cfield->id ?>][]"><?
+          }
+          
           if (!empty($cfield->field_value)) {
               $values = json_decode($cfield->field_value);
               if (count($values) > 0) {
                   foreach ($values AS $value) {
+                      
                       if ($value == $cfield->value) {
                           $checked = ' checked="checked"';
                       } else {
@@ -139,18 +151,31 @@ textarea.edit-view{
                       }
                       switch ($cfield->field_type) {
                           case 'radio':
-                              ?><label class="edit-view hidden"><input type="radio" name="cost_fields[<?= $cfield->id ?>][value]"> - <?= $value ?></label><br><?
+                              ?><label class="edit-view hidden"><input<?= $checked ?> type="radio" value="<?= $value ?>" name="cost_fields[<?= $cfield->id ?>]"> - <?= $value ?></label><br><?
                               break;
                           case 'checkbox':
-                              ?><label class="edit-view hidden"><input<?= $checked ?> type="checkbox" name="cost_fields[<?= $cfield->id ?>][value]"> - <?= $value ?></label><br><?
+                              ?><label class="edit-view hidden"><input<?= $checked ?> type="checkbox" value="<?= $value ?>" name="cost_fields[<?= $cfield->id ?>][]"> - <?= $value ?></label><br><?
+                              break;
+                          case 'single_select':
+                              ?><option <?= $checked ?> value="<?= $value ?>"><?= $value ?></option><?
+                              break;
+                          case 'multi_select':
+                              ?><option <?= $checked ?> value="<?= $value ?>"><?= $value ?></option><?
                               break;
                               
                           default:
-                              ?><input name="cost_fields[<?= $cfield->id ?>][value]" value="<?= $cfield->value ?>" class="edit-view hidden" type="text"><?
+                              ?><input name="cost_fields[<?= $cfield->id ?>]" value="<?= $cfield->value ?>" class="edit-view hidden" type="text"><?
                       }
+                      
                   }
               }   
           }
+          
+          
+          if (in_array($cfield->field_type, array('single_select', 'multi_select'))) {
+              ?></select><?
+          }
+          
           ?>
         </td>
       </tr>
@@ -413,7 +438,7 @@ function saveContact(){
         },
         success: function(data){
             if (data.success === true) {
-                window.location = window.location;
+                //window.location = window.location;
             } else {
                 $('.info') = data.result 
             }

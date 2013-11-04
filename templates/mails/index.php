@@ -1,17 +1,7 @@
-<style>
-.wrap .add-new-h2.active{
-    color: #F0F0F0;
-    background: #585858;
-    text-shadow: none;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="/wp-content/plugins/vspostman/libs/Toggle-Switch/toggleswitch.css">
 
-<div class="wrap">
-  <div class="icon32"><img src="/wp-content/plugins/vspostman/img/blue-document-text-image.png" alt=""></div>
-  <h2>Воронки продаж 
-    <a href="/wp-admin/admin.php?page=vspostman-mails" class="add-new-h2 active">Список воронок</a>
-    <a href="/wp-admin/admin.php?page=vspostman-mails&act=add" class="add-new-h2">Добавить воронку</a>
-  </h2>
+
+
 
 
 <!--ul class="subsubsub">
@@ -73,10 +63,16 @@
           <td class="title">
             <strong><?= $item->name ?></strong>
             <div class="row-actions-visible">
-              <span class="duplicate"><a href="/wp-admin/admin.php?page=vspostman-mails&act=duplicate&uid=<?= $item->id ?>" onclick="if (!confirm('Будет создана копия воронки “<?= $item->name ?>”, только без подписчиков. Продолжить?')) return false;">Дублировать</a> | </span>
-              <span class="edit"><a href="/wp-admin/admin.php?page=vspostman-mails&act=edit&uid=<?= $item->id ?>">Редактировать</a> | </span>
-              <span class="stat"><a href="/wp-admin/admin.php?page=vspostman-stats&act=stat&uid=<?= $item->id ?>">Статистика</a> | </span>
-              <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-mails&act=delete&uid=<?= $item->id ?>" class="delete" onclick="if (!confirm('Воронка “<?= $item->name ?>” будет удалена. Продолжить?')) return false;">Удалить</a></span></div>
+              <div style="display: inline-block; margin-top: 3px;">
+                <input type="checkbox" class="toggleswitch" value="<?= $item->id ?>" <?= $item->active == 1 ? ' checked="checked"' : '' ?>/>
+              </div>
+              <div style="display: inline-block; margin: 4px 0 0 16px; vertical-align: top;">
+                  <span class="duplicate"><a href="/wp-admin/admin.php?page=vspostman-mails&act=duplicate&uid=<?= $item->id ?>" onclick="if (!confirm('Будет создана копия воронки “<?= $item->name ?>”, только без подписчиков. Продолжить?')) return false;">Дублировать</a> | </span>
+                  <span class="edit"><a href="/wp-admin/admin.php?page=vspostman-mails&act=edit&uid=<?= $item->id ?>">Редактировать</a> | </span>
+                  <span class="stat"><a href="/wp-admin/admin.php?page=vspostman-stats&act=stat&uid=<?= $item->id ?>">Статистика</a> | </span>
+                  <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-mails&act=delete&uid=<?= $item->id ?>" class="delete" onclick="if (!confirm('Воронка “<?= $item->name ?>” будет удалена. Продолжить?')) return false;">Удалить</a></span>
+              </div>
+            </div>
           </td>
           
           <td class="">
@@ -111,4 +107,32 @@
     </div>
 </form>
 
-</div>
+
+
+<script type="text/javascript" src="/wp-content/plugins/vspostman/libs/Toggle-Switch/jquery.toggleswitch.min.js"></script>
+<script>
+function funnelActiveChange(fid, active){
+    console.log(fid, active);
+    jQuery.ajax({
+        url: '/wp-content/plugins/vspostman/ajax.php',
+        dataType: 'json',
+        type: 'POST',
+        data: {
+            controller: 'mails',
+            act: 'funnel_set_active',
+            fid: fid,
+            active: active
+        }
+    });
+}
+jQuery(document).ready(function($) {
+    $('.toggleswitch').toggleSwitch({
+        onChangeOn: function () {
+            funnelActiveChange($(this).val(), 1);
+        },
+        onChangeOff: function () {
+            funnelActiveChange($(this).val(), 0);
+        }
+    });
+});
+</script>
