@@ -29,8 +29,8 @@ class Mails_Controller extends Base_Controller{
     }    
 
     public function action_index()
-    {
-        $this->items = $this->db->get_results("SELECT f.*, COUNT(cf.contact_id) AS `subscribers` FROM " . TABLE_FUNNELS . " AS f JOIN " . TABLE_CONTACTS_FUNNELS . " AS cf ON f.id = cf.funnel_id WHERE cf.is_removal = 0 AND cf.in_blacklist = 0 ORDER BY f.`created` DESC");
+    {   
+        $this->items = $this->db->get_results("SELECT wvf.*, COUNT(wvcf.contact_id) AS subscribers FROM ".TABLE_FUNNELS." wvf JOIN ".TABLE_CONTACTS_FUNNELS." wvcf ON wvf.id = wvcf.funnel_id WHERE wvcf.is_removal = 0 AND wvcf.in_blacklist = 0 GROUP BY wvf.id ORDER BY wvf.`created` DESC");
     }
     
     

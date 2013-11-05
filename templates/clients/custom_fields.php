@@ -38,11 +38,25 @@
 
 <? if ($custom_fields AND count($custom_fields) > 0) { ?>
 <table class="wp-list-table widefat" style="margin-top: 20px; width: 500px;">
-  <? foreach ($custom_fields AS $fields) { ?>
+  <?
+  foreach ($custom_fields AS $fields) {
+      $types = array(
+          'text'          => 'текст',
+          'number'        => 'число',
+          'date'          => 'дата',
+          'phone'         => 'телефон',
+          'textarea'      => 'многострочный текст',
+          'radio'         => 'переключатель',
+          'checkbox'      => 'флажок',
+          'single_select' => 'выпадающий список',
+          'multi_select'  => 'множественный выбор',
+      ); 
+                    
+  ?>
   <tr>
     <td><?= $fields->field_label ?></td>
-    <td><?= $fields->field_type ?></td>
-    <td style="width: 60px;"><a href="/wp-admin/admin.php?page=vspostman-clients&act=custom_fields&edit=<?= $fields->id ?>" title="Редактировать">ред.</a> | <a onclick="return confirm('Вы уверены?')" href="/wp-admin/admin.php?page=vspostman-clients&act=custom_fields&remove=<?= $fields->id ?>" title="Удалить">уд.</a></td>
+    <td><?= $types[$fields->field_type] ?></td>
+    <td style="width: 60px;"><a href="/wp-admin/admin.php?page=vspostman-clients&act=custom_fields&edit=<?= $fields->id ?>" title="Редактировать">ред.</a> | <a onclick="return confirm('Вместа с полем будут удалены все связанные с ним данные клиентов. Продолжить?')" href="/wp-admin/admin.php?page=vspostman-clients&act=custom_fields&remove=<?= $fields->id ?>" title="Удалить">уд.</a></td>
   </tr>
   <? } ?>
 </table>
