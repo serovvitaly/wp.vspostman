@@ -264,7 +264,7 @@ class Clients_Controller extends Base_Controller{
                 }
             }
             
-            $this->comments = $this->db->get_results("SELECT comment.*, u.user_nicename as `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " AS comment JOIN " . TABLE_WP_USERS . " u ON comment.user_id = u.ID WHERE comment.`contact_id` = {$contact_id} ORDER BY comment.created DESC LIMIT 2");
+            $this->comments = $this->db->get_results("SELECT comment.*, u.user_nicename AS `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " AS comment JOIN " . TABLE_WP_USERS . " u ON comment.user_id = u.ID WHERE comment.`contact_id` = {$contact_id} ORDER BY comment.created DESC LIMIT 2");
             
             $this->funnels  = $this->db->get_results("SELECT cont.*,funn.name FROM " . TABLE_CONTACTS_FUNNELS . " as cont JOIN " . TABLE_FUNNELS . " as funn ON cont.funnel_id = funn.id WHERE cont.contact_id = {$contact_id}");
             
@@ -373,6 +373,12 @@ class Clients_Controller extends Base_Controller{
             
             $cost_fields = $this->_input('cost_fields');
             
+            $recs_values = $this->db->get_results("SELECT `contact_id`, `field_id` FROM " . TABLE_CLIENTS_CUSTOM_FIELDS_VALUES . " WHERE `contact_id` = {$id} AND `field_id` IN (".implode(',', array_keys($cost_fields)).")");
+           
+            array_walk_recursive($recs_values, function(&$item, $key){
+                $item = (array) $item;
+            });
+            
             if ($cost_fields AND count($cost_fields) > 0) {
                 foreach ($cost_fields AS $field_id => $field_value) {
                     
@@ -380,9 +386,20 @@ class Clients_Controller extends Base_Controller{
                         $field_value = implode("\n", $field_value);
                     }
                     
-                    $sql = "INSERT INTO " . TABLE_CLIENTS_CUSTOM_FIELDS_VALUES . " SET `contact_id` = {$id}, `field_id` = {$field_id}, `value` = '{$field_value}'  ON DUPLICATE KEY UPDATE `value` = `value`";
-                    $this->db->query($sql);
-                    $result = $sql;
+                    if (in_array(array('contact_id' => $id, 'field_id' => $field_id), $recs_values)) {
+                        $this->db->update(TABLE_CLIENTS_CUSTOM_FIELDS_VALUES, array(
+                            'value' => $field_value
+                        ), array(
+                            'contact_id' => $id, 
+                            'field_id'   => $field_id, 
+                        ));
+                    } else {
+                        $this->db->insert(TABLE_CLIENTS_CUSTOM_FIELDS_VALUES, array(
+                            'contact_id' => $id, 
+                            'field_id'   => $field_id,
+                            'value' => $field_value
+                        ));
+                    }
                 }
                 
                 //$data['cost_fields'] = json_encode($cost_fields);

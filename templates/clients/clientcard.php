@@ -17,6 +17,10 @@ td.td-title{
 .edit-view{
     border-color: #AFC8DB !important;
     width: 210px;
+    display: inline-table;
+}
+.edit-view.hidden{
+    display: none;
 }
 textarea.edit-view{
     width: 210px;
@@ -120,11 +124,8 @@ textarea.edit-view{
       <?   
           if (isset($cost_fields) AND count($cost_fields) > 0) {
               foreach ($cost_fields AS $cfield) {
-                  $render_value = json_decode($cfield->value);
                   
-                  if (is_array($render_value)) {
-                      $render_value = implode('<br>', $render_value);
-                  }
+                  $render_value = $cfield->value;
                   
           ?>
       <tr<?= empty($cfield->value) ? ' class="hidden"' : '' ?>>
@@ -141,26 +142,30 @@ textarea.edit-view{
           
           if (!empty($cfield->field_value)) {
               $values = json_decode($cfield->field_value);
+              
+              if (!is_array($values)) {
+                  $values = array($values);
+              }
+              
               if (count($values) > 0) {
                   foreach ($values AS $value) {
                       
-                      if ($value == $cfield->value) {
-                          $checked = ' checked="checked"';
-                      } else {
-                          $checked = '';
-                      }
                       switch ($cfield->field_type) {
                           case 'radio':
-                              ?><label class="edit-view hidden"><input<?= $checked ?> type="radio" value="<?= $value ?>" name="cost_fields[<?= $cfield->id ?>]"> - <?= $value ?></label><br><?
+                              $checked = ($value == $cfield->value) ? ' checked="checked"' : '';
+                              ?><label class="edit-view hidden"><input<?= $checked ?> type="radio" value="<?= $value ?>" name="cost_fields[<?= $cfield->id ?>]"> - <?= $value ?></label><?
                               break;
                           case 'checkbox':
-                              ?><label class="edit-view hidden"><input<?= $checked ?> type="checkbox" value="<?= $value ?>" name="cost_fields[<?= $cfield->id ?>][]"> - <?= $value ?></label><br><?
+                              $checked = in_array($value, explode("\n", $cfield->value)) ? ' checked="checked"' : '';
+                              ?><label class="edit-view hidden"><input<?= $checked ?> type="checkbox" value="<?= $value ?>" name="cost_fields[<?= $cfield->id ?>][]"> - <?= $value ?></label><?
                               break;
                           case 'single_select':
-                              ?><option <?= $checked ?> value="<?= $value ?>"><?= $value ?></option><?
+                              $selected = in_array($value, explode("\n", $cfield->value)) ? ' selected="selected"' : '';
+                              ?><option<?= $selected ?> value="<?= $value ?>"><?= $value ?></option><?
                               break;
                           case 'multi_select':
-                              ?><option <?= $checked ?> value="<?= $value ?>"><?= $value ?></option><?
+                              $selected = in_array($value, explode("\n", $cfield->value)) ? ' selected="selected"' : '';
+                              ?><option<?= $selected ?> value="<?= $value ?>"><?= $value ?></option><?
                               break;
                               
                           default:
@@ -438,7 +443,7 @@ function saveContact(){
         },
         success: function(data){
             if (data.success === true) {
-                //window.location = window.location;
+                window.location = window.location;
             } else {
                 $('.info') = data.result 
             }
