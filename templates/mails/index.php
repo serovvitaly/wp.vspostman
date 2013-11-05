@@ -25,11 +25,11 @@
         
         </div>
     <div class="tablenav-pages one-page" style="display: none;">
-        <span class="pagination-links"><a class="first-page disabled" title="Перейти на первую страницу" href="http://wordpress/wp-admin/plugins.php">«</a>
-        <a class="prev-page disabled" title="Перейти на предыдущую страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">‹</a>
+        <span class="pagination-links"><a class="first-page disabled" title="Перейти на первую страницу" href="/wp-admin/plugins.php">«</a>
+        <a class="prev-page disabled" title="Перейти на предыдущую страницу" href="/wp-admin/plugins.php?paged=1">‹</a>
         <span class="paging-input"><input class="current-page" title="Текущая страница" type="text" name="paged" value="1" size="1"> из <span class="total-pages">1</span></span>
-        <a class="next-page disabled" title="Перейти на следующую страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">›</a>
-        <a class="last-page disabled" title="Перейти на последнюю страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">»</a></span>
+        <a class="next-page disabled" title="Перейти на следующую страницу" href="/wp-admin/plugins.php?paged=1">›</a>
+        <a class="last-page disabled" title="Перейти на последнюю страницу" href="/wp-admin/plugins.php?paged=1">»</a></span>
     </div>
         <br class="clear">
     </div>
@@ -80,7 +80,7 @@
           </td>
           
           <td class="">
-            <a href="http://wordpress/wp-admin/admin.php?page=vspostman-clients&funnel_id=<?= $item->id ?>" title="Показать список подписчиков"><?= $item->subscribers ?></a>
+            <a href="/wp-admin/admin.php?page=vspostman-clients&funnel_id=<?= $item->id ?>" title="Показать список подписчиков"><?= $item->subscribers ?></a>
             <span style="padding: 5px;"> </span>
             <a title="Добавить подписчиков" href="#" onclick="addSubscribers(); return false;" class="button button-small">+</a>
           </td>
@@ -100,11 +100,11 @@
             </div> 
         </div>
 <div class="tablenav-pages one-page">
-<span class="pagination-links"><a class="first-page disabled" title="Перейти на первую страницу" href="http://wordpress/wp-admin/plugins.php">«</a>
-<a class="prev-page disabled" title="Перейти на предыдущую страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">‹</a>
+<span class="pagination-links"><a class="first-page disabled" title="Перейти на первую страницу" href="/wp-admin/plugins.php">«</a>
+<a class="prev-page disabled" title="Перейти на предыдущую страницу" href="/wp-admin/plugins.php?paged=1">‹</a>
 <span class="paging-input">1 из <span class="total-pages">1</span></span>
-<a class="next-page disabled" title="Перейти на следующую страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">›</a>
-<a class="last-page disabled" title="Перейти на последнюю страницу" href="http://wordpress/wp-admin/plugins.php?paged=1">»</a></span></div>
+<a class="next-page disabled" title="Перейти на следующую страницу" href="/wp-admin/plugins.php?paged=1">›</a>
+<a class="last-page disabled" title="Перейти на последнюю страницу" href="/wp-admin/plugins.php?paged=1">»</a></span></div>
         <br class="clear">
     </div>
 </form>
