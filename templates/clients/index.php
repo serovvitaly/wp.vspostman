@@ -269,14 +269,17 @@ function removeConditionsGroupField(el){
     });
 }
 
-function goSearch(page){
+function goSearch(page, data){
     $('#clients-search-result').removeClass('list-empty');
     $('#filter-form input[name="act"]').val('search');
+    
+    var dataMix = $.extend({
+        page: page ? page : 1
+    }, data);
+    
     $('#filter-form').ajaxSubmit({
         dataType: 'json',
-        data: {
-            page: page ? page : 1
-        },
+        data: dataMix,
         beforeSubmit: function(formData, jqForm, options){
             $('#clients-search-result table tbody').html('');
         },
@@ -305,6 +308,12 @@ function goSearch(page){
 $(document).ready(function(){
     
     <? if ($current_filter > 0) { ?>loadFilter(<?= $current_filter ?>);<? } else { ?>addConditionsGroup();<? } ?>
+    
+    <? if ($funnel_id > 0) { ?>
+    goSearch(1, {
+        funnel_id: '<?= $funnel_id ?>' 
+    });
+    <? } ?>
     
     $('#filter-form').ajaxForm({
         dataType: 'json',

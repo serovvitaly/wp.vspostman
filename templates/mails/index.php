@@ -80,7 +80,9 @@
           </td>
           
           <td class="">
-            <a href="#" title="Показать список подписчиков" onclick="alert('Скоро будет выводиться список контактов.'); return false;"><?= $item->subscribers ?></a>
+            <a href="http://wordpress/wp-admin/admin.php?page=vspostman-clients&funnel_id=<?= $item->id ?>" title="Показать список подписчиков"><?= $item->subscribers ?></a>
+            <span style="padding: 5px;"> </span>
+            <a title="Добавить подписчиков" href="#" onclick="addSubscribers(); return false;" class="button button-small">+</a>
           </td>
 
         </tr>
@@ -111,6 +113,9 @@
 
 <script type="text/javascript" src="/wp-content/plugins/vspostman/libs/Toggle-Switch/jquery.toggleswitch.min.js"></script>
 <script>
+function addSubscribers(){
+    alert('Скоро будет выводиться добавление контактов.');
+}
 function funnelActiveChange(fid, active){
     console.log(fid, active);
     jQuery.ajax({

@@ -202,8 +202,13 @@ class Clients_Controller extends Base_Controller{
         
         $re = $this->db->query('SELECT * as count FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0");
         
-        //print_r($filter);
         $where_sql = '';
+        
+        $funnel_id = $this->_input('funnel_id', 0);
+        if ($funnel_id > 0) {
+            $where_sql .= "`id` IN(SELECT `contact_id` FROM `".TABLE_CONTACTS_FUNNELS."` WHERE `funnel_id` = {$funnel_id}) AND ";
+        }
+        
         if (count($filter) > 0) {
             foreach ($filter AS $group) {
                 $condition = ( isset($group['condition']) AND strtolower($group['condition']) == 'or' ) ? ' OR ' : ' AND '; 
@@ -219,7 +224,7 @@ class Clients_Controller extends Base_Controller{
         }
         
         $sql = 'SELECT COUNT(id) as count FROM ' . TABLE_CLIENTS_CONTACTS . " WHERE `deleted` = 0{$where_sql}";
-        //echo $sql . "\n\n";
+        
         $total = $this->db->get_var($sql);
         
         $limit = (int) $this->_input('limit', 20);
@@ -462,6 +467,8 @@ class Clients_Controller extends Base_Controller{
     
     public function action_index()
     {
+        $this->funnel_id = $this->_input('funnel_id', 0);
+        
         $this->current_filter = $this->_input('filter', 0);
         
         $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
