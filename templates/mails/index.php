@@ -80,7 +80,11 @@
           </td>
           
           <td class="">
+            <? if ($item->subscribers > 0) { ?>
             <a href="/wp-admin/admin.php?page=vspostman-clients&funnel_id=<?= $item->id ?>" title="Показать список подписчиков"><?= $item->subscribers ?></a>
+            <? } else { ?>
+            0
+            <? } ?>
             <span style="padding: 5px;"> </span>
             <a title="Добавить подписчиков" href="#" onclick="addSubscribers(); return false;" class="button button-small">+</a>
           </td>
