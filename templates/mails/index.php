@@ -80,7 +80,7 @@
           </td>
           
           <td class="">
-            <a href="#" title="Показать список подписчиков"><?= $item->readers ?></a>
+            <a href="#" title="Показать список подписчиков" onclick="alert('Скоро будет выводиться список контактов.'); return false;"><?= $item->subscribers ?></a>
           </td>
 
         </tr>

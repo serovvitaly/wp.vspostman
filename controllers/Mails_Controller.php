@@ -30,7 +30,7 @@ class Mails_Controller extends Base_Controller{
 
     public function action_index()
     {
-        $this->items = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS . " ORDER BY `created` DESC");
+        $this->items = $this->db->get_results("SELECT f.*, COUNT(cf.contact_id) AS `subscribers` FROM " . TABLE_FUNNELS . " AS f JOIN " . TABLE_CONTACTS_FUNNELS . " AS cf ON f.id = cf.funnel_id WHERE cf.is_removal = 0 AND cf.in_blacklist = 0 ORDER BY f.`created` DESC");
     }
     
     
