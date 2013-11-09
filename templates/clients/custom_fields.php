@@ -23,7 +23,6 @@
           <option<?= $field_edit->field_type == 'text' ? ' selected="selected"' : '' ?> value="text">текст</option>
           <option<?= $field_edit->field_type == 'number' ? ' selected="selected"' : '' ?> value="number">число</option>
           <option<?= $field_edit->field_type == 'date' ? ' selected="selected"' : '' ?> value="date">дата</option>
-          <!--option value="phone">телефон</option-->
           <option<?= $field_edit->field_type == 'textarea' ? ' selected="selected"' : '' ?> value="textarea">многострочный текст</option>
           <option<?= $field_edit->field_type == 'radio' ? ' selected="selected"' : '' ?> value="radio">переключатель</option>
           <option<?= $field_edit->field_type == 'checkbox' ? ' selected="selected"' : '' ?> value="checkbox">флажок</option>

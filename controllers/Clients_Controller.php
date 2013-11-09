@@ -1217,28 +1217,29 @@ class Clients_Controller extends Base_Controller{
         $fid          = $this->_input('fid', 0);
         $field_label  = $this->_input('field_label');
         $field_type   = $this->_input('field_type');
-        $field_value  = $this->_input('field_value', array());
+        $field_value  = $this->_input('field_value', NULL);
+        
+        if ($field_value) {
+            $field_value = json_encode($field_value);
+        }
         
         $out = array(
             'success' => false,
             'result'  => NULL,
         );
         
-        if (is_array($field_value) AND count($field_value) > 0 AND !empty($field_label) AND !empty($field_type)) {
+        if (!empty($field_label) AND !empty($field_type)) {
+            
+            $data = array(
+                'field_label' => $field_label,
+                'field_type'  => $field_type,
+                'field_value' => $field_value,
+            );
+            
             if ($fid > 0) {
-                $this->db->update(TABLE_CLIENTS_CUSTOM_FIELDS, array(
-                    'field_label' => $field_label,
-                    'field_type'  => $field_type,
-                    'field_value' => json_encode($field_value),
-                ), array(
-                    'id' => $fid
-                ));
+                $this->db->update(TABLE_CLIENTS_CUSTOM_FIELDS, $data, array('id' => $fid));
             } else {
-                $this->db->insert(TABLE_CLIENTS_CUSTOM_FIELDS, array(
-                    'field_label' => $field_label,
-                    'field_type'  => $field_type,
-                    'field_value' => json_encode($field_value),
-                ));
+                $this->db->insert(TABLE_CLIENTS_CUSTOM_FIELDS, $data);
                 
                 $fid = $this->db->insert_id;
             }
