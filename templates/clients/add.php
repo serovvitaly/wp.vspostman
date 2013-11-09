@@ -40,8 +40,6 @@
 function checkEmail(email){
     var reg = /^([a-zA-Z0-9-_\.]+)@([a-zA-Z0-9-]+)(\.)([a-zA-Z]{2,4})(\.?)([a-zA-Z]{0,4})$/;
     
-    console.log(reg.test(email));
-    
     return reg.test(email);
 }
 

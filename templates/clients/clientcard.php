@@ -1,40 +1,4 @@
 
-<style>
-.pre-view{
-    line-height: 25px;
-    padding-left: 5px;
-    display: inline-block;
-}
-.pre-view.textarea{
-    line-height: 18px;
-}
-.pre-view.hidden{
-    display: none;
-}
-td.td-title{
-    line-height: 25px;
-}
-.edit-view{
-    border-color: #AFC8DB !important;
-    width: 210px;
-    display: inline-table;
-}
-.edit-view.hidden{
-    display: none;
-}
-textarea.edit-view{
-    width: 210px;
-    height: 110px;
-}
-.clients-unsubscribe-contact{
-    font-size: 13px;
-    font-weight: bold;
-    text-decoration: none;
-    color: #F00;
-    display: inline-block;
-    margin: -3px 0 0 2px;
-}
-</style>
 
 <h2 class="nav-tab-wrapper">
   <a href="#" class="nav-tab nav-tab-active">Общие</a>
@@ -331,24 +295,6 @@ textarea.edit-view{
 
 <script>
 
-function removeComment(comId){
-    
-    if (!confirm('Комментарий будет удален. Продолжить?')) {
-        return;
-    }
-    
-    _ajax({
-        controller: 'clients',
-        action: 'remove_comment',
-        data: {
-            contact_id: comId
-        }
-    });
-    
-    $('#clients-comments-item-' + comId).fadeOut(200, function(){ $(this).remove() });
-    
-}
-
 function displayCommentForm(){
     $('#clients-comment-form textarea').css('border-color', '');
     $('#clients-comment-toggle').hide();
@@ -384,7 +330,11 @@ function sendCommentForm(){
         },
         success: function(data){
             if (data.success === true) {
-                $('#clients-comments-list').prepend('<tr id="clients-comments-item-'+data.result.id+'"><td><a href="#" class="clients-unsubscribe-contact" style="float: right" title="Удалить" onclick="removeComment('+data.result.id+'); return false;">x</a><strong><?= wp_get_current_user()->display_name ?></strong> <i>'+data.result.created+'</i><p style="margin: 5px 0 15px;">'+data.result.content+'</p></td></tr>');
+                
+                window.location = window.location;
+                return;
+                
+                $('#clients-comments-list').append('<tr id="clients-comments-item-'+data.result.id+'"><td><a href="#" class="clients-unsubscribe-contact" style="float: right" title="Удалить" onclick="removeComment('+data.result.id+'); return false;">x</a><strong><?= wp_get_current_user()->display_name ?></strong> <i>'+data.result.created+'</i><p style="margin: 5px 0 15px;">'+data.result.content+'</p></td></tr>');
                 
                 hideCommentForm();
             }

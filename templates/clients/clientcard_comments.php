@@ -25,7 +25,7 @@
         foreach ($comments AS $com) {
     ?>
   <div>
-    <strong><?= $com->user_name ?></strong> <i><?= $com->created ?></i><br>
+    <a href="#" class="clients-unsubscribe-contact" style="padding-right: 5px" title="Удалить" onclick="removeComment(<?= $com->id ?>); return false;">x</a><strong><?= $com->user_name ?></strong> <i><?= $com->created ?></i><br>
     <p style="margin: 5px 0 15px;"><?= $com->content ?></p>
   </div>
     <?

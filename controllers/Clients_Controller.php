@@ -360,19 +360,25 @@ class Clients_Controller extends Base_Controller{
     
     public function action_remove_comment()
     {
-        $contact_id = $this->_input('contact_id', 0);
+        $comment_id = $this->_input('comment_id');
+        $contact_id = $this->_input('contact_id');
         
         $out = array(
             'success' => true,
             'result'  => NULL
         );
         
+        if ($comment_id > 0) {
+            $this->db->delete(TABLE_CONTACTS_COMMENTS, array('id' => $comment_id));
+        }
+        
         if ($contact_id > 0) {
-            $this->db->delete(TABLE_CONTACTS_COMMENTS, array('id' => $contact_id));
+            //$sql = "SELECT cc.*, wu.display_name AS user FROM " . TABLE_CONTACTS_COMMENTS . " cc JOIN " . TABLE_WP_USERS . " wu ON cc.user_id = wu.id WHERE cc.`contact_id` = {$contact_id} ORDER BY cc.`created` DESC LIMIT 2,1";
+            
+            //$out['result'] = $this->db->get_row($sql);
         }
         
         echo json_encode($out);
-        
         return false;
     }
     

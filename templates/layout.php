@@ -47,6 +47,33 @@ function _ajax(options){
     $.ajax(opts);
 }
 
+
+
+function removeComment(comId){
+    
+    if (!confirm('Комментарий будет удален. Продолжить?')) {
+        return;
+    }
+    
+    _ajax({
+        controller: 'clients',
+        action: 'remove_comment',
+        data: {
+            comment_id: comId,
+            //contact_id: '<?= $id ?>'
+        },
+        success: function(data){
+            if (data.success === true) {
+                
+            }
+        }
+    });
+    
+    window.location = window.location;
+    
+    //$('#clients-comments-item-' + comId).fadeOut(200, function(){ $(this).remove() });
+    
+}
 </script>
 
 <style>
@@ -124,6 +151,41 @@ function _ajax(options){
 }
 .hasDatepicker{
     background: url(/wp-content/plugins/vspostman/img/date-trigger.png) no-repeat right;
+}
+
+.pre-view{
+    line-height: 25px;
+    padding-left: 5px;
+    display: inline-block;
+}
+.pre-view.textarea{
+    line-height: 18px;
+}
+.pre-view.hidden{
+    display: none;
+}
+td.td-title{
+    line-height: 25px;
+}
+.edit-view{
+    border-color: #AFC8DB !important;
+    width: 210px;
+    display: inline-table;
+}
+.edit-view.hidden{
+    display: none;
+}
+textarea.edit-view{
+    width: 210px;
+    height: 110px;
+}
+.clients-unsubscribe-contact{
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #F00;
+    display: inline-block;
+    margin: -3px 0 0 2px;
 }
 </style>
 
