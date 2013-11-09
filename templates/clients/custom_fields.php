@@ -1,5 +1,5 @@
 <div style="margin: 20px 0;">
-  <button class="button" onclick="showFieldEditForm()">Добавить настраиваемое поле</button>
+  <button id="clients-custom-fields-button" class="button" onclick="showFieldEditForm()">Добавить настраиваемое поле</button>
 </div>
 
 <div id="clients-custom-fields" <?= $field_edit ? '' : ' style="display: none;"' ?>>
@@ -19,19 +19,33 @@
       <td>Тип поля:</td>
       <td>
         <select name="field_type" onchange="ChangeFormElements(this.value)" style="width: 170px;">
-          <option value="">-- выберите --</option>
-          <option value="text">текст</option>
-          <option value="number">число</option>
-          <option value="date">дата</option>
-          <option value="phone">телефон</option>
-          <option value="textarea">многострочный текст</option>
-          <option value="radio">переключатель</option>
-          <option value="checkbox">флажок</option>
-          <option value="single_select">выпадающий список</option>
-          <option value="multi_select">множественный выбор</option>
+          <option<?= $field_edit->field_type == '' ? ' selected="selected"' : '' ?> value="">-- выберите --</option>
+          <option<?= $field_edit->field_type == 'text' ? ' selected="selected"' : '' ?> value="text">текст</option>
+          <option<?= $field_edit->field_type == 'number' ? ' selected="selected"' : '' ?> value="number">число</option>
+          <option<?= $field_edit->field_type == 'date' ? ' selected="selected"' : '' ?> value="date">дата</option>
+          <!--option value="phone">телефон</option-->
+          <option<?= $field_edit->field_type == 'textarea' ? ' selected="selected"' : '' ?> value="textarea">многострочный текст</option>
+          <option<?= $field_edit->field_type == 'radio' ? ' selected="selected"' : '' ?> value="radio">переключатель</option>
+          <option<?= $field_edit->field_type == 'checkbox' ? ' selected="selected"' : '' ?> value="checkbox">флажок</option>
+          <option<?= $field_edit->field_type == 'single_select' ? ' selected="selected"' : '' ?> value="single_select">выпадающий список</option>
+          <option<?= $field_edit->field_type == 'multi_select' ? ' selected="selected"' : '' ?> value="multi_select">множественный выбор</option>
         </select>
       </td>
     </tr>
+    <?
+    if ($field_edit AND $field_edit->field_value) {
+        $values = json_decode($field_edit->field_value);
+        if (count($values) > 0) {
+            echo '<tr class="custom-field"><td>Значения:</td><td class="custom-field-wrapper">';
+            foreach ($values AS $value) {
+            ?>
+            <div class="custom-field-item"><input name="field_value[]" type="text" style="width: 170px;" value="<?= $value ?>"> <a href="#" onclick="addCustomField(); return false;">[+]</a> <a href="#" onclick="removeCustomField(this); return false;">[-]</a></div>
+            <?
+            }
+            echo '</td></tr>';
+        }
+    }
+    ?>
   </table>
   <button class="button button-primary" onclick="saveCustomField()">Сохранить</button> <a onclick="hideFieldEditForm(); return false;" href="#" style="padding: 0 0 3px 10px;">отмена</a>
 </div>
@@ -39,24 +53,28 @@
 <? if ($custom_fields AND count($custom_fields) > 0) { ?>
 <table class="wp-list-table widefat" style="margin-top: 20px; width: 500px;">
   <?
-  foreach ($custom_fields AS $fields) {
-      $types = array(
-          'text'          => 'текст',
-          'number'        => 'число',
-          'date'          => 'дата',
-          'phone'         => 'телефон',
-          'textarea'      => 'многострочный текст',
-          'radio'         => 'переключатель',
-          'checkbox'      => 'флажок',
-          'single_select' => 'выпадающий список',
-          'multi_select'  => 'множественный выбор',
-      ); 
-                    
+  
+  $types = array(
+      'text'          => 'текст',
+      'number'        => 'число',
+      'date'          => 'дата',
+      'phone'         => 'телефон',
+      'textarea'      => 'многострочный текст',
+      'radio'         => 'переключатель',
+      'checkbox'      => 'флажок',
+      'single_select' => 'выпадающий список',
+      'multi_select'  => 'множественный выбор',
+  ); 
+  
+  foreach ($custom_fields AS $fields) {                
   ?>
   <tr>
     <td><?= $fields->field_label ?></td>
     <td><?= $types[$fields->field_type] ?></td>
-    <td style="width: 60px;"><a href="/wp-admin/admin.php?page=vspostman-clients&act=custom_fields&edit=<?= $fields->id ?>" title="Редактировать">ред.</a> | <a onclick="return confirm('Вместа с полем будут удалены все связанные с ним данные клиентов. Продолжить?')" href="/wp-admin/admin.php?page=vspostman-clients&act=custom_fields&remove=<?= $fields->id ?>" title="Удалить">уд.</a></td>
+    <td style="width: 60px;">
+      <a href="/wp-admin/admin.php?page=vspostman-clients&act=custom_fields&edit=<?= $fields->id ?>" title="Редактировать">ред.</a> | 
+      <a onclick="return confirm('Вместа с полем будут удалены все связанные с ним данные клиентов. Продолжить?')" href="/wp-admin/admin.php?page=vspostman-clients&act=custom_fields&remove=<?= $fields->id ?>" title="Удалить">уд.</a>
+    </td>
   </tr>
   <? } ?>
 </table>
@@ -67,9 +85,12 @@
 <script>
 function showFieldEditForm(){
     $('#clients-custom-fields').slideDown(100);
+    $('#clients-custom-fields-button').hide();
 }
 function hideFieldEditForm(){
     $('#clients-custom-fields').slideUp(100);
+    $('#clients-custom-fields-button').show();
+    $('#clients-custom-fields [name="fid"]').val('');
     $('#clients-custom-fields [name="field_label"]').val('');
     $('#clients-custom-fields [name="field_type"]').val('');
     $('#clients-custom-fields .custom-field').remove();
@@ -144,10 +165,12 @@ function ChangeFormElements(value){
     var element = '';
     switch (value) {
         case 'date' :
-            element = '<input name="field_value[]" class="field-date" type="text" style="width: 90px;">';
+            //element = '<input name="field_value[]" class="field-date" type="text" style="width: 90px;">';
+            element = null;
             break;
         case 'textarea' :
-            element = '<textarea name="field_value[]" style="width: 300px; height: 100px"></textarea>';
+            //element = '<textarea name="field_value[]" style="width: 300px; height: 100px"></textarea>';
+            element = null;
             break;
         case 'radio' :
             element = '<div class="custom-field-item"><input name="field_value[]" type="text" style="width: 170px;"> <a href="#" onclick="addCustomField(); return false;">[+]</a> <a href="#" onclick="removeCustomField(this); return false;">[-]</a></div>';
@@ -163,19 +186,23 @@ function ChangeFormElements(value){
             break;
             
         default:
-            element = '<input name="field_value[]" type="text" style="width: 170px;">';
+            //element = '<input name="field_value[]" type="text" style="width: 170px;">';
+            element = null;
     }
     
-    $('#clients-custom-fields table').append('<tr class="custom-field"><td>Значение:</td><td class="custom-field-wrapper">'+element+'</td></tr>');
+    if (element !== null) {
+        $('#clients-custom-fields table').append('<tr class="custom-field"><td>Значения:</td><td class="custom-field-wrapper">'+element+'</td></tr>');
+    }
+    /*
     $('.field-date').datepicker({
         dateFormat: 'dd.mm.yy'
-    });
+    }); */
 }
 
 
 $(document).ready(function(){
-    $('#clients-custom-fields [name="field_type"]').val('<?= $field_edit->field_type ?>');
-    ChangeFormElements('<?= $field_edit->field_type ?>');
+    //$('#clients-custom-fields [name="field_type"]').val('<?= $field_edit->field_type ?>');
+    //ChangeFormElements('<?= $field_edit->field_type ?>');
 });
 
 </script>
