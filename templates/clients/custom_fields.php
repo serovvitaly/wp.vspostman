@@ -1,5 +1,5 @@
 <div style="margin: 20px 0;">
-  <button id="clients-custom-fields-button" class="button" onclick="showFieldEditForm()">Добавить настраиваемое поле</button>
+  <? if (!$field_edit) { ?><button id="clients-custom-fields-button" class="button" onclick="showFieldEditForm()">Добавить настраиваемое поле</button><? } ?>
 </div>
 
 <div id="clients-custom-fields" <?= $field_edit ? '' : ' style="display: none;"' ?>>
@@ -112,10 +112,7 @@ function saveCustomField(){
         $('#clients-custom-fields [name="field_label"]').css('border-color', 'red');
         error = true;
     }
- /*   if (field_name == '') {
-        $('#clients-custom-fields [name="field_name"]').css('border-color', 'red');
-        error = true;
-    } */
+    
     if (field_type == '') {
         $('#clients-custom-fields [name="field_type"]').css('border-color', 'red');
         error = true;
@@ -126,7 +123,7 @@ function saveCustomField(){
             values.push(field_values[i].value.trim());
         }
     } else {
-        error = true;
+        //error = true;
     }
     
     if (error === false) {
