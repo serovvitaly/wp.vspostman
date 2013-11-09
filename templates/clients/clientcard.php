@@ -184,6 +184,9 @@ textarea.edit-view{
               }   
           } else {
               switch ($cfield->field_type) {
+                  case 'date':
+                      ?><input name="cost_fields[<?= $cfield->id ?>]" value="<?= $cfield->value ?>" class="edit-view hidden datepicker" type="text"><?
+                      break;
                   case 'textarea':
                       ?><textarea class="edit-view hidden" cols="" rows="" name="cost_fields[<?= $cfield->id ?>]"><?= $cfield->value ?></textarea><?
                       break;
