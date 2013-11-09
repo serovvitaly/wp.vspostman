@@ -252,7 +252,6 @@ textarea.edit-view{
     <? } else { ?>
     <table style="width: 100%;" id="client-funnels-list">
     </table>
-    <p class="client-flist-empty" style="color: gray;">Нет связанных воронок</p>
     <? } ?>
     
     <div id="clients-clientcard-finfo"></div>
@@ -278,12 +277,13 @@ textarea.edit-view{
     <legend style="margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #D0D0D0; width: 100%;">
       <span style="font-size: 20px; padding: 0 196px 0 0">Комментарии</span>
     </legend>
-    <table style="width: 400px;" id="clients-comments-list">
+    <table style="width: 440px;" id="clients-comments-list">
 <?
     if (count($comments) > 0) {
         foreach ($comments AS $com) {
     ?>
-      <tr><td>
+      <tr id="clients-comments-item-<?= $com->id ?>"><td>
+        <a href="#" class="clients-unsubscribe-contact" style="float: right" title="Удалить" onclick="removeComment(<?= $com->id ?>); return false;">x</a>
         <strong><?= $com->user_name ?></strong> <i><?= $com->created ?></i>
         <p style="margin: 5px 0 15px;"><?= $com->content ?></p>
       </td></tr>
@@ -292,7 +292,7 @@ textarea.edit-view{
     }
 ?>
     </table>
-    <a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard_comments&cid=<?= $id ?>">показать все комментарии</a>
+    <? if ($comments_count > 3) { ?><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard_comments&cid=<?= $id ?>">показать все комментарии</a><? } ?>
     <button id="clients-comment-toggle" onclick="displayCommentForm();" style="float: right;" class="button button-small button-primary">Добавить комментарий</button>
     <table id="clients-comment-buttons" style="float: right; display: none;"><tr>
        <td><button onclick="sendCommentForm();" style="float: right;" class="button button-small button-primary">Отправить</button></td>
@@ -310,6 +310,24 @@ textarea.edit-view{
 </div>
 
 <script>
+
+function removeComment(comId){
+    
+    if (!confirm('Комментарий будет удален. Продолжить?')) {
+        return;
+    }
+    
+    _ajax({
+        controller: 'clients',
+        action: 'remove_comment',
+        data: {
+            contact_id: comId
+        }
+    });
+    
+    $('#clients-comments-item-' + comId).fadeOut(200, function(){ $(this).remove() });
+    
+}
 
 function displayCommentForm(){
     $('#clients-comment-form textarea').css('border-color', '');
@@ -346,7 +364,7 @@ function sendCommentForm(){
         },
         success: function(data){
             if (data.success === true) {
-                $('#clients-comments-list').prepend('<tr><td><strong><?= wp_get_current_user()->display_name ?></strong> <i>'+data.result.created+'</i><p style="margin: 5px 0 15px;">'+data.result.content+'</p></td></tr>');
+                $('#clients-comments-list').prepend('<tr id="clients-comments-item-'+data.result.id+'"><td><a href="#" class="clients-unsubscribe-contact" style="float: right" title="Удалить" onclick="removeComment('+data.result.id+'); return false;">x</a><strong><?= wp_get_current_user()->display_name ?></strong> <i>'+data.result.created+'</i><p style="margin: 5px 0 15px;">'+data.result.content+'</p></td></tr>');
                 
                 hideCommentForm();
             }

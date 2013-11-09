@@ -305,6 +305,19 @@ function goSearch(page, data){
     });
 }
 
+function determineField(el){
+    var self = $(el);
+    self.parents('.filter-item-field').find('input[type="text"]').val('');
+    self.parents('.filter-item-field').find('input[type="text"]').datepicker('destroy');
+    switch (self.val()) {
+        case 'birthdate':
+            self.parents('.filter-item-field').find('input[type="text"]').datepicker({
+                dateFormat: 'dd.mm.yy'
+            });
+            break;
+    }
+}
+
 $(document).ready(function(){
     
     <? if ($current_filter > 0) { ?>loadFilter(<?= $current_filter ?>);<? } else { ?>addConditionsGroup();<? } ?>
@@ -438,11 +451,10 @@ $(document).ready(function(){
         
     </div>
 </script>
-
 <script id="tpl-filter-item-field" type="text/x-jquery-tmpl">
 <tr class="filter-item-field">
   <td>
-    <select name="fields[${uid}][${fid}][name]">
+    <select name="fields[${uid}][${fid}][name]" onchange="determineField(this)">
       <option{{if mix.name == 'first_name'}} selected="selected"{{/if}} value="first_name">ФИО</option>
       <option{{if mix.name == 'email'}} selected="selected"{{/if}} value="email">Email</option>
       <option{{if mix.name == 'country'}} selected="selected"{{/if}} value="country">Страна</option>

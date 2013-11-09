@@ -28,6 +28,25 @@ function getUniqueId(){
     return d.valueOf() + '' + d.getUTCMilliseconds();
 }
 
+function _ajax(options){
+    
+    var data = $.extend({
+        controller: options.controller,
+        act: options.action,
+    }, options.data);
+    
+    var opts = $.extend({
+        url: '/wp-content/plugins/vspostman/ajax.php',
+        dataType: 'json',
+        type: 'POST',
+        data: {}
+    }, options);
+    
+    opts.data = data;
+    
+    $.ajax(opts);
+}
+
 </script>
 
 <style>

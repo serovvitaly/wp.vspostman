@@ -269,7 +269,9 @@ class Clients_Controller extends Base_Controller{
                 }
             }
             
-            $this->comments = $this->db->get_results("SELECT comment.*, u.user_nicename AS `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " AS comment JOIN " . TABLE_WP_USERS . " u ON comment.user_id = u.ID WHERE comment.`contact_id` = {$contact_id} ORDER BY comment.created DESC LIMIT 2");
+            $this->comments = $this->db->get_results("SELECT comment.*, u.user_nicename AS `user_name` FROM " . TABLE_CONTACTS_COMMENTS . " AS comment JOIN " . TABLE_WP_USERS . " u ON comment.user_id = u.ID WHERE comment.`contact_id` = {$contact_id} ORDER BY comment.created DESC LIMIT 3");
+            
+            $this->comments_count = (int) $this->db->get_var("SELECT COUNT(id) AS `count` FROM " . TABLE_CONTACTS_COMMENTS . " WHERE `contact_id` = {$contact_id}");
             
             $this->funnels  = $this->db->get_results("SELECT cont.*,funn.name FROM " . TABLE_CONTACTS_FUNNELS . " as cont JOIN " . TABLE_FUNNELS . " as funn ON cont.funnel_id = funn.id WHERE cont.contact_id = {$contact_id}");
             
@@ -349,6 +351,24 @@ class Clients_Controller extends Base_Controller{
                     'result'  => $this->db->get_row("SELECT * FROM " . TABLE_CONTACTS_COMMENTS . " WHERE `id` = {$insert_id}")
                 );
             }
+        }
+        
+        echo json_encode($out);
+        
+        return false;
+    }
+    
+    public function action_remove_comment()
+    {
+        $contact_id = $this->_input('contact_id', 0);
+        
+        $out = array(
+            'success' => true,
+            'result'  => NULL
+        );
+        
+        if ($contact_id > 0) {
+            $this->db->delete(TABLE_CONTACTS_COMMENTS, array('id' => $contact_id));
         }
         
         echo json_encode($out);
