@@ -167,6 +167,8 @@ textarea.edit-view{
                               $selected = in_array($value, explode("\n", $cfield->value)) ? ' selected="selected"' : '';
                               ?><option<?= $selected ?> value="<?= $value ?>"><?= $value ?></option><?
                               break;
+                          default:
+                              ?><input name="cost_fields[<?= $cfield->id ?>]" value="<?= $cfield->value ?>" class="edit-view hidden" type="text"><?
                       }
                       
                   }
@@ -180,7 +182,16 @@ textarea.edit-view{
                           ?><input name="cost_fields[<?= $cfield->id ?>]" value="<?= $cfield->value ?>" class="edit-view hidden" type="text"><?
                   }
               }   
-          }
+          } else {
+              switch ($cfield->field_type) {
+                  case 'textarea':
+                      ?><textarea class="edit-view hidden" cols="" rows="" name="cost_fields[<?= $cfield->id ?>]"><?= $cfield->value ?></textarea><?
+                      break;
+                      
+                  default:
+                      ?><input name="cost_fields[<?= $cfield->id ?>]" value="<?= $cfield->value ?>" class="edit-view hidden" type="text"><?
+              }
+          } 
           
           
           if (in_array($cfield->field_type, array('single_select', 'multi_select'))) {
