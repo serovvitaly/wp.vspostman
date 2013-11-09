@@ -52,11 +52,11 @@
     <tbody id="the-list">
     <? foreach ($list AS $item) { ?>
         <tr>
-          <td><?= $item->first_name ?></td>
-          <td><?= $item->email ?></td>
-          <td>---</td>
+          <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard&cid=<?= $item->contact_id ?>"><?= $item->first_name ?></a></td>
+          <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard&cid=<?= $item->contact_id ?>"><?= $item->email ?></a></td>
+          <td><?= $item->funnel_name ?></td>
           <td><?= $item->blacklist_at ?></td>
-          <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=blacklist&cid=<?= $item->id ?>" onclick="return confirm('Вы уверены?')">удалить из списка</a></td>
+          <td><a href="/wp-admin/admin.php?page=vspostman-clients&act=blacklist&cid=<?= $item->contact_id ?>&fid=<?= $item->funnel_id ?>" onclick="return confirm('Вы уверены?')">удалить из списка</a></td>
         </tr>
     <? } ?>
     </tbody>

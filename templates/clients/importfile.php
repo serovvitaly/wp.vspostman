@@ -1,7 +1,7 @@
 <h2 class="nav-tab-wrapper">
   <a href="/wp-admin/admin.php?page=vspostman-clients&act=import" class="nav-tab">Копировать & вставить</a>
   <a href="/wp-admin/admin.php?page=vspostman-clients&act=importfile" class="nav-tab nav-tab-active">Загрузить файл</a>
-  <a href="/wp-admin/admin.php?page=vspostman-clients&act=importservices" class="nav-tab">Другие сервисы</a>
+  <!--a href="/wp-admin/admin.php?page=vspostman-clients&act=importservices" class="nav-tab">Другие сервисы</a-->
 </h2>
 
 <div class="tab-container">

@@ -495,6 +495,8 @@ class Clients_Controller extends Base_Controller{
         
         $this->filters = $this->db->get_results("SELECT `id`,`name`,`created` FROM " . TABLE_CLIENTS_FILTERS);
         
+        $this->custom_fields = $this->db->get_results("SELECT * FROM " . TABLE_CLIENTS_CUSTOM_FIELDS . " ORDER BY `sort`");
+        
     }
     
     public function action_add()
@@ -1134,15 +1136,16 @@ class Clients_Controller extends Base_Controller{
     public function action_blacklist()
     {
         $cid = $this->_input('cid');
+        $fid = $this->_input('fid');
         
-        if ($cid > 0) {            
-            $this->db->query("UPDATE " . TABLE_CONTACTS_FUNNELS . " SET `in_blacklist` = 0 WHERE `contact_id` = {$cid}");
-            $this->db->query("UPDATE " . TABLE_CLIENTS_CONTACTS . " SET `in_blacklist` = 0 WHERE `id` = {$cid}");
+        if ($cid > 0 AND $fid > 0) {            
+            $this->db->query("UPDATE " . TABLE_CONTACTS_FUNNELS . " SET `in_blacklist` = 0 WHERE `contact_id` = {$cid} AND `funnel_id` = {$fid}");
         }
         
         $this->funnels_list = $this->db->get_results("SELECT * FROM " . TABLE_FUNNELS);
         
-        $this->list = $this->db->get_results("SELECT * FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `in_blacklist` = 1 OR id IN(SELECT contact_id FROM ".TABLE_CONTACTS_FUNNELS." WHERE `in_blacklist` = 1)");
+        $this->list = $this->db->get_results("SELECT f.*, u.first_name, u.email, fun.name AS funnel_name FROM " . TABLE_CONTACTS_FUNNELS . " f JOIN " . TABLE_CLIENTS_CONTACTS . " u ON f.contact_id = u.id JOIN " . TABLE_FUNNELS . " fun ON f.funnel_id = fun.id WHERE f.`in_blacklist` = 1");
+    
     }
     
     
@@ -1165,15 +1168,91 @@ class Clients_Controller extends Base_Controller{
                 if (count($elist) > 0) {
                     $elist = implode(',', $elist);
                     
-                    $blacklist_at = date('Y-m-d H:i:s');
+                    $elist_ids = $this->db->get_results("SELECT `id` FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `email` IN({$elist})");
                     
-                    if ($funnel_id > 0) {
-                        $this->db->query("INSERT INTO ".TABLE_CONTACTS_FUNNELS." (funnel_id,in_blacklist,blacklist_at,contact_id) SELECT {$funnel_id},1,'{$blacklist_at}',id FROM ".TABLE_CLIENTS_CONTACTS." WHERE `email` IN({$elist})");
-                    } else {
-                        $this->db->query("UPDATE " . TABLE_CLIENTS_CONTACTS . " SET `in_blacklist` = 1, `blacklist_at` = '{$blacklist_at}' WHERE `email` IN({$elist})");
+                    array_walk($elist_ids, function(&$item){
+                        $item = $item->id;
+                    });
+                    
+                    if (count($elist_ids) > 0) {
+                        
+                        $blacklist_at = date('Y-m-d H:i:s');
+                        
+                        // существующие связи воронок с контактами
+                        $existants_relations = $this->db->get_results("SELECT `contact_id`, `funnel_id` FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `contact_id` IN(" . implode(',', $elist_ids) . ")");
+                        
+                        if (!$existants_relations) {
+                            $existants_relations = array();
+                        }
+                        
+                        if (count($existants_relations) > 0) {
+                            $_temp_existants_relations = array();
+                            foreach ($existants_relations AS $existant_relation) {
+                                $_temp_existants_relations[$existant_relation->contact_id][] = $existant_relation->funnel_id;
+                            }
+                            $existants_relations = $_temp_existants_relations; 
+                        }
+                        
+                        if ($funnel_id > 0) {
+                            
+                            foreach ($elist_ids AS $contact_id) {
+                                
+                                if (isset($existants_relations[$contact_id])) {
+                                    $this->db->update(TABLE_CONTACTS_FUNNELS, array(
+                                        'in_blacklist' => 1,
+                                        'blacklist_at' => $blacklist_at,
+                                    ), array(
+                                        'funnel_id'  => $funnel_id,
+                                        'contact_id' => $contact_id,
+                                    ));
+                                } else {
+                                    $this->db->insert(TABLE_CONTACTS_FUNNELS, array(
+                                        'in_blacklist' => 1,
+                                        'blacklist_at' => $blacklist_at,
+                                        'funnel_id'  => $funnel_id,
+                                        'contact_id' => $contact_id,
+                                    ));
+                                }
+                            }
+                            
+                        } else {
+                            
+                            $funnels_ids = $this->db->get_results("SELECT `id` FROM " . TABLE_FUNNELS);
+                            array_walk($funnels_ids, function(&$item){
+                                $item = $item->id;
+                            });
+                            
+                            if (count($funnels_ids) > 0) {
+                                foreach ($elist_ids AS $contact_id) {
+                                    
+                                    foreach ($funnels_ids AS $funnel_id) {
+                                        
+                                        if (isset($existants_relations[$contact_id]) AND is_array($existants_relations[$contact_id]) AND in_array($funnel_id, $existants_relations[$contact_id])) {
+                                            $this->db->update(TABLE_CONTACTS_FUNNELS, array(
+                                                'in_blacklist' => 1,
+                                                'blacklist_at' => $blacklist_at,
+                                            ), array(
+                                                'funnel_id'    => $funnel_id,
+                                                'contact_id'   => $contact_id,
+                                            ));
+                                        } else {
+                                            $this->db->insert(TABLE_CONTACTS_FUNNELS, array(
+                                                'in_blacklist' => 1,
+                                                'blacklist_at' => $blacklist_at,
+                                                'funnel_id'    => $funnel_id,
+                                                'contact_id'   => $contact_id,
+                                            ));
+                                        }
+                                        
+                                    }
+                                    
+                                }
+                            }                            
+                        }
+                        
+                        $result = '<span style="color: green">Контакты добавлены в черный список.</span>'; 
                     }
-                    
-                    $result = '<span style="color: green">Контакты добавлены в черный список.</span>';    
+   
                 } else {
                     $result = '<span style="color: red">Список контактов - пуст.</span>';
                 }
