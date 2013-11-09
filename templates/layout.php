@@ -122,6 +122,9 @@ function _ajax(options){
     font-weight: bold;
     font-size: 18px;
 }
+.hasDatepicker{
+    background: url(/wp-content/plugins/vspostman/img/date-trigger.png) no-repeat right;
+}
 </style>
 
 <div class="wrap">

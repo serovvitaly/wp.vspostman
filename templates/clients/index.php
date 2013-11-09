@@ -309,12 +309,10 @@ function determineField(el){
     var self = $(el);
     self.parents('.filter-item-field').find('input[type="text"]').val('');
     self.parents('.filter-item-field').find('input[type="text"]').datepicker('destroy');
-    switch (self.val()) {
-        case 'birthdate':
-            self.parents('.filter-item-field').find('input[type="text"]').datepicker({
-                dateFormat: 'dd.mm.yy'
-            });
-            break;
+    if (self.find('[value="'+self.val()+'"]').data('plugin') == 'datepicker') {
+        self.parents('.filter-item-field').find('input[type="text"]').datepicker({
+            dateFormat: 'dd.mm.yy'
+        });
     }
 }
 
@@ -467,8 +465,18 @@ $(document).ready(function(){
       <option{{if mix.name == 'vk'}} selected="selected"{{/if}} value="vk">Вконтакте</option>
       <option{{if mix.name == 'google'}} selected="selected"{{/if}} value="google">Google+</option>
       <option{{if mix.name == 'web'}} selected="selected"{{/if}} value="web">Веб-сайт</option>
-      <option{{if mix.name == 'birthdate'}} selected="selected"{{/if}} value="birthdate">Дата рождения</option>
+      <option{{if mix.name == 'birthdate'}} selected="selected"{{/if}} value="birthdate" data-plugin="datepicker">Дата рождения</option>
       <option{{if mix.name == 'information'}} selected="selected"{{/if}} value="information">Доп. информация</option>
+      <?
+      if ($custom_fields AND count($custom_fields) > 0) {
+          echo '<optgroup label="-- Настраиваемые поля --"></optgroup>';
+          foreach ($custom_fields AS $cfield) {
+          ?>
+          <option<?= $cfield->field_type == 'date' ? ' data-plugin="datepicker"' : '' ?> {{if mix.name == 'custom_field_<?= $cfield->id ?>'}} selected="selected"{{/if}} value="custom_field_<?= $cfield->id ?>"><?= $cfield->field_label ?></option>
+          <?
+          }
+      }
+      ?>
     </select>
   </td>
   <td>
