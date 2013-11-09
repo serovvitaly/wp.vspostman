@@ -661,8 +661,8 @@ class Clients_Controller extends Base_Controller{
             $email = NULL;
             
             if (is_array($contact)) {
+                $name    = trim($contact['name']);
                 $contact = trim($contact['email']);
-                $name    = trim($contact['name']); 
             } else {
                 $contact = trim($contact);
             }
@@ -696,10 +696,19 @@ class Clients_Controller extends Base_Controller{
         
         if (count($list) > 0) {
             foreach ($list AS $contact) {
+                
                 $contact = $_perse_contact($contact);
                 
                 $name  = $contact['name'];
                 $email = $contact['email'];
+                
+                $detect_encoding = mb_detect_encoding($name);
+                
+                switch ($detect_encoding) {
+                    case 'ASCII':
+                        $name = iconv('ASCII', 'UTF-8', $name);
+                        break;
+                }
                 
                 if ($email) {
                     $evalid = preg_match('/([a-zA-Z0-9-_.]+)@([a-zA-Z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+/', $email);
