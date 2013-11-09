@@ -78,7 +78,7 @@
       </tr>
       <tr<?= (!isset($birthdate) OR empty($birthdate)) ? ' class="hidden"' : '' ?>>
         <td class="td-title">Дата рождения</td>
-        <td><span class="pre-view"><?= $birthdate ?></span><input name="birthdate" value="<?= $birthdate ?>" class="edit-view hidden datepicker" type="text"></td>
+        <td><span class="pre-view"><?= $birthdate ?></span><input data-mask="00.00.0000" name="birthdate" value="<?= $birthdate ?>" class="edit-view hidden datepicker" type="text"></td>
       </tr>
       <tr<?= (!isset($information) OR empty($information)) ? ' class="hidden"' : '' ?>>
         <td class="td-title">Дополнительная информация</td>
@@ -148,8 +148,11 @@
               }   
           } else {
               switch ($cfield->field_type) {
+                  case 'number':
+                      ?><input data-mask="0#" name="cost_fields[<?= $cfield->id ?>]" value="<?= $cfield->value ?>" class="edit-view hidden" type="text"><?
+                      break;
                   case 'date':
-                      ?><input name="cost_fields[<?= $cfield->id ?>]" value="<?= $cfield->value ?>" class="edit-view hidden datepicker" type="text"><?
+                      ?><input data-mask="00.00.0000" name="cost_fields[<?= $cfield->id ?>]" value="<?= $cfield->value ?>" class="edit-view hidden datepicker" type="text"><?
                       break;
                   case 'textarea':
                       ?><textarea class="edit-view hidden" cols="" rows="" name="cost_fields[<?= $cfield->id ?>]"><?= $cfield->value ?></textarea><?
@@ -462,6 +465,10 @@ function editContact(el){
 $(document).ready(function(){
     $('.datepicker').datepicker({
         dateFormat: 'dd.mm.yy'
+    });
+    $('[data-mask]').each(function(index, item){
+        //$(this).mask($(this).data('mask'));
+        $(this).mask($(this).data('mask'), {reverse: false, maxlength: false});
     });
 });
 

@@ -5,7 +5,9 @@
 <link rel="stylesheet" type="text/css" href="/wp-content/plugins/vspostman/libs/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.min.css">
 <link rel="stylesheet" type="text/css" href="/wp-content/plugins/vspostman/libs/jquery-ui/css/flick/jquery-ui-1.10.3.custom.min.css">
 
-<script src="/wp-content/plugins/vspostman/libs/Chart.min.js"></script>
+<script type="text/javascript" src="/wp-content/plugins/vspostman/libs/Chart.min.js"></script>
+
+<script type="text/javascript" src="/wp-content/plugins/vspostman/libs/jQuery-Mask-Plugin/jquery.mask.min.js"></script>
 
 <script>
 $ = jQuery;
