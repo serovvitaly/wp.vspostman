@@ -927,6 +927,10 @@ class Clients_Controller extends Base_Controller{
         $op_from   = $this->_input('op_from');
         $op_to     = $this->_input('op_to');
         
+        $tsql = "SELECT COUNT(`contact_id`) AS `count` FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `funnel_id` = {$op_to} AND `contact_id` IN(SELECT `contact_id` FROM " . TABLE_CONTACTS_FUNNELS . " WHERE `funnel_id` = {$op_from})";
+                
+        $funnel_to_present = $this->db->get_var($tsql);
+        
         if ($op_from > 0 AND $op_to > 0 AND $op_from != $op_to ) {
             switch ($operation) {
                 case 'copy':
@@ -935,18 +939,28 @@ class Clients_Controller extends Base_Controller{
                     $success = true;
                     $affected_rows = mysql_affected_rows();
                     if ($affected_rows > 0) {
-                        $result = '<span style="color: green">Скопировано клиентов - '.$affected_rows.'.</span>';
+                        $result = '<span style="color: green">Скопировано клиентов: '.$affected_rows.'.';
+                        if ($funnel_to_present > 0) {
+                            $result .= ' Уже присутствовало в воронке: '.$funnel_to_present.'.</span>';
+                        } else {
+                            $result .= '</span>';
+                        }
                     } else {
                         $result = '<span style="color: blue">Скопировано клиентов - 0.</span>'; 
                     }
                     
                     break;
                 case 'move':
-                    $this->db->update(TABLE_CONTACTS_FUNNELS, array('funnel_id' => $op_to), array('funnel_id', $op_from));
+                    //$this->db->update(TABLE_CONTACTS_FUNNELS, array('funnel_id' => $op_to), array('funnel_id', $op_from));
                     $success = true;
                     $affected_rows = mysql_affected_rows();
                     if ($affected_rows > 0) {
-                        $result = '<span style="color: green">Перенесено клиентов - '.$affected_rows.'.</span>';
+                        $result = '<span style="color: green">Перенесено клиентов: '.$affected_rows.'.';
+                        if ($funnel_to_present > 0) {
+                            $result .= ' Уже присутствовало в воронке: '.$funnel_to_present.'.</span>';
+                        } else {
+                            $result .= '</span>';
+                        }
                     } else {
                         $result = '<span style="color: blue">Перенесено клиентов - 0.</span>'; 
                     }
@@ -955,7 +969,7 @@ class Clients_Controller extends Base_Controller{
                     
             }
         } else {
-            $result = '<span style="color: red">Не удалось перенести контакты.</span>';
+            $result = '<span style="color: red">Не удалось выполнить операцию.</span>';
         }
         
         echo json_encode(array(
