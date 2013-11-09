@@ -1,5 +1,5 @@
 <div style="margin: 20px 0;">
-  <? if (!$field_edit) { ?><button id="clients-custom-fields-button" class="button" onclick="showFieldEditForm()">Добавить настраиваемое поле</button><? } ?>
+  <button<?= $field_edit ? ' style="display: none"' : '' ?> id="clients-custom-fields-button" class="button" onclick="showFieldEditForm()">Добавить настраиваемое поле</button>
 </div>
 
 <div id="clients-custom-fields" <?= $field_edit ? '' : ' style="display: none;"' ?>>
