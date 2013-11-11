@@ -9,7 +9,7 @@
   <div style="margin: 0 0 20px; width: 500px;">
     <button id="clients-comment-toggle" onclick="displayCommentForm();" class="button button-small button-primary">Добавить комментарий</button>
     <table id="clients-comment-buttons" style="float: right; display: none;"><tr>
-       <td><button onclick="sendCommentForm();" style="float: right;" class="button button-small button-primary">Отправить</button></td>
+       <td><button onclick="sendCommentForm();" style="float: right;" class="button button-small button-primary">Сохранить</button></td>
        <td><a href="#" onclick="hideCommentForm(); return false;">отмена</a></td>
     </tr></table>
     

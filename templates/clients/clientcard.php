@@ -12,12 +12,13 @@
   <fieldset>
     <legend style="margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #D0D0D0; width: 100%;">
       <span style="font-size: 20px;">Анкета</span>
-      <span style="float: right;">   
+      <span style="float: right;">
+        <a href="#" class="button button-small button-primary clients-editable-act hidden" onclick="saveContact(this); return false;">Сохранить</a>
+         
         <a href="#" onclick="editContact(this); return false;">изменить</a>
         
         <span class="clients-editable-act-remove"> | <a href="/wp-admin/admin.php?page=vspostman-clients&act=client_remove&cid=<?= $id ?>" onclick="return confirm('Клиент <?= $first_name ?> <<?= $email ?>> будет удален из базы данных вместе со всей связанной с ним информацией. Продолжить?')">удалить</a></span>
         
-        <a href="#" class="button button-small clients-editable-act hidden" onclick="saveContact(this); return false;">Сохранить</a>
       </span>
       
     </legend>
@@ -282,7 +283,7 @@
     <? if ($comments_count > 3) { ?><a href="/wp-admin/admin.php?page=vspostman-clients&act=clientcard_comments&cid=<?= $id ?>">показать все комментарии</a><? } ?>
     <button id="clients-comment-toggle" onclick="displayCommentForm();" style="float: right;" class="button button-small button-primary">Добавить комментарий</button>
     <table id="clients-comment-buttons" style="float: right; display: none;"><tr>
-       <td><button onclick="sendCommentForm();" style="float: right;" class="button button-small button-primary">Отправить</button></td>
+       <td><button onclick="sendCommentForm();" style="float: right;" class="button button-small button-primary">Сохранить</button></td>
        <td><a href="#" onclick="hideCommentForm(); return false;">отмена</a></td>
     </tr></table>
     
