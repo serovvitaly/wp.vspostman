@@ -654,39 +654,7 @@ class Clients_Controller extends Base_Controller{
     * @param mixed $list
     */
     protected function _import(array $list)
-    {
-        $_perse_contact = function($contact){
-            
-            $name  = '';
-            $email = NULL;
-            
-            if (is_array($contact)) {
-                $name    = trim($contact['name']);
-                $contact = trim($contact['email']);
-            } else {
-                $contact = trim($contact);
-            }
-            
-            $valid1 = preg_match('/^([a-zA-Z0-9-_.]+)@([a-zA-Z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+$/', $contact, $matches1);
-            $valid2 = preg_match('/^(.+),[\s]{0,}(([a-zA-Z0-9-_.]+)@([a-zA-Z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+)$/', $contact, $matches2);
-            $valid3 = preg_match('/^(.+)\<(([a-zA-Z0-9-_.]+)@([a-zA-Z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+)\>$/', $contact, $matches3);
-            
-            if ($valid1) {
-                $email = $matches1[0];
-            } elseif ($valid2) {
-                $name  = $matches2[1];
-                $email = $matches2[2];
-            } elseif ($valid3) {
-                $name  = $matches3[1];
-                $email = $matches3[2];
-            }
-            
-            return array(
-                'name'  => $name,
-                'email' => $email,
-            );
-        };
-        
+    {        
         $total   = count($list); // общее количество email
         $added   = 0;            // добавлено в базу
         $novalid = 0;            // невалидных
@@ -697,30 +665,33 @@ class Clients_Controller extends Base_Controller{
         if (count($list) > 0) {
             foreach ($list AS $contact) {
                 
-                $contact = $_perse_contact($contact);
+                $contact_mix = explode(',', $contact);
                 
-                $name  = $contact['name'];
-                $email = $contact['email'];
-                
-                $detect_encoding = mb_detect_encoding($name);
-                
-                switch ($detect_encoding) {
-                    case 'ASCII':
-                        $name = iconv('ASCII', 'UTF-8', $name);
-                        break;
-                }
-                
-                if ($email) {
-                    $evalid = preg_match('/([a-zA-Z0-9-_.]+)@([a-zA-Z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+/', $email);
+                if (count($line_mix) != 3) {
+                    $name  = trim($contact_mix[0]);
+                    $phone = trim($contact_mix[1]);
+                    $email = trim($contact_mix[2]);
                     
-                    if ($evalid) {
-                        $erow = $this->db->get_var("SELECT `id` FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `email` = '{$email}'");
-                        if ($erow === NULL) {
-                            $this->db->insert(TABLE_CLIENTS_CONTACTS, array('email' => $email, 'first_name' => $name));
-                            $inserted[] = $this->db->insert_id;
-                            $added++;
+                    $name = iconv('WINDOWS-1251', 'UTF-8', $name);
+                    
+                    if ($email) {
+                        $evalid = preg_match('/([a-zA-Z0-9-_.]+)@([a-zA-Z0-9-]+)(\.)([a-z]{2,4})(\.?)([a-z]{0,4})+/', $email);
+                        
+                        if ($evalid) {
+                            $erow = $this->db->get_var("SELECT `id` FROM " . TABLE_CLIENTS_CONTACTS . " WHERE `email` = '{$email}'");
+                            if ($erow === NULL) {
+                                $this->db->insert(TABLE_CLIENTS_CONTACTS, array(
+                                    'email' => $email,
+                                    'phone' => $phone,
+                                    'first_name' => $name
+                                ));
+                                $inserted[] = $this->db->insert_id;
+                                $added++;
+                            } else {
+                                $skipped++;
+                            }
                         } else {
-                            $skipped++;
+                            $novalid++;
                         }
                     } else {
                         $novalid++;
@@ -728,6 +699,8 @@ class Clients_Controller extends Base_Controller{
                 } else {
                     $novalid++;
                 }
+                
+
             }
         }
         
@@ -814,17 +787,8 @@ class Clients_Controller extends Base_Controller{
             if ($f) {
                 
                 $list = array();
-                
-                while (($data = fgetcsv($f, 1000, ';')) !== FALSE) {
-                    $total++;
-                    
-                    $name  = isset($data[0]) ? trim($data[0]) : '';
-                    $email = isset($data[1]) ? trim($data[1]) : NULL;
-                    
-                    $list[] = array(
-                        'name'  => $name,
-                        'email' => $email,
-                    );
+                while (($line = fgets($f, 1000)) !== FALSE) {                  
+                    $list[] = $line;
                 }
                 
                 extract($this->_import($list));
