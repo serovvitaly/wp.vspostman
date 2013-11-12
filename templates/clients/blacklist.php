@@ -82,7 +82,8 @@ $(document).ready(function(){
             infoBox.html('<i>Выполняется операция...</i>');
         },
         success: function(data){
-            $('#clients-blacklistgo-form .info').html(data.result);
+            //$('#clients-blacklistgo-form .info').html(data.result);
+            window.location = window.location;
         }
     });
 });
