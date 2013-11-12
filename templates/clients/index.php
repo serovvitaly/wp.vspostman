@@ -313,6 +313,19 @@ function determineField(el){
         self.parents('.filter-item-field').find('input[type="text"]').datepicker({
             dateFormat: 'dd.mm.yy'
         });
+        
+        this.esList = self.parents('.filter-item-field').find('.expression-selector option');
+        
+        $.each(this.esList, function(index, item){
+            this.fValue = $(item).attr('value'); 
+            if ( this.fValue == 'eq' || this.fValue == 'later' | this.fValue == 'earlier' ) {
+                $(item).show();
+            } else {
+                $(item).hide();
+            }
+        });
+    } else {
+        self.parents('.filter-item-field').find('.expression-selector option').show();
     }
 }
 
@@ -385,7 +398,7 @@ $(document).ready(function(){
           </tr>
         </table> 
          
-        <table class="filter-params">
+        <table class="filter-params" style="margin-right: 40px; width: 350px;">
           <tr>
             <td style="width: 130px;">Зарегистрирован:</td>
             <td>
@@ -407,8 +420,8 @@ $(document).ready(function(){
           <tr class="clients-custom-dates-range" style="display: none">
             <td></td>
             <td>
-              с <input class="datepicker" name="date_start[${uid}]"{{if mix.dates_range == 'custom'}} value="${mix.date_start}"{{/if}} type="text" style="width: 70px;">  
-              по <input class="datepicker" name="date_end[${uid}]"{{if mix.dates_range == 'custom'}} value="${mix.date_end}"{{/if}} type="text" style="width: 70px;">
+              с <input class="datepicker" name="date_start[${uid}]"{{if mix.dates_range == 'custom'}} value="${mix.date_start}"{{/if}} type="text" style="width: 90px;">  
+              по <input class="datepicker" name="date_end[${uid}]"{{if mix.dates_range == 'custom'}} value="${mix.date_end}"{{/if}} type="text" style="width: 90px;">
             </td>
           </tr>
         </table>
@@ -480,8 +493,10 @@ $(document).ready(function(){
     </select>
   </td>
   <td>
-    <select name="fields[${uid}][${fid}][exp]">
+    <select class="expression-selector" name="fields[${uid}][${fid}][exp]">
       <option{{if mix.exp == 'eq'}} selected="selected"{{/if}} value="eq" selected="selected">равно</option>
+      <option{{if mix.exp == 'later'}} selected="selected"{{/if}} value="later" style="display: none">позже</option>
+      <option{{if mix.exp == 'earlier'}} selected="selected"{{/if}} value="earlier" style="display: none">раньше</option>
       <option{{if mix.exp == 'not_eq'}} selected="selected"{{/if}} value="not_eq">НЕ равно</option>
       <option{{if mix.exp == 'co'}} selected="selected"{{/if}} value="co">содержит</option>
       <option{{if mix.exp == 'not_co'}} selected="selected"{{/if}} value="not_co">НЕ содержит</option>
