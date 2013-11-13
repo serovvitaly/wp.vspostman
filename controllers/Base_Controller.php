@@ -36,7 +36,7 @@ abstract class Base_Controller {
                 $source = $_REQUEST;
         }
         
-        return isset($source[$field]) ? $source[$field] : $default;
+        return isset($source[$field]) ? trim($source[$field]) : $default;
     }
     
     
@@ -62,7 +62,9 @@ abstract class Base_Controller {
             $controller = explode('_', $controller);
             $controller = $controller[0];
             
-            $include_tpl = VSP_DIR . "/templates/{$controller}/{$action_name}." . static::TPL_EXT;
+            $template = (isset($this->template) AND !empty($this->template)) ? str_replace('.', '/', $this->template) : $action_name;
+            
+            $include_tpl = VSP_DIR . "/templates/{$controller}/{$template}." . static::TPL_EXT;
             
             if (file_exists($include_tpl)) {
                 ob_start();

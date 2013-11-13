@@ -69,44 +69,7 @@ function vspostman_menu_mails() {
     $_table_mail_links = $wpdb->prefix . 'vspostman_mail_links';    
     
     switch ($act) {
-        case 'edit':
-            if ($uid < 1) {
-                //
-            }
-            $item = $wpdb->get_row("SELECT * FROM {$_table_funnels} WHERE id={$uid}");
-            
-            //$item->title = $item->name;
-            $item->title = 'Редактирование';
-            
-            $mails = $wpdb->get_results("SELECT `id`,`level`,`title`,`left`,`bound_id`,`mail_type`,`created` FROM {$_table_mails} WHERE funnel_id={$uid} ORDER BY `created`");
-            $item->mails = $mails;
-            $ms = array();
-            if (count($mails) > 0) {
-                foreach ($mails AS $mail) {
-                    $ms[$mail->level][] = $mail;
-                }
-            }
-            $mails = $ms;
-             
-            $item->mails_json = json_encode($mails); 
-            
-            include  'templates/mails/funnel-form.php';
-            break;
-        case 'save':
-        
-            $data = array(
-                'name' => isset($_POST['name']) ? $_POST['name'] : '',
-                'updated' => date('Y-m-d H:i:s'),
-            );
-        
-            if ($uid > 0) {
-                $wpdb->update($_table_funnels, $data, array('id' => $uid));
-            } else {
-                $wpdb->insert($_table_funnels, $data);
-            }
-            $redirect_to = '/wp-admin/admin.php?page=vspostman-mails';
-            include  'templates/redirect.php';
-            break;
+
         case 'duplicate':
             if ($uid > 0) {
                 $funnel = $wpdb->get_row("SELECT * FROM {$_table_funnels} WHERE `id`={$uid}");
@@ -147,33 +110,6 @@ function vspostman_menu_mails() {
             }
             
             break;
-        case 'stat':
-            if ($uid < 1) {
-                //
-            }
-            //
-            break;
-        case 'delete':
-            if ($uid > 0) {
-                $mails = $wpdb->get_results("SELECT `id` FROM {$_table_mails} WHERE `funnel_id`={$uid}");
-                if (count($mails) > 0) {
-                    $mids = array();
-                    foreach ($mails AS $mail) {
-                        $mids[] = $mail->id;
-                    }
-                    $mids = implode(',', $mids);
-                    $wpdb->query("DELETE FROM {$_table_mail_links} WHERE `mail_id` IN ({$mids})");
-                    $wpdb->delete($_table_mails, array('funnel_id' => $uid));
-                }
-                
-                $wpdb->delete($_table_funnels, array('id' => $uid));
-                $redirect_to = '/wp-admin/admin.php?page=vspostman-mails';
-                include  'templates/redirect.php';
-            } else {
-                echo '<h4>Не удалось удалить воронку.</h4>';
-            }
-            
-            break;
             
         case 'mail-add':
             $item = new stdClass();
@@ -195,10 +131,6 @@ function vspostman_menu_mails() {
             $funnels_list = $wpdb->get_results("SELECT `id`,`name` FROM {$_table_funnels}");
             
             include  'templates/mails/mail-form.php';
-            break;
-            
-        case 'mail-stat':
-            
             break;
             
         case 'mail-duplicate':

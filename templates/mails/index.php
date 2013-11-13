@@ -67,10 +67,10 @@
                 <input type="checkbox" class="toggleswitch" value="<?= $item->id ?>" <?= $item->active == 1 ? ' checked="checked"' : '' ?>/>
               </div>
               <div style="display: inline-block; margin: 4px 0 0 16px; vertical-align: top;">
-                  <span class="duplicate"><a href="/wp-admin/admin.php?page=vspostman-mails&act=duplicate&uid=<?= $item->id ?>" onclick="if (!confirm('Будет создана копия воронки “<?= $item->name ?>”, только без подписчиков. Продолжить?')) return false;">Дублировать</a> | </span>
-                  <span class="edit"><a href="/wp-admin/admin.php?page=vspostman-mails&act=edit&uid=<?= $item->id ?>">Редактировать</a> | </span>
-                  <span class="stat"><a href="/wp-admin/admin.php?page=vspostman-stats&act=stat&uid=<?= $item->id ?>">Статистика</a> | </span>
-                  <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-mails&act=delete&uid=<?= $item->id ?>" class="delete" onclick="if (!confirm('Воронка “<?= $item->name ?>” будет удалена. Продолжить?')) return false;">Удалить</a></span>
+                  <span class="duplicate"><a href="/wp-admin/admin.php?page=vspostman-mails&act=duplicate&fid=<?= $item->id ?>" onclick="if (!confirm('Будет создана копия воронки “<?= $item->name ?>”, только без подписчиков. Продолжить?')) return false;">Дублировать</a> | </span>
+                  <span class="edit"><a href="/wp-admin/admin.php?page=vspostman-mails&act=edit&fid=<?= $item->id ?>">Редактировать</a> | </span>
+                  <span class="stat"><a href="/wp-admin/admin.php?page=vspostman-stats&act=stat&fid=<?= $item->id ?>">Статистика</a> | </span>
+                  <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-mails&act=delete&fid=<?= $item->id ?>" class="delete" onclick="if (!confirm('Воронка “<?= $item->name ?>” будет удалена. Продолжить?')) return false;">Удалить</a></span>
               </div>
             </div>
           </td>

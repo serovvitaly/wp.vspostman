@@ -381,7 +381,7 @@ $(document).ready(function(){
             </td>
           </tr-->
           <tr>
-            <td>Воронки:</td>
+            <td style="width: 60px;">Воронки:</td>
             <td>
               <ul style="margin: 0;">
               <?

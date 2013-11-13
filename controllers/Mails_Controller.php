@@ -40,6 +40,8 @@ class Mails_Controller extends Base_Controller{
     public function action_add()
     {
         $this->title = 'Новая воронка';
+        
+        $this->template = 'edit';
     }
     
     
@@ -50,31 +52,88 @@ class Mails_Controller extends Base_Controller{
         $fid  = $this->_input('fid');
         
         if ($fid > 0) {
-            $this->item = $this->db->get_row("SELECT * FROM " . TABLE_FUNNELS . " WHERE id = {$fid}");
+            $this->item = $this->db->get_row("SELECT * FROM " . TABLE_FUNNELS . " WHERE `id` = {$fid}");
+            $this->item->mails = $this->db->get_results("SELECT * FROM " . TABLE_MAILS . " WHERE `funnel_id` = {$fid}");
         }
         
         
     }
     
     
-    public function action_save()
-    {
+    public function action_delete()
+    {         
         $fid  = $this->_input('fid');
         
-        $name = $this->_input('name');
-        
         if ($fid > 0) {
-            //
-        } else {
-            
-            if (!empty($name)) {
-                //
-            }
-            
-            $redirect_to = '/wp-admin/admin.php?page=vspostman-mails&act=edit';
-            include(VSP_DIR . '/templates/redirect.php');
+            $this->db->delete(TABLE_FUNNELS, array('id' => $fid));
         }
         
+        $redirect_to = '/wp-admin/admin.php?page=vspostman-mails';
+        include(VSP_DIR . '/templates/redirect.php');
+        return false;
+    }
+    
+    
+    public function action_check_funnel()
+    {
+        $name = trim($this->_input('funnel_name'));
+        
+        $out = array(
+            'success' => false,
+            'result'  => NULL
+        );
+        
+        $if = $this->db->get_var("SELECT `id` FROM " . TABLE_FUNNELS . " WHERE `name` = '{$name}'");
+        
+        if (!$if) {
+            $out['success'] = true;
+        }
+        
+        echo json_encode($out);
+        return false;
+    }
+    
+    
+    public function action_save()
+    {
+        $fid  = trim($this->_input('funnel_id'));
+        $name = trim($this->_input('funnel_name'));
+        
+        $out = array(
+            'success' => false,
+            'result' => NULL
+        );
+        
+        if (!empty($name)) {
+            
+            $data = array(
+                'name' => $name
+            );
+            
+            if ($fid > 0) {
+                
+                $data['updated'] = date('Y-m-d H:i:s');
+                
+                $this->db->update(TABLE_FUNNELS, $data, array('id' => $fid));
+                
+                $out['success'] = true;
+            } else {
+                
+                $if = $this->db->get_var("SELECT `id` FROM " . TABLE_FUNNELS . " WHERE `name` = '{$name}'");
+                
+                if ($if > 0) {
+                    $out['result'] = "Невозможно добавить воронку, так как воронка с названием “{$name}” уже существует. <input class=\"button button-small\" type=\"submit\" onclick=\"clearForm(); return false;\" value=\"OK\">";
+                } else {
+                    $this->db->insert(TABLE_FUNNELS, $data);
+                    $out['result'] = $this->db->insert_id;
+                    $out['success'] = true;
+                }
+            }
+        } else {
+            //
+        }
+        
+        echo json_encode($out);
         return false;
     }
         
@@ -88,6 +147,79 @@ class Mails_Controller extends Base_Controller{
             $this->db->update(TABLE_FUNNELS, array('active' => (int) $active), array('id' => $fid));
         }
         
+        return false;
+    }
+    
+    
+    public function action_mail_add()
+    {
+        $fid = $this->_input('fid');
+        
+        $this->template = 'mail.edit';
+        
+        $this->funnels_list = $this->db->get_results("SELECT `id`,`name` FROM " . TABLE_FUNNELS);
+    }
+    
+    
+    public function action_mail_edit()
+    {
+        $mid = $this->_input('mid');
+        
+        $this->template = 'mail.edit';
+        
+        $this->item = $this->db->get_row("SELECT * FROM " . TABLE_MAILS . " WHERE `id` = {$mid}");
+        
+        $this->funnels_list = $this->db->get_results("SELECT `id`,`name` FROM " . TABLE_FUNNELS);
+    }
+    
+    
+    public function action_mail_save()
+    {
+        $out = array(
+            'success' => false,
+            'result'  => NULL
+        );
+        
+        $mid = $this->_input('mid');
+        $fid = $this->_input('fid');
+        
+        $allowed_fields = array('funnel_id','level','bound_id','title','subject','content',
+                                'mail_type','mail_link_id','order_id','data_modified_type',
+                                'data_modified_field','date_fielddatetime','time_mailing_type',
+                                'time_mailing_delay_days','time_mailing_delay_hours',
+                                'time_mailing_hour','time_mailing_weekdays');
+        
+        $data = array();
+        if (count($_POST) > 0) {
+            foreach ($_POST AS $field_key => $field_value) {
+                if (in_array($field_key, $allowed_fields)) {
+                    $data[$field_key] = $field_value; 
+                }
+            }
+        }
+        
+        
+        if (isset($data['funnel_id']) AND (empty($data['funnel_id']) OR $data['funnel_id'] < 1 OR $data['mail_type'] == 'manuallyadd')) {
+            unset($data['funnel_id']);
+        }
+        
+        $out['data'] = $data;
+        
+        if (count($data) > 0) {
+            if ($mid > 0) {
+                $this->db->update(TABLE_MAILS, $data, array('id' => $mid));
+                $out['result'] = $this->db->insert_id;
+            } else {
+                if (!isset($data['funnel_id']) AND $fid > 0) {
+                    $data['funnel_id'] = $fid;
+                }
+                $this->db->insert(TABLE_MAILS, $data);
+            }
+            
+            $out['success'] = true;
+        }
+        
+        echo json_encode($out);
         return false;
     }
     
