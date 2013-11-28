@@ -1,4 +1,5 @@
-<script type="text/javascript" src="/wp-content/plugins/vspostman/libs/raphael-min.js"></script>
+<script type="text/javascript" src="/wp-content/plugins/vspostman/libs/jquery.svg.package-1.4.5/jquery.svg.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/wp-content/plugins/vspostman/libs/jquery.svg.package-1.4.5/jquery.svg.css">
 
 <style>
 .buttons-grp{
@@ -20,6 +21,91 @@
 }
 .mails-dt-info .red{
     color: red;
+}
+.fly-box{
+    border: 2px solid #747FA8;
+    padding: 5px;
+    margin: 0 2px;
+    display: inline-block;
+    width: 100px;
+    text-align: center;
+    background: #FAFAEF;
+    vertical-align: top;
+    -webkit-border-radius: 2px;
+       -moz-border-radius: 2px;
+            border-radius: 2px;
+}
+.fly-box .title-hover{
+    background: black;
+    color: white;
+    position: absolute;
+    width: 140px;
+    margin-top: -26px;
+    margin-left: -26px;
+    padding: 3px 5px;
+    display: none;
+}
+.fly-box:hover .title-hover{
+   /* display: block; */
+}
+.fly-box .title{
+    height: 50px;
+}
+.fly-box-level{
+    border-bottom: 1px dotted #C0C0C0;
+    padding: 14px 2px 10px;
+    text-align: center;
+}
+.fly-box-level .level-index{
+    position: absolute;
+    display: block;
+    margin-top: -15px;
+}
+.fly-box-level .fb-clinging{
+    border: 4px solid red;
+    display: inline-block;
+    margin-left: -4px;
+    position: absolute;
+    -webkit-border-radius: 4px;
+       -moz-border-radius: 4px;
+            border-radius: 4px;
+}
+.fly-box-level .fb-clinging.top{
+    margin-top: -10px;
+}
+.fly-box-level .fb-clinging.bottom{
+    margin-top: 52px;
+}
+#fly-box-level-0 .fly-box{
+    border-color: #AF5487;
+}
+#fly-box-level-0 .fb-clinging.top{
+    display: none;
+}
+.fly-box .hint-right{
+    position: absolute;
+    display: none;
+    margin: -6px 0 0 107px;
+    padding: 5px;
+}
+.fly-box .hint-right i{
+    width: 20px;
+    height: 20px;
+    display: block;
+    cursor: pointer;
+    opacity: 0.6;
+}
+.fly-box .hint-right i.edit{
+    background: url("/wp-content/plugins/vspostman/img/pencil_min.png") no-repeat center;
+}
+.fly-box .hint-right i.delete{
+    background: url("/wp-content/plugins/vspostman/img/cross_min.png") no-repeat center;
+}
+.fly-box .hint-right i:hover{
+    opacity: 1;
+}
+.fly-box:hover .hint-right{
+    display: block;
 }
 </style>
 
@@ -70,64 +156,173 @@
       </div>
   
   </div>
-<? if (count($item->mails) > 0) { ?>
-  <div>
-    <h3>Независимые письма, входящие в воронку</h3>
-    <table class="wp-list-table widefat" cellspacing="0">
-        <thead>
-          <tr>
-            <th scope="col" class="manage-column column-name" style="">Наименование</th>
-            <th scope="col" class="manage-column column-name" style="">Дата</th>
-            <th scope="col" class="manage-column column-name" style="">Тип</th>
-          </tr>
-        </thead>
-        <tfoot>
-          <tr>
-            <th scope="col" class="manage-column column-name" style="">Наименование</th>
-            <th scope="col" class="manage-column column-name" style="">Дата</th>
-            <th scope="col" class="manage-column column-name" style="">Тип</th>
-          </tr>
-        </tfoot>
-        <tbody id="the-list">
-        <?
-                $_mail_types = array(
-                    1 => 'По подписке',
-                    2 => 'По ручному добавлению',
-                    3 => 'По клику',
-                    4 => 'По открытию',
-                    5 => 'По отправке',
-                    6 => 'По заказу',
-                    7 => 'По изменению данных',
-                    8 => 'По специальной дате',
-                );
-                
-                foreach ($item->mails AS $mail) {
-        ?>
-            <tr class="inactive">
-              <td class="title">
-                <strong><?= $mail->title ?></strong>
-                <div class="row-actions-visible">
-                  <span class="duplicate"><a href="/wp-admin/admin.php?page=vspostman-mails&act=mail_duplicate&mid=<?= $mail->id ?>" onclick="if (!confirm('Точно дублировать?')) return false;">Дублировать</a> | </span>
-                  <span class="edit"><a href="/wp-admin/admin.php?page=vspostman-mails&act=mail_edit&mid=<?= $mail->id ?>">Редактировать</a> | </span>
-                  <span class="stat"><a href="/wp-admin/admin.php?page=vspostman-stats&act=mail_stat&mid=<?= $mail->id ?>">Статистика</a> | </span>
-                  <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-mails&act=mail_delete&mid=<?= $mail->id ?>" class="delete" onclick="if (!confirm('Точно удалить?')) return false;">Удалить</a></span></div>
-              </td>
-              <td class="">
-                <?= $mail->created ?>
-              </td>
-              <td class="">
-                <?= $_mail_types[$mail->mail_type] ?>
-              </td>
-            </tr>
-        <? } ?>
-        </tbody>
-    </table>
-  </div>
-<? } ?>    
+  
+<? if (count($item->mails) > 0) { 
+    
+      $anchors = array();    
+      $levels = array();
+      $no_levels = array();
+      foreach ($item->mails AS $mail) {
+          if ($mail->bound_id > 0 OR $mail->is_root == 1) {
+              $levels[$mail->level][] = $mail;
+              if ($mail->bound_id > 0) {
+                  $anchors[] = array(
+                      'from' => $mail->id,
+                      'to' => $mail->bound_id,
+                  );
+              }
+          } else {
+              $no_levels[] = $mail;
+          }  
+      }
+      
+      if (count($levels) > 0) {
+          ksort($levels);
+          
+          echo '<div id="fly-container" style="border: 1px solid #DFDFDF; margin-top: 40px;">';
+          
+          ?>
+          <div style="position: absolute; z-index: -1;" id="fly-line-canva">
+          </div>
+          <?
+          
+          foreach ($levels AS $level_index => $level) {
+              $level_boxes = '';
+              foreach ($level AS $level_box) {
+                  $level_boxes .= '<div id="fly-box-'.$level_box->id.'" class="fly-box"><div class="title-hover">'.$level_box->title.'</div><div class="hint-right"><i class="edit" onclick="editMail('.$level_box->id.')"></i><i class="delete" onclick="deleteMail('.$level_box->id.')"></i></div><i class="fb-clinging top"></i><i class="fb-clinging bottom"></i><div class="title">'.$level_box->title.'</div></div>';
+              }
+          ?>
+          <div id="fly-box-level-<?= $level_index ?>" class="fly-box-level">
+            <div class="level-index"><?= $level_index ?> день</div>
+            <?= $level_boxes ?>
+          </div>
+          <?
+          }
+
+          echo '</div>';
+      }
+      
+      if (count($no_levels) > 0) {
+      ?>
+      <div>
+        <h3>Независимые письма, входящие в воронку</h3>
+        <table class="wp-list-table widefat" cellspacing="0">
+            <thead>
+              <tr>
+                <th scope="col" class="manage-column column-name" style="">Наименование</th>
+                <th scope="col" class="manage-column column-name" style="">Дата</th>
+                <th scope="col" class="manage-column column-name" style="">Тип</th>
+              </tr>
+            </thead>
+            <tfoot>
+              <tr>
+                <th scope="col" class="manage-column column-name" style="">Наименование</th>
+                <th scope="col" class="manage-column column-name" style="">Дата</th>
+                <th scope="col" class="manage-column column-name" style="">Тип</th>
+              </tr>
+            </tfoot>
+            <tbody id="the-list">
+            <?
+                    $_mail_types = array(
+                        1 => 'По подписке',
+                        2 => 'По ручному добавлению',
+                        3 => 'По клику',
+                        4 => 'По открытию',
+                        5 => 'По отправке',
+                        6 => 'По заказу',
+                        7 => 'По изменению данных',
+                        8 => 'По специальной дате',
+                    );
+                    
+                    foreach ($no_levels AS $mail) {
+            ?>
+                <tr class="inactive">
+                  <td class="title">
+                    <strong><?= $mail->title ?></strong>
+                    <div class="row-actions-visible">
+                      <span class="duplicate"><a href="/wp-admin/admin.php?page=vspostman-mails&act=mail_duplicate&mid=<?= $mail->id ?>" onclick="if (!confirm('Точно дублировать?')) return false;">Дублировать</a> | </span>
+                      <span class="edit"><a href="/wp-admin/admin.php?page=vspostman-mails&act=mail_edit&mid=<?= $mail->id ?>">Редактировать</a> | </span>
+                      <span class="stat"><a href="/wp-admin/admin.php?page=vspostman-stats&act=mail_stat&mid=<?= $mail->id ?>">Статистика</a> | </span>
+                      <span class="delete"><a href="/wp-admin/admin.php?page=vspostman-mails&act=mail_delete&mid=<?= $mail->id ?>" class="delete" onclick="if (!confirm('Точно удалить?')) return false;">Удалить</a></span></div>
+                  </td>
+                  <td class="">
+                    <?= $mail->created ?>
+                  </td>
+                  <td class="">
+                    <?= $_mail_types[$mail->mail_type] ?>
+                  </td>
+                </tr>
+            <? } ?>
+            </tbody>
+        </table>
+      </div>
+      <?
+      }
+
+
+} ?>    
 
 
 <script>
 var $ = jQuery;
+
+var svg = null;
+
+function buildLine(startId, stopId){
+    var canva = $('#fly-line-canva');
+    
+    var canvaTop = canva.position().top;
+    
+    var start = $('#fly-box-'+startId).position();
+    var stop  = $('#fly-box-'+stopId).position();
+    
+    if (start && stop) {
+        svg.polyline([[start.left + 58, start.top - canvaTop], [stop.left + 58, stop.top - canvaTop + 62]], {stroke: 'black', strokeWidth: 1});
+    }    
+}
+
+function renderLines(){
+    
+    $('#fly-line-canva').width($('#fly-container').width());
+    $('#fly-line-canva').height($('#fly-container').height());
+    
+    if (svg) {
+        $('#fly-line-canva').svg('destroy')
+    }
+    
+    $('#fly-line-canva').svg();
+    
+    svg = $('#fly-line-canva').svg('get');
+    
+    var anchors = $.parseJSON('<?= json_encode($anchors) ?>');
+
+    $.each(anchors, function(index, item){
+        buildLine(item.from, item.to);
+    });
+}
+
+renderLines();
+
+
+function deleteMail(id){
+    if (confirm('Письмо будет удалено. Продолжить?')) {
+        _ajax({
+            type: 'GET',
+            url: '/wp-admin/admin.php?page=vspostman-mails&act=mail_delete&mid='+id
+        });
+        var removeEl = $('#fly-box-'+id);
+        var parentLevel = removeEl.parent('.fly-box-level');
+        removeEl.remove();
+        if (parentLevel.find('.fly-box').length < 1) {
+            parentLevel.remove();
+        }
+        renderLines();
+    }
+}
+
+function editMail(id){
+    window.location = '/wp-admin/admin.php?page=vspostman-mails&act=mail_edit&mid='+id;
+}
 
 function clearForm(){
     $('.mails-dt-info').slideUp(100, function(){$(this).html('')});
@@ -182,190 +377,8 @@ function saveFunnel(){
 
 }
 
-var zoomIndex = 0;
-
-var mailsMix = $.parseJSON('<?= $item->mails_json ?>');
-
-function zoom(z){
-    switch (z) {
-        case '+':
-            zoomIndex--;
-            break;
-        case '-':
-            zoomIndex++;
-            break;
-        default:
-            zoomIndex = 0;
-    }
-    if (zoomIndex < 0) zoomIndex = 0;
-    if (zoomIndex > 5) zoomIndex = 5;
-    
-    var multiplier = 300 * zoomIndex;
-    var width  = paper.width  + multiplier;
-    var height = paper.height + multiplier;
-    
-    paper.setViewBox(0, 0, width, height);
-}
-
-
-Raphael.fn.connection = function (obj1, obj2, line, bg) {
-    if (!obj1) return false;
-    if (obj1.line && obj1.from && obj1.to) {
-        line = obj1;
-        obj1 = line.from;
-        obj2 = line.to;
-    }
-    var bb1 = obj1.getBBox(),
-        bb2 = obj2.getBBox(),
-        p = [
-            {x: bb1.x + bb1.width / 2,   y: bb1.y - 1},
-            {x: bb2.x + bb2.width / 2,   y: bb2.y + bb2.height + 1}
-        ],
-        d = {}, dis = [];
-    
-    if (dis.length == 0) {
-        var res = [0, 1];
-    } else {
-        res = d[Math.min.apply(Math, dis)];
-    }
-    var x1 = p[res[0]].x,
-        y1 = p[res[0]].y,
-        x4 = p[res[1]].x,
-        y4 = p[res[1]].y;
-    dx = Math.max(Math.abs(x1 - x4) / 4, 10);
-    dy = Math.max(Math.abs(y1 - y4) / 4, 10);
-    var x2 = [x1, x1, x1 - dx, x1 + dx][res[0]].toFixed(3),
-        y2 = [y1 - 12, y1, y1, y1][res[0]].toFixed(3),
-        x3 = [x4, x4, x4 - dx, x4 + dx][res[1]].toFixed(3),
-        y3 = [y1, y1 - 12, y4, y4][res[1]].toFixed(3);
-    //var path = ["M", x1.toFixed(3), y1.toFixed(3), "C", x2, y2, x3, y3, x4.toFixed(3), y4.toFixed(3)].join(",");
-    var path = ["M", x1.toFixed(3), y1.toFixed(3), "L", x2, y2, x3, y3, x4.toFixed(3), y4.toFixed(3)].join(",");
-    if (line && line.line) {
-        line.bg && line.bg.attr({path: path});
-        line.line.attr({path: path});
-    } else {
-        var color = typeof line == "string" ? line : "#000";
-        return {
-            bg: bg && bg.split && this.path(path).attr({stroke: bg.split("|")[0], fill: "none", "stroke-width": bg.split("|")[1] || 3}),
-            line: this.path(path).attr({stroke: color, fill: "none"}),
-            from: obj1,
-            to: obj2
-        };
-    }
-};
-
-function dragstop(){
-    $.ajax({
-        url: '/wp-content/plugins/vspostman/ajax.php',
-        data: {
-            act: 'set-param',
-            source: 'mail',
-            param: 'left',
-            mid: this.mid,
-            value: this.getBBox().x
-        },
-        type: 'post'
-    });
-}
-function dragger(){
-    // Original coords for main element
-    this.ox = this.attr("x");
-    this.oy = this.attr("y");
-        
-    // Original coords for pair element
-    this.pair.ox = this.pair.attr("x");
-    this.pair.oy = this.pair.attr("y");           
-}
-function move (dx, dy) {
-    // Move main element
-    var att = {x: this.ox + dx, y: this.oy};
-    this.attr(att);
-    
-    // Move paired element
-    att = {x: this.pair.ox + dx, y: this.pair.oy};
-    this.pair.attr(att);            
-    
-    // Move connections
-    for (i = connections.length; i--;) {
-        paper.connection(connections[i]);
-    }
-    paper.safari();
-}
-
-var paper = Raphael("myholder", $('myholder').width(), $('myholder').height());
-
-var connections = [], shapes = [], texts = [], tempS, tempT;
-
-var iterate = 0;
-for (var ofs = 0; ofs < 100; ofs++) {
-    
-    if (mailsMix[ofs] && mailsMix[ofs].length > 0) {
-        var offset = 100 * iterate;
-        iterate++;
-        paper.text(30, offset + 15, ofs).attr({
-            'fill': '#C0C0C0',
-            'font-size': 30
-        });
-        
-        paper.path('M0 '+(offset+95)+'H'+paper.width).attr({
-            'fill': '#D0D0D0',
-            'stroke' : '#D0D0D0',
-            'stroke-width': 1
-        });
-        for (var it = 0; it < mailsMix[ofs].length; it++) {
-            var item = mailsMix[ofs][it];
-            
-            tempS = paper.rect(item.left*1, offset+20, 150, 50, 2).attr({
-                title: item.title,
-                fill: '#F0F0F0',
-                cursor: "move"
-            }).drag(move, dragger, dragstop).dblclick(function(){
-                //console.log(this);
-            });
-            
-            tempS.mouseover(function(){ return;
-                if (!this.popover) {
-                    this.popover = paper.rect(this.getPointAtLength().x*1-5, this.getPointAtLength().y-5, 160, 60, 2).attr({
-                        fill: 'red',
-                        opacity: 0.6,
-                        cursor: "pointer",
-                        'stroke-width': 0
-                    });
-                    
-                } else this.popover.show();
-                
-            }).mouseout(function(e){ return;
-                var bb = this.popover.getBBox();
-                console.log(e.offsetX, '<', bb.x, 'OR', e.offsetX, '>', bb.x2, 'AND', e.offsetY, '<', bb.y, 'OR', e.offsetY, '>', bb.y2);
-                if (this.popover && (e.offsetX < bb.x || e.offsetX > bb.x2) && (e.offsetY < bb.y || e.offsetY > bb.y2)) {
-                    console.log('HIDE');
-                    this.popover.hide();
-                } else console.log('NoN');
-            });
-            
-            tempS.mid = item.id;
-            tempS.bound_id = item.bound_id;
-            
-            tempT = paper.text(item.left*1+75, offset+40, item.title).attr({
-                fill: '#585858',
-                cursor: "move",
-                'font-size': 12
-            }).drag(move, dragger);
-            
-            tempS.pair = tempT;
-            tempT.pair = tempS;
-            
-            shapes[item.id] = tempS;
-            texts[item.id] = tempT;
-            
-        }               
-    }
-}
-
-$.each(shapes, function(index, item){
-    if (item && item.bound_id > 0) {
-        connections[item.id] = paper.connection(shapes[index], shapes[item.bound_id], "#000");
-    }
+$(window).resize(function(){
+    renderLines();
 });
 
 </script>

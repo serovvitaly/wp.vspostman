@@ -13,7 +13,7 @@ var zoomIndex = 0;
 
 var mailsMix = $.parseJSON('<?= $item->mails_json ?>');
 
-var mailsMix = [
+var mailsMix2 = [
     {
         "type": "draw2d.shape.basic.Rectangle",
         "id": "354fa3b9-a834-0221-2009-abc2d6bd852a",

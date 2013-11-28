@@ -54,6 +54,29 @@ class Mails_Controller extends Base_Controller{
         if ($fid > 0) {
             $this->item = $this->db->get_row("SELECT * FROM " . TABLE_FUNNELS . " WHERE `id` = {$fid}");
             $this->item->mails = $this->db->get_results("SELECT * FROM " . TABLE_MAILS . " WHERE `funnel_id` = {$fid}");
+            
+            $this->item->mails_json = json_encode(array(
+                array(
+                    'type' => 'draw2d.shape.node.Start',
+                    'id' => '354fa3b9-a834-0221-2009-abc2d6bd852a',
+                    'x' => 200,
+                    'y' => 50,
+                    'width' => 200,
+                    'height' => 50,
+                    'radius' => 1,
+                    //'angle' => 90
+                ),
+                array(
+                    'type' => 'draw2d.shape.node.Between',
+                    'id' => '354fa3b9-a834-0221-2009-abc2d6bd852a',
+                    'x' => 200,
+                    'y' => 150,
+                    'width' => 200,
+                    'height' => 50,
+                    'radius' => 1,
+                    //'angle' => 90
+                ),
+            ));
         }
         
         
@@ -170,6 +193,16 @@ class Mails_Controller extends Base_Controller{
         $this->item = $this->db->get_row("SELECT * FROM " . TABLE_MAILS . " WHERE `id` = {$mid}");
         
         $this->funnels_list = $this->db->get_results("SELECT `id`,`name` FROM " . TABLE_FUNNELS);
+    }
+    
+    
+    public function action_mail_delete()
+    {
+        $mid = $this->_input('mid');
+        
+        $this->db->delete(TABLE_MAILS, array('id' => $mid));
+        
+        return false;
     }
     
     
