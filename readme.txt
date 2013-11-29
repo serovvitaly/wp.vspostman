@@ -37,3 +37,8 @@ function vspostman_menu_mails() {
     // Добавьте вызов контроллера
     echo _controller('Mails_Controller')->action($_REQUEST['act']);    
 }
+
+
+БАЗА ДАННЫХ
+============
+Структура БД находится в файле install.sql
